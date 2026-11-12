@@ -176,6 +176,9 @@
   #killFx { position: absolute; left: 50%; top: 36%; transform: translate(-50%,-50%); font-family: "Oswald", sans-serif; font-size: 30px; font-weight: 600; letter-spacing: .3em; color: #f4f1ea;
             text-shadow: 0 0 20px rgba(217,164,65,.7), 0 3px 10px #000; pointer-events: none; opacity: 0; }
   #killFx.play { animation: hsFade 1.2s ease-out both; }
+  #buffs { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: none; }
+  #buffs .bf { font-family: "Kanit", sans-serif; font-size: 14px; font-weight: 500; padding: 4px 12px; border-radius: 3px; color: #1a1408; animation: pop .3s both; }
+  #buffs .inf { background: #ff7a33; box-shadow: 0 0 16px rgba(255,106,31,.6); } #buffs .god { background: #ffd23c; box-shadow: 0 0 16px rgba(255,210,60,.6); }
   #killFeed div.hs { border-left: 3px solid #ff2d20; } #killFeed div.hs span { color: #ff6b5a; }
   #bTimer { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); font-family: "Oswald", sans-serif; font-size: 26px; font-weight: 600; letter-spacing: .08em;
             background: rgba(10,12,15,.7); border: 1px solid var(--line); padding: 2px 16px; border-radius: 3px; pointer-events: none; }
@@ -269,7 +272,7 @@
       <div id="maps" class="diffs" style="grid-template-columns:repeat(3,1fr)"></div>
       <div class="lobbyHead"><b>ช่วงเวลา</b></div>
       <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
-      <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · ปืนสั้น 30 นัด / ปืนกล 60 นัด / สไนเปอร์ 20 นัด · ยิงหัวแรง ×2 · เล็งซูม กระโดด นั่ง · มีตึก 2 ชั้นและ 3 ชั้นขึ้นได้<br>กล่องแดง +50 เลือด · กล่องเขียว เติมกระสุนเต็มทุกกระบอก · กล่องฟ้า +50 เกราะ (สะสมได้ไม่จำกัด) · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
+      <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · ปืนสั้น 30 นัด / ปืนกล 60 นัด / สไนเปอร์ 20 นัด · ยิงหัวแรง ×2 · เล็งซูม กระโดด นั่ง · มีตึก 2 ชั้นและ 3 ชั้นขึ้นได้<br>กล่องแดง +50 เลือด · กล่องเขียว เติมกระสุนเต็มทุกกระบอก · กล่องฟ้า +50 เกราะ (สะสมได้ไม่จำกัด) · กล่องส้ม ∞ กระสุนไม่จำกัด 10 วิ · กล่องทอง ★ อมตะ 10 วิ · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
       <div id="quizOpts">
       <div class="lobbyHead"><b>หมวดคำถาม</b></div>
       <div id="cats" class="diffs" style="grid-template-columns:1fr 1fr"></div>
@@ -300,6 +303,7 @@
     <ol id="bScore"></ol>
     <div id="killFeed"></div>
     <div id="bToast"></div>
+    <div id="buffs"></div>
     <div id="scope"><div class="ring"></div><i class="h"></i><i class="v"></i><b></b></div>
     <div id="redDot"></div>
     <div id="hpBox">
@@ -1548,7 +1552,7 @@ function snapshot() {
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, lane: p.lane, points: p.points, gain: p.gain,
       correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready,
-      hp: p.hp, armor: p.armor || 0, hs: p.hs || 0, kills: p.kills || 0, deaths: p.deaths || 0, alive: p.alive !== false, rsp: p.rsp || 0, sp: p.sp || null, ag: p.ag || 0 })),
+      hp: p.hp, armor: p.armor || 0, hs: p.hs || 0, infU: p.infU || 0, godU: p.godU || 0, kills: p.kills || 0, deaths: p.deaths || 0, alive: p.alive !== false, rsp: p.rsp || 0, sp: p.sp || null, ag: p.ag || 0 })),
     mode: H.mode, killTarget: KILL_TARGET, feed: H.mode === 'shoot' ? H.feed : null,
     pickups: H.mode === 'shoot' && (H.state === 'battle' || H.state === 'countdown') ? H.pickups.map(k => ({ id: k.id, k: k.k, x: k.x, z: k.z, y: k.y || 0, a: k.a })) : null,
   };
@@ -1682,7 +1686,7 @@ const WEAPONS = [
   { name: 'ปืนกล', dmg: 11, near: 6, far: 35, min: 0.3, range: 50, rate: 95, spread: 0.008, hip: 0.024, auto: true, zoom: 1.6, mag: 60 },
   { name: 'สไนเปอร์', dmg: 80, near: 30, far: 130, min: 0.75, range: 150, rate: 1300, spread: 0.0004, hip: 0.06, auto: false, zoom: 4.5, mag: 20 },
 ];
-const ARMOR_VIS = 100, BATTLE_TIME = 180000, KILL_TARGET = 15, HP_MAX = 100, RESPAWN_MS = 3000, PICK_RESPAWN = 15000;
+const BUFF_MS = 10000, ARMOR_VIS = 100, BATTLE_TIME = 180000, KILL_TARGET = 15, HP_MAX = 100, RESPAWN_MS = 3000, PICK_RESPAWN = 15000;
 const PR = 0.5;
 function dmgAt(w, d) {
   const W = WEAPONS[w | 0]; if (d > W.range) return 0; if (d <= W.near) return W.dmg;
@@ -1709,7 +1713,7 @@ function chooseSpawn(exceptId) {
 }
 function spawnPlayer(id, p) {
   const s = chooseSpawn(id);
-  Object.assign(p, { hp: HP_MAX, armor: 0, alive: true, rsp: 0, sp: [+s.x.toFixed(2), +s.z.toFixed(2), ((p.sp && p.sp[2]) || 0) + 1] });
+  Object.assign(p, { hp: HP_MAX, armor: 0, infU: 0, godU: 0, alive: true, rsp: 0, sp: [+s.x.toFixed(2), +s.z.toFixed(2), ((p.sp && p.sp[2]) || 0) + 1] });
   if (p.bot) { const b = H.bots.get(id) || { w: (Math.random() * 3) | 0, next: 0, sd: 1, flip: 0 }; Object.assign(b, { x: s.x, z: s.z, yaw: 0, pitch: 0, mv: 0 }); H.bots.set(id, b); }
 }
 function initBattlePlayer(id, p) { Object.assign(p, { kills: 0, deaths: 0, ag: 0, hs: 0 }); spawnPlayer(id, p); }
@@ -1721,6 +1725,7 @@ function startBattle() {
   clearTimers();
   H.feed = []; H.pickups = []; H.bots.clear();
   for (let i = 0; i < 9; i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
+  for (const k of ['inf', 'god']) { const s = freePickupSpot(); H.pickups.push({ id: 'p' + k, k, x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const [id, p] of H.players) initBattlePlayer(id, p);
   H.state = 'countdown'; H.endsAt = Date.now() + 3200;
   later(() => { H.state = 'battle'; H.endsAt = Date.now() + BATTLE_TIME; H.dirty = true; }, 3200);
@@ -1734,6 +1739,7 @@ function endBattle() {
 function applyHit(sid, tid, dmg, w, hs) {
   const s = H.players.get(sid), tg = H.players.get(tid);
   if (H.state !== 'battle' || !s || !tg || !s.alive || !tg.alive || sid === tid) return;
+  if ((tg.godU || 0) > Date.now()) return;
   hs = !!hs; dmg = Math.max(0, Math.min((WEAPONS[w | 0] || WEAPONS[0]).dmg * (hs ? 2 : 1), Math.round(+dmg || 0))); if (!dmg) return;
   const ab = Math.min(tg.armor || 0, dmg); tg.armor = (tg.armor || 0) - ab; tg.hp -= dmg - ab;
   if (tg.hp <= 0) {
@@ -1791,8 +1797,8 @@ function battlePick(a, p) {
   if (H.state !== 'battle' || !p || !p.alive) return false;
   const k = H.pickups.find(x => x.id === a.pid && x.a), ps = posOf(a.id);
   if (!k || !ps || Math.hypot(ps.x - k.x, ps.z - k.z) > 3.5 || Math.abs((ps.y || 0) - (k.y || 0)) > 1.8) return false;
-  k.a = false; k.re = Date.now() + PICK_RESPAWN;
-  if (k.k === 'hp') p.hp = Math.min(HP_MAX, p.hp + 50); else if (k.k === 'armor') p.armor = (p.armor || 0) + 50; else p.ag = (p.ag || 0) + 1;
+  k.a = false; k.re = Date.now() + (k.k === 'inf' || k.k === 'god' ? BUFF_MS + 400 : PICK_RESPAWN);
+  if (k.k === 'inf') p.infU = Date.now() + BUFF_MS; else if (k.k === 'god') p.godU = Date.now() + BUFF_MS; else if (k.k === 'hp') p.hp = Math.min(HP_MAX, p.hp + 50); else if (k.k === 'armor') p.armor = (p.armor || 0) + 50; else p.ag = (p.ag || 0) + 1;
   return true;
 }
 
@@ -2233,6 +2239,8 @@ function rayCast(o, d, maxT, excludeId, tMin = 0, wallsOnly = false) {
 // ไอเทม
 const pickMeshes = new Map();
 const pickTex = {
+  inf: canvasTex(64, 64, (x) => { x.fillStyle = '#5a1606'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#ff6a1f'; x.fillRect(4, 4, 56, 56); x.fillStyle = '#fff3e0'; x.font = '700 40px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('∞', 32, 30); x.font = '700 10px Oswald, sans-serif'; x.fillText('AMMO', 32, 54); }),
+  god: canvasTex(64, 64, (x) => { x.fillStyle = '#4a3a06'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#ffd23c'; x.fillRect(4, 4, 56, 56); x.fillStyle = '#fffbe6'; x.font = '700 36px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('★', 32, 28); x.fillStyle = '#4a3a06'; x.font = '700 10px Oswald, sans-serif'; x.fillText('GOD', 32, 54); }),
   armor: canvasTex(64, 64, (x) => { x.fillStyle = '#22324a'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#5b9bd5'; x.beginPath(); x.moveTo(32, 8); x.lineTo(54, 16); x.lineTo(50, 40); x.lineTo(32, 56); x.lineTo(14, 40); x.lineTo(10, 16); x.closePath(); x.fill(); x.fillStyle = '#e8f1fa'; x.font = '700 14px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('+50', 32, 38); }),
   hp: canvasTex(64, 64, (x) => { x.fillStyle = '#f2f2ee'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#c62828'; x.fillRect(24, 10, 16, 44); x.fillRect(10, 24, 44, 16); }),
   ammo: canvasTex(64, 64, (x) => { x.fillStyle = '#4a5233'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#d9a12b'; x.fillRect(0, 26, 64, 12); x.fillStyle = '#e8e2d2'; x.font = '700 14px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('AMMO', 32, 20); }),
@@ -2245,10 +2253,12 @@ function syncPickups(list) {
     if (!m || m.userData.k !== k.k) {
       if (m) scene.remove(m);
       m = new THREE.Group(); m.userData.k = k.k;
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.9), new THREE.MeshStandardMaterial({ map: pickTex[k.k], roughness: 0.6, emissive: k.k === 'hp' ? '#ff5a5a' : k.k === 'armor' ? '#4a90e2' : '#ffcc55', emissiveIntensity: 0.25 }));
+      const special = k.k === 'inf' || k.k === 'god', col = { hp: '#ff5a5a', armor: '#4a90e2', ammo: '#ffcc55', inf: '#ff6a1f', god: '#ffd23c' }[k.k];
+      const b = new THREE.Mesh(special ? new THREE.BoxGeometry(1.1, 1.1, 1.1) : new THREE.BoxGeometry(0.9, 0.7, 0.9), new THREE.MeshStandardMaterial({ map: pickTex[k.k], roughness: 0.6, emissive: col, emissiveIntensity: special ? 0.6 : 0.25 }));
       b.castShadow = true; m.add(b);
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 6, 28), new THREE.MeshBasicMaterial({ color: k.k === 'hp' ? '#ff6b6b' : k.k === 'armor' ? '#6fb1ff' : '#ffd166', transparent: true, opacity: 0.7 }));
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 6, 28), new THREE.MeshBasicMaterial({ color: { hp: '#ff6b6b', armor: '#6fb1ff', ammo: '#ffd166', inf: '#ff7a33', god: '#ffe066' }[k.k], transparent: true, opacity: 0.7 }));
       ring.rotation.x = Math.PI / 2; ring.position.y = -0.85; m.add(ring);
+      if (special) { const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.7, 14, 16, 1, true), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 6; m.add(beam); }
       scene.add(m); pickMeshes.set(k.id, m);
     }
     m.position.set(k.x, (k.y || 0) + 1.1, k.z); m.visible = !!k.a;
@@ -2528,6 +2538,19 @@ function buildArmorTiers(r) {
   r.guns.vest.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); r.armorFx.vestMats.push(o.material); } });
 }
 const VEST_COL = [null, ['#1f2a3a', '#3a6ea5'], ['#3d4652', '#8a96a3'], ['#2b3340', '#c9a227'], ['#1b1d22', '#e0b43a'], ['#2a2210', '#ffd76a']];
+function poseBuffs(r, pl, alive) {
+  if (!r.buffFx) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(1.35, 24, 16), new THREE.MeshBasicMaterial({ color: '#ffd23c', transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false }));
+    bub.position.y = 1.35; r.root.add(bub);
+    const inf = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.05, 8, 32), new THREE.MeshBasicMaterial({ color: '#ff6a1f', transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false }));
+    inf.rotation.x = Math.PI / 2; inf.position.y = 1.0; r.root.add(inf);
+    r.buffFx = { bub, inf };
+  }
+  const now = hostNow(), t = performance.now() / 1000, god = alive && (pl.godU || 0) > now, inf = alive && (pl.infU || 0) > now;
+  r.buffFx.bub.visible = god; r.buffFx.inf.visible = inf;
+  if (god) { r.buffFx.bub.material.opacity = 0.12 + 0.08 * Math.sin(t * 6); r.buffFx.bub.scale.setScalar(1 + 0.03 * Math.sin(t * 5)); }
+  if (inf) { r.buffFx.inf.position.y = 0.4 + ((t * 1.6) % 2.2); r.buffFx.inf.rotation.z = t * 3; }
+}
 function poseArmor(r, armor, alive) {
   const tier = alive ? armorTier(armor) : 0;
   r.guns.vest.visible = tier > 0;
@@ -2552,7 +2575,7 @@ function updateHpBar(r, hp, armor, alive) {
     const cv = document.createElement('canvas'); cv.width = 160; cv.height = 34;
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true }));
-    sp.scale.set(1.7, 0.36, 1); sp.position.y = 3.42; sp.renderOrder = 9; r.root.add(sp);
+    sp.scale.set(0.9, 0.19, 1); sp.position.y = 3.3; sp.renderOrder = 9; r.root.add(sp);
     r.hpBar = { sp, cv, tex, key: '' };
   }
   const b = r.hpBar, key = alive ? hp + '|' + armor : 'dead';
@@ -2566,13 +2589,11 @@ function updateHpBar(r, hp, armor, alive) {
   x.fillStyle = 'rgba(0,0,0,.35)'; for (let k = 1; k < 4; k++) x.fillRect(4 + (w - 8) * k / 4 - 1, 4, 2, 16);
   x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(4, 23, w - 8, 7);
   if (armor > 0) { x.fillStyle = '#5b9bd5'; x.fillRect(4, 23, (w - 8) * Math.min(1, armor / ARMOR_VIS), 7); if (armor > ARMOR_VIS) { x.fillStyle = '#9fd0ff'; x.fillRect(4, 23, (w - 8) * Math.min(1, (armor - ARMOR_VIS) / ARMOR_VIS), 3); } }
-  x.font = '700 13px Oswald, sans-serif'; x.textBaseline = 'middle'; x.lineWidth = 3; x.strokeStyle = 'rgba(0,0,0,.8)'; x.fillStyle = '#fff';
-  x.textAlign = 'left'; x.strokeText(Math.max(0, hp), 8, 12); x.fillText(Math.max(0, hp), 8, 12);
-  if (armor > 0) { x.textAlign = 'right'; x.fillStyle = '#cfe6ff'; x.strokeText('AR ' + armor, w - 8, 12); x.fillText('AR ' + armor, w - 8, 12); }
   b.tex.needsUpdate = true;
 }
 function unposeShooter(r) {
   if (r.hpBar) r.hpBar.sp.visible = false;
+  if (r.buffFx) { r.buffFx.bub.visible = false; r.buffFx.inf.visible = false; }
   if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0);
@@ -2640,8 +2661,9 @@ function toast(msg) { $('#bToast').textContent = msg; $('#bToast').style.opacity
 // ยิง
 function fireShot() {
   const W = WEAPONS[me.w], now = performance.now(); if (now < me.cool) return false;
-  if (me.ammo[me.w] <= 0) { me.cool = now + 350; Music.sfx('empty'); toast(`${W.name} กระสุนหมด · เปลี่ยนปืน หรือไปเก็บกล่องกระสุน`); return true; }
-  me.cool = now + W.rate; me.ammo[me.w]--; renderWeaponBar();
+  const Pm = S.players.find(p => p.id === myId), inf = !!Pm && (Pm.infU || 0) > hostNow();
+  if (!inf && me.ammo[me.w] <= 0) { me.cool = now + 350; Music.sfx('empty'); toast(`${W.name} กระสุนหมด · เปลี่ยนปืน หรือไปเก็บกล่องกระสุน`); return true; }
+  me.cool = now + W.rate; if (!inf) { me.ammo[me.w]--; renderWeaponBar(); }
   const o = camera.position.clone(), d = new THREE.Vector3(); camera.getWorldDirection(d);
   let spread = W.spread + (W.hip - W.spread) * (1 - me.aimK); if (me.cr) spread *= 0.7; if (me.mv) spread *= 1.5; if (!me.grounded) spread *= 2.5;
   d.x += (Math.random() - .5) * spread * 2; d.y += (Math.random() - .5) * spread * 2; d.z += (Math.random() - .5) * spread * 2; d.normalize();
@@ -2720,6 +2742,7 @@ function shooterFrame(dt, t) {
     const yy = id === myId ? me.y : src.ry || 0, air = id === myId ? !me.grounded : (src.ry || 0) > 0.05 && Math.abs((src.y || 0) - (src.ry || 0)) > 0.02;
     r.root.position.set(src.rx, 0.07 + yy, src.rz); r.root.rotation.y = id === myId ? me.yaw : src.ryaw;
     updateHpBar(r, pl.hp ?? HP_MAX, pl.armor || 0, pl.alive !== false && !(id === myId && scoped));
+    poseBuffs(r, pl, pl.alive !== false);
     poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0);
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
   }
@@ -2740,7 +2763,11 @@ function shooterFrame(dt, t) {
   const hp = P ? P.hp : 0, ar = P ? P.armor || 0 : 0;
   $('#hpFill').style.width = hp + '%'; $('#hpFill').style.background = hp > 50 ? '#6aa96b' : hp > 25 ? '#d9a441' : '#c0503a'; $('#hpNum').textContent = hp;
   $('#arFill').style.width = Math.min(100, ar / ARMOR_VIS * 100) + '%'; $('#arNum').textContent = ar; $('#arRow').style.opacity = ar > 0 ? 1 : 0.35;
-  $('#ammoNum').textContent = `${me.ammo[me.w]}/${WEAPONS[me.w].mag}`; $('#ammoNum').classList.toggle('low', me.ammo[me.w] <= WEAPONS[me.w].mag * 0.2);
+  const nowH = hostNow(), infL = P ? (P.infU || 0) - nowH : 0, godL = P ? (P.godU || 0) - nowH : 0;
+  $('#buffs').innerHTML = (infL > 0 ? `<span class="bf inf">∞ กระสุนไม่จำกัด ${Math.ceil(infL / 1000)}s</span>` : '') + (godL > 0 ? `<span class="bf god">★ อมตะ ${Math.ceil(godL / 1000)}s</span>` : '');
+  if (P && (P.infU || 0) > (me.lastInfU || 0) && infL > 0) { Music.sfx('kill'); toast('กระสุนไม่จำกัด 10 วินาที!'); } if (P) me.lastInfU = P.infU || 0;
+  if (P && (P.godU || 0) > (me.lastGodU || 0) && godL > 0) { Music.sfx('kill'); toast('อมตะ 10 วินาที!'); } if (P) me.lastGodU = P.godU || 0;
+  $('#ammoNum').textContent = infL > 0 ? '∞' : `${me.ammo[me.w]}/${WEAPONS[me.w].mag}`; $('#ammoNum').classList.toggle('low', me.ammo[me.w] <= WEAPONS[me.w].mag * 0.2);
   const left = Math.max(0, S.endsAt - hostNow());
   $('#bTimer').textContent = battle ? `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}` : 'เตรียมพร้อม';
   me.flash = Math.max(0, me.flash - dt * 1.6); $('#dmgFlash').style.opacity = me.flash * 0.75;
