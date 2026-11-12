@@ -2470,10 +2470,11 @@ function ensureGuns(r) {
   add(new THREE.BoxGeometry(0.7, 0.62, 0.16), vm, 0, 1.8, 0.23); add(new THREE.BoxGeometry(0.7, 0.62, 0.14), vm, 0, 1.8, -0.23);
   add(new THREE.BoxGeometry(0.72, 0.06, 0.18), vs, 0, 1.98, 0.24); add(new THREE.BoxGeometry(0.4, 0.14, 0.05), vs, 0, 1.68, 0.32);
   for (const sd of [-1, 1]) { add(new THREE.BoxGeometry(0.12, 0.5, 0.5), vm, sd * 0.36, 1.8, 0); add(new THREE.SphereGeometry(0.2, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), vm, sd * 0.45, 2.08, 0).scale.set(1.1, 0.7, 1.1); }
-  return (r.guns = { g, models, vest });
+  r.guns = { g, models, vest }; buildArmorTiers(r);
+  return r.guns;
 }
 function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
-  const gs = ensureGuns(r); gs.g.visible = alive; gs.models.forEach((m, i) => m.visible = i === w); gs.vest.visible = alive && armor > 0;
+  const gs = ensureGuns(r); gs.g.visible = alive; gs.models.forEach((m, i) => m.visible = i === w); poseArmor(r, armor, alive);
   if (!alive) { r.body.rotation.x = -1.5; r.body.position.y = 0.32; r.legs.forEach(l => l.rotation.x = 0.1); r.arms.forEach(a => a.rotation.set(-0.3, 0, 0)); gs.vest.visible = false; return; }
   r.body.rotation.x = 0; r.phase += dt * (mv ? (cr ? 6 : 10) : 2);
   const s = Math.sin(r.phase), amp = mv ? (cr ? 0.35 : 0.75) : 0;
@@ -2483,6 +2484,67 @@ function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   const aim = -1.5 - pitch;
   r.arms[0].rotation.set(aim, 0, -0.04); r.arms[1].rotation.set(aim + 0.2, 0, -0.6);
   r.head.rotation.x = -pitch * 0.5;
+}
+// ---------- เกราะหลายระดับ (ยิ่งเก็บเยอะ ยิ่งอลังการ) ----------
+const ARMOR_TIERS = ['เสื้อเกราะ', 'เกราะเหล็ก', 'เกราะอัศวิน', 'เกราะทองคำ', 'เกราะตำนาน'];
+const armorTier = a => a <= 0 ? 0 : Math.min(5, Math.ceil(a / 50));
+function buildArmorTiers(r) {
+  const steel = toon('#8a96a3'), dark = toon('#2a3240'), gold = toon('#c9a227');
+  const glowC = new THREE.MeshStandardMaterial({ color: '#7fe3ff', emissive: '#4fd6ff', emissiveIntensity: 2.2 });
+  const glowO = new THREE.MeshStandardMaterial({ color: '#ffb35a', emissive: '#ff8a1f', emissiveIntensity: 2.4 });
+  const glowG = new THREE.MeshStandardMaterial({ color: '#ffe08a', emissive: '#ffc93c', emissiveIntensity: 1.6, metalness: 0.6, roughness: 0.3 });
+  const T = [null, new THREE.Group(), new THREE.Group(), new THREE.Group(), new THREE.Group(), new THREE.Group()];
+  const attach = (tier, parent, geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) => { const g = new THREE.Group(); g.userData.tier = tier; const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; g.add(m); parent.add(g); (r.armorBits = r.armorBits || []).push(g); return m; };
+  // ระดับ 2: บ่าเหล็ก สนับเข่า เข็มขัดกระเป๋า
+  const half = new THREE.SphereGeometry(0.26, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55);
+  for (const sd of [-1, 1]) { const p = attach(2, r.body, half, steel, sd * 0.5, 2.12, 0, 1.25, 0.85, 1.2); p.rotation.z = -sd * 0.35; }
+  for (const l of r.legs) attach(2, l, new THREE.BoxGeometry(0.26, 0.24, 0.12), steel, 0, -0.5, 0.15);
+  for (const px of [-0.28, -0.1, 0.1, 0.28]) attach(2, r.body, new THREE.BoxGeometry(0.14, 0.16, 0.1), dark, px, 1.42, 0.33);
+  // ระดับ 3: หมวกเหล็ก + แถบเลนส์เรืองแสง ปลอกแขน ขลิบทอง แกนพลังงานกลางอก
+  attach(3, r.head, new THREE.SphereGeometry(0.49, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), steel, 0, 0.05, -0.02).rotation.x = -0.1;
+  attach(3, r.head, new THREE.BoxGeometry(0.62, 0.09, 0.08), glowC, 0, 0.06, 0.42);
+  for (const a of r.arms) attach(3, a, new THREE.CylinderGeometry(0.14, 0.13, 0.3, 10), steel, 0, -0.48, 0);
+  attach(3, r.body, new THREE.BoxGeometry(0.74, 0.05, 0.18), gold, 0, 2.08, 0.25); attach(3, r.body, new THREE.BoxGeometry(0.05, 0.6, 0.18), gold, 0, 1.8, 0.27);
+  attach(3, r.body, new THREE.OctahedronGeometry(0.1), glowC, 0, 1.86, 0.34);
+  // ระดับ 4: เกราะหลัง + ช่องไอพ่นเรืองไฟ หนามบ่า สนับแข้งทอง
+  attach(4, r.body, new THREE.BoxGeometry(0.62, 0.7, 0.2), dark, 0, 1.85, -0.36);
+  for (const sd of [-1, 1]) {
+    attach(4, r.body, new THREE.CylinderGeometry(0.09, 0.11, 0.4, 10), gold, sd * 0.18, 1.62, -0.48);
+    attach(4, r.body, new THREE.CylinderGeometry(0.07, 0.07, 0.04, 10), glowO, sd * 0.18, 1.41, -0.48);
+    attach(4, r.body, new THREE.ConeGeometry(0.08, 0.34, 6), gold, sd * 0.56, 2.32, 0).rotation.z = -sd * 0.5;
+    attach(4, r.body, new THREE.ConeGeometry(0.06, 0.24, 6), gold, sd * 0.48, 2.36, -0.12).rotation.z = -sd * 0.6;
+  }
+  for (const l of r.legs) attach(4, l, new THREE.CylinderGeometry(0.17, 0.15, 0.36, 10), gold, 0, -0.78, 0.02);
+  // ระดับ 5: หงอนหมวก เขา วงแหวนพลังใต้เท้า ผลึกลอยวนรอบตัว
+  attach(5, r.head, new THREE.ConeGeometry(0.07, 0.6, 6), glowG, 0, 0.62, -0.05).rotation.x = -0.35;
+  for (const sd of [-1, 1]) attach(5, r.head, new THREE.ConeGeometry(0.06, 0.4, 6), glowG, sd * 0.36, 0.38, 0.02).rotation.z = -sd * 0.7;
+  const ringMat = new THREE.MeshBasicMaterial({ color: '#ffd76a', transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false });
+  const ring = attach(5, r.root, new THREE.TorusGeometry(0.95, 0.04, 8, 40), ringMat, 0, 0.12, 0); ring.rotation.x = Math.PI / 2;
+  const ring2 = attach(5, r.root, new THREE.TorusGeometry(1.2, 0.02, 6, 40), ringMat, 0, 0.18, 0); ring2.rotation.x = Math.PI / 2;
+  const shards = [];
+  for (let k = 0; k < 6; k++) shards.push(attach(5, r.root, new THREE.OctahedronGeometry(0.12), glowG, 0, 1.6, 0, 0.7, 1.4, 0.7));
+  r.armorFx = { ring, ring2, shards, glowC, glowO, glowG, vestMats: [] };
+  // สีเสื้อเกราะเปลี่ยนตามระดับ
+  r.guns.vest.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); r.armorFx.vestMats.push(o.material); } });
+}
+const VEST_COL = [null, ['#1f2a3a', '#3a6ea5'], ['#3d4652', '#8a96a3'], ['#2b3340', '#c9a227'], ['#1b1d22', '#e0b43a'], ['#2a2210', '#ffd76a']];
+function poseArmor(r, armor, alive) {
+  const tier = alive ? armorTier(armor) : 0;
+  r.guns.vest.visible = tier > 0;
+  if (r.armorTierShown !== tier) {
+    r.armorTierShown = tier;
+    for (const g of r.armorBits) g.visible = tier >= g.userData.tier;
+    if (tier) r.armorFx.vestMats.forEach((m, i) => m.color.set(VEST_COL[tier][i % 2 ? 1 : 0]));
+  }
+  if (tier >= 3) {
+    const t = performance.now() / 1000, pulse = 0.5 + 0.5 * Math.sin(t * 4);
+    r.armorFx.glowC.emissiveIntensity = 1.6 + pulse * 1.4; r.armorFx.glowO.emissiveIntensity = 1.8 + pulse * 1.6;
+    if (tier >= 5) {
+      r.armorFx.glowG.emissiveIntensity = 1.2 + pulse * 1.6;
+      r.armorFx.ring.rotation.z = t * 1.6; r.armorFx.ring2.rotation.z = -t * 1.1; r.armorFx.ring.material.opacity = 0.5 + pulse * 0.4;
+      r.armorFx.shards.forEach((s, k) => { const a = t * 1.4 + k * Math.PI / 3; s.position.set(Math.cos(a) * 1.05, 1.3 + Math.sin(t * 2 + k) * 0.35, Math.sin(a) * 1.05); s.rotation.y = t * 3; });
+    }
+  }
 }
 // หลอดเลือดบนหัว
 function updateHpBar(r, hp, armor, alive) {
@@ -2511,7 +2573,7 @@ function updateHpBar(r, hp, armor, alive) {
 }
 function unposeShooter(r) {
   if (r.hpBar) r.hpBar.sp.visible = false;
-  if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; }
+  if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0);
 }
@@ -2618,7 +2680,7 @@ function shooterFrame(dt, t) {
     const ar = P.armor || 0;
     if (P.hp < me.lastHp || ar < me.lastAr) { me.flash = ar < me.lastAr && P.hp >= me.lastHp ? 0.45 : 1; Music.sfx('hurt'); }
     else if (P.hp > me.lastHp && me.lastHp > 0) { Music.sfx('pick'); toast('+50 เลือด'); }
-    if (ar > me.lastAr && alive) { Music.sfx('pick'); toast('+50 เกราะ'); }
+    if (ar > me.lastAr && alive) { Music.sfx('pick'); { const tr = armorTier(ar); toast(tr > armorTier(me.lastAr) ? `อัปเกรด! ${ARMOR_TIERS[tr - 1]} (ระดับ ${tr})` : '+50 เกราะ'); if (tr > armorTier(me.lastAr)) Music.sfx('kill'); } }
     me.lastHp = P.hp; me.lastAr = ar;
   }
   if (!alive) setAim(0);
