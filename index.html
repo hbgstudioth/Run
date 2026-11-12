@@ -1195,7 +1195,7 @@ function updateAura(r, dt) {
 function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.parent.remove(p.m); p.m.material.dispose(); }); if (r.scoreSp) r.root.remove(r.scoreSp); scene.remove(r.root); r.root.traverse(o => { if (o.material && o.material.map && o.isSprite) { o.material.map.dispose(); o.material.dispose(); } }); }
 
 /* ---------- ตึกเดินขึ้นได้ (ตึก 2 ชั้น + ตึก 3 ชั้น ทุกฉาก) ---------- */
-const FH = 3.4;
+const FH = 4.2;
 const BLD = [
   [{ x: -22, z: 11, f: 2, w: 10, d: 8 }, { x: 22, z: -13, f: 3, w: 12, d: 10 }],
   [{ x: -21, z: -13, f: 2, w: 10, d: 8 }, { x: 22, z: -12, f: 3, w: 12, d: 10 }],
@@ -1215,7 +1215,7 @@ function buildBuildings() {
     for (const b of BLD[m]) {
       const g = new THREE.Group(); root.add(g); world.bGroups.add(g);
       const x0 = b.x - b.w / 2, x1 = b.x + b.w / 2, z0 = b.z - b.d / 2, z1 = b.z + b.d / 2, T = 0.3, front = b.z > 0 ? 'z0' : 'z1';
-      world.bRects[m].push({ x0: x0 - 1, x1: x1 + 1, z0: z0 - 1, z1: z1 + 1 });
+      world.bRects[m].push({ x0: x0 - 1.5, x1: x1 + 1.5, z0: z0 - (front === 'z0' ? 7 : 1.5), z1: z1 + (front === 'z1' ? 7 : 1.5) });
       const box = (ax0, ax1, ay0, ay1, az0, az1, mat) => {
         if (ax1 - ax0 < 0.01 || ay1 - ay0 < 0.01 || az1 - az0 < 0.01) return;
         const me2 = new THREE.Mesh(new THREE.BoxGeometry(ax1 - ax0, ay1 - ay0, az1 - az0), mat); me2.position.set((ax0 + ax1) / 2, (ay0 + ay1) / 2, (az0 + az1) / 2);
@@ -1228,17 +1228,17 @@ function buildBuildings() {
         for (const o of opens.sort((p, q) => p.a - q.a)) { put(cur, o.a, yb, yt); put(o.a, o.b, yb, o.y0); put(o.a, o.b, o.y1, yt); cur = o.b; }
         put(cur, a1, yb, yt);
       };
-      const wins = (a0, a1, yb) => [{ a: a0 + (a1 - a0) * 0.25 - 0.8, b: a0 + (a1 - a0) * 0.25 + 0.8, y0: yb + 1.0, y1: yb + 2.2 }, { a: a0 + (a1 - a0) * 0.75 - 0.8, b: a0 + (a1 - a0) * 0.75 + 0.8, y0: yb + 1.0, y1: yb + 2.2 }];
+      const wins = (a0, a1, yb) => [{ a: a0 + (a1 - a0) * 0.25 - 0.8, b: a0 + (a1 - a0) * 0.25 + 0.8, y0: yb + 1.1, y1: yb + 2.9 }, { a: a0 + (a1 - a0) * 0.75 - 0.8, b: a0 + (a1 - a0) * 0.75 + 0.8, y0: yb + 1.1, y1: yb + 2.9 }];
       for (let i = 0; i < b.f; i++) {
         const yb = i * FH, yt = (i + 1) * FH;
-        const fo = i === 0 ? [{ a: b.x - 0.95, b: b.x + 0.95, y0: yb, y1: yb + 2.5 }, ...wins(x0, x1, yb).map(w => ({ ...w, a: w.a - 1.2, b: w.b - 1.2 })).slice(0, 1)] : wins(x0, x1, yb);
+        const fo = i === 0 ? [{ a: b.x - 1.4, b: b.x + 1.4, y0: yb, y1: yb + 3.5 }] : wins(x0, x1, yb);
         wall('x', front === 'z0' ? z0 + T / 2 : z1 - T / 2, x0, x1, yb, yt, fo);
         wall('x', front === 'z0' ? z1 - T / 2 : z0 + T / 2, x0, x1, yb, yt, wins(x0, x1, yb));
         wall('z', x0 + T / 2, z0 + T, z1 - T, yb, yt, wins(z0, z1, yb));
         wall('z', x1 - T / 2, z0 + T, z1 - T, yb, yt, wins(z0, z1, yb));
         // บันไดขึ้นชั้นถัดไป (สลับซ้าย/ขวา)
         if (i < b.f - 1) {
-          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 1.4, sx1 = sx0 + 1.4, zs = z0 + T + 1.3, n = 10, dz = 0.45, rise = FH / n;
+          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 1.4, sx1 = sx0 + 1.4, zs = z0 + T + 1.4, n = 12, dz = 0.42, rise = FH / n;
           for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, sm);
           // พื้นชั้นบน (เว้นช่องบันได)
           const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz;
@@ -1252,6 +1252,16 @@ function buildBuildings() {
       box(x0 - 0.2, x1 + 0.2, b.f * FH + 0.05, b.f * FH + 0.7, z0 - 0.2, z0 + 0.1, tm); box(x0 - 0.2, x1 + 0.2, b.f * FH + 0.05, b.f * FH + 0.7, z1 - 0.1, z1 + 0.2, tm);
       // พื้นชั้นล่าง (ขอบพื้นเตี้ย ก้าวขึ้นได้)
       const pl = new THREE.Mesh(new THREE.BoxGeometry(b.w, 0.12, b.d), fm); pl.position.set(b.x, 0.06, b.z); pl.receiveShadow = true; g.add(pl);
+    }
+    // เคลียร์ของตกแต่ง (ต้นไม้ รถ กระสอบทราย ฯลฯ) ที่ทับตัวตึกหรือบังหน้าประตู
+    root.updateMatrixWorld(true);
+    const bb = new THREE.Box3();
+    for (const o of [...root.children]) {
+      if (world.bGroups.has(o) || o.isInstancedMesh || o.isLight) continue;
+      bb.setFromObject(o);
+      const w = bb.max.x - bb.min.x, d = bb.max.z - bb.min.z;
+      if (!isFinite(w) || Math.max(w, d) > 20 || bb.max.y - bb.min.y < 0.3) continue;
+      if (world.bRects[m].some(r => bb.max.x > r.x0 && bb.min.x < r.x1 && bb.max.z > r.z0 && bb.min.z < r.z1)) root.remove(o);
     }
   }
 }
