@@ -6,169 +6,168 @@
 <title>H-Runner – แข่งคิดเลข วิ่งเข้าเส้นชัย</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,600;0,800;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
-<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
 <style>
+  :root { --panel: rgba(13,15,19,.84); --line: rgba(255,255,255,.11); --txt: #e8e5df; --mut: #8d929a; --acc: #d9a441; --acc2: #b4432e; --ok: #6aa96b; --bad: #c0503a; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3ff; font-family: "Kanit", system-ui, sans-serif; color: #1e293b; user-select: none; }
-  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0b0d; font-family: "Oswald", "Kanit", system-ui, sans-serif; color: var(--txt); user-select: none; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; filter: saturate(.74) contrast(1.1) brightness(.97); }
+  #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0,0,0,.62) 100%); }
+  #grain { position: fixed; inset: -60px; pointer-events: none; opacity: .075; mix-blend-mode: overlay; animation: grain .6s steps(5) infinite; }
+  @keyframes grain { 0% { transform: translate(0,0); } 20% { transform: translate(-22px,14px); } 40% { transform: translate(18px,-26px); } 60% { transform: translate(-12px,30px); } 80% { transform: translate(26px,8px); } }
   #ui { position: fixed; inset: 0; pointer-events: none; }
   #ui > * { pointer-events: auto; }
   .hidden { display: none !important; }
 
-  /* ---------- หน้าจอทั่วไป ---------- */
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
-  .panel { background: rgba(255,255,255,.93); border-radius: 26px; padding: 22px; width: min(92vw, 420px);
-           box-shadow: 0 10px 0 rgba(15,40,90,.18), 0 20px 50px rgba(15,40,90,.35); border: 4px solid #fff; backdrop-filter: blur(6px); }
-  label { display: block; font-weight: 600; font-size: 14px; color: #475569; margin: 4px 0 6px; }
-  input { font-family: inherit; font-size: 18px; padding: 11px 14px; border-radius: 14px; border: 3px solid #cbd5e1; width: 100%;
-          margin-bottom: 12px; outline: none; background: #f8fafc; color: #0f172a; }
-  input:focus { border-color: #3b82f6; background: #fff; }
-  .btn { font-family: inherit; font-size: 18px; font-weight: 800; padding: 12px 18px; border: 0; border-radius: 16px; cursor: pointer; width: 100%;
-         color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.2); transition: transform .08s, box-shadow .08s; position: relative; top: 0; }
-  .btn:active { top: 4px; box-shadow: none !important; }
-  .btn:disabled { filter: grayscale(.8) brightness(1.1); cursor: default; }
-  .btn.green { background: linear-gradient(#4ade80, #16a34a); box-shadow: 0 5px 0 #15803d; }
-  .btn.blue { background: linear-gradient(#60a5fa, #2563eb); box-shadow: 0 5px 0 #1d4ed8; }
-  .btn.ghost { background: #e2e8f0; color: #334155; text-shadow: none; box-shadow: 0 4px 0 #cbd5e1; font-size: 15px; padding: 10px; }
-  .btn.big { font-size: 24px; padding: 14px; }
-  .small { font-size: 13px; color: #64748b; text-align: center; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 20px; width: min(92vw, 440px);
+           box-shadow: 0 30px 80px rgba(0,0,0,.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  label { display: block; font-family: "Kanit", sans-serif; font-weight: 400; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); margin: 2px 0 7px; }
+  input { font-family: "Kanit", sans-serif; font-size: 17px; padding: 11px 13px; border-radius: 4px; border: 1px solid var(--line); width: 100%;
+          margin-bottom: 14px; outline: none; background: rgba(255,255,255,.05); color: var(--txt); transition: border-color .2s; }
+  input::placeholder { color: #5f646c; }
+  input:focus { border-color: var(--acc); background: rgba(255,255,255,.07); }
+  .btn { font-family: "Oswald", "Kanit", sans-serif; font-size: 16px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 13px 16px; border-radius: 4px;
+         cursor: pointer; width: 100%; border: 1px solid var(--line); color: var(--txt); background: rgba(255,255,255,.06); transition: background .2s, border-color .2s, transform .08s; }
+  .btn:hover { border-color: rgba(255,255,255,.25); }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.green { background: linear-gradient(180deg, #e2b257, #b98629); color: #16120a; border-color: #ebc172; box-shadow: 0 10px 30px rgba(217,164,65,.22); }
+  .btn.blue { background: rgba(255,255,255,.08); }
+  .btn.ghost { background: transparent; color: var(--mut); font-size: 13px; padding: 10px; }
+  .btn.big { font-size: 19px; padding: 15px; }
+  .small { font-family: "Kanit", sans-serif; font-size: 12px; color: var(--mut); text-align: center; }
   .row { display: flex; gap: 8px; margin-bottom: 12px; }
 
-  /* ---------- หน้าแรก ---------- */
-  #home { justify-content: flex-start; padding-top: max(3vh, 14px); }
-  .logo { font-weight: 900; font-style: italic; font-size: clamp(58px, 15vw, 112px); line-height: .95; letter-spacing: -2px;
-          transform: skewX(-6deg); filter: drop-shadow(0 6px 0 #1e3a8a) drop-shadow(0 12px 18px rgba(0,0,0,.35));
-          position: relative; white-space: nowrap; animation: pop .7s cubic-bezier(.2,1.6,.4,1) both; }
-  .logo span { -webkit-text-stroke: 6px #1e3a8a; paint-order: stroke fill; }
-  .logo .h { background: linear-gradient(#fff36b, #ffb300 60%, #ff7a00); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .logo .dash { color: #fff; }
-  .logo .run { background: linear-gradient(#ffffff, #bfe3ff 55%, #5ab0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .logo::before { content: ""; position: absolute; left: -46px; top: 30%; width: 40px; height: 40%;
-                  background: repeating-linear-gradient(180deg, #fff 0 6px, transparent 6px 14px); opacity: .85; border-radius: 4px; }
-  .tagline { margin: 8px 0 14px; font-weight: 800; font-size: clamp(16px, 4.4vw, 22px); color: #fff; background: #ff6b35;
-             padding: 4px 18px; border-radius: 999px; box-shadow: 0 4px 0 #c2410c; transform: rotate(-2deg); animation: pop .7s .15s both cubic-bezier(.2,1.6,.4,1); }
-  @keyframes pop { from { transform: scale(.4) rotate(-8deg); opacity: 0; } }
-  .looks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
-  .look { border: 3px solid transparent; border-radius: 14px; padding: 4px 2px 3px; background: #f1f5f9; cursor: pointer; text-align: center; font-size: 11px; line-height: 1.15; font-weight: 600; color: #475569; }
-  .look.sel { border-color: #f59e0b; background: #fff7d6; transform: translateY(-3px) scale(1.06); box-shadow: 0 6px 12px rgba(245,158,11,.35); }
-  .ava { width: 38px; height: 38px; margin: 0 auto 2px; border-radius: 50%; position: relative; border: 3px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2);
-         display: inline-block; flex: none; object-fit: cover; background: radial-gradient(circle at 50% 35%, #ffffff, #bfdbfe); }
-  .look .ava { width: 88%; height: auto; aspect-ratio: 1; display: block; border-radius: 12px; margin: 0 auto 2px; }
-  .look.sel .ava { background: radial-gradient(circle at 50% 35%, #fff, #fde68a); }
-  .diffs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
-  .diff { font-family: inherit; border: 3px solid transparent; border-radius: 14px; padding: 6px 0; background: #f1f5f9; font-weight: 800; font-size: 14px; cursor: pointer; color: #334155; }
-  .diff.sel { border-color: #1e3a8a; background: #dbeafe; }
+  #home { justify-content: flex-start; padding-top: max(4vh, 16px); }
+  .logo { font-family: "Oswald", sans-serif; font-weight: 700; font-size: clamp(54px, 14vw, 112px); line-height: .95; letter-spacing: .05em; text-transform: uppercase;
+          filter: drop-shadow(0 10px 30px rgba(0,0,0,.8)); white-space: nowrap; animation: rise 1s cubic-bezier(.2,.8,.2,1) both; }
+  .logo .h { background: linear-gradient(180deg, #f3c76b, #b07f2a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .logo .dash { color: var(--acc2); }
+  .logo .run { background: linear-gradient(180deg, #f4f2ee 0%, #b9bcc1 55%, #6d727a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tagline { margin: 6px 0 22px; font-family: "Kanit", sans-serif; font-weight: 400; font-size: clamp(12px, 3.4vw, 15px); letter-spacing: .32em; text-transform: uppercase; color: #b9b5ad;
+             display: flex; align-items: center; gap: 12px; animation: rise 1s .15s both; }
+  .tagline::before, .tagline::after { content: ""; width: 34px; height: 1px; background: var(--acc); opacity: .7; }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+  @keyframes pop { from { opacity: 0; transform: scale(.9); } }
+  .looks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+  .look { border: 1px solid var(--line); border-radius: 4px; padding: 4px 2px 5px; background: rgba(255,255,255,.03); cursor: pointer; text-align: center;
+          font-size: 12px; letter-spacing: .08em; color: var(--mut); transition: border-color .2s, background .2s; }
+  .look.sel { border-color: var(--acc); background: rgba(217,164,65,.12); color: var(--txt); }
+  .ava { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: inline-block; flex: none; object-fit: cover;
+         background: radial-gradient(circle at 50% 30%, #3a3f47, #121418); }
+  .look .ava { width: 92%; height: auto; aspect-ratio: 1; display: block; border-radius: 3px; margin: 0 auto 3px; border: 0; }
+  .diffs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+  .diff { font-family: "Kanit", sans-serif; border: 1px solid var(--line); border-radius: 4px; padding: 7px 0; background: rgba(255,255,255,.03); font-size: 13px; cursor: pointer; color: var(--mut); }
+  .diff.sel { border-color: var(--acc); background: rgba(217,164,65,.14); color: var(--txt); }
   .diff:disabled { cursor: default; } .diff:disabled:not(.sel) { opacity: .45; }
-  #camBtn { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); font-family: inherit; font-weight: 800; font-size: 14px; border: 0; border-radius: 999px;
-            padding: 7px 14px; background: rgba(15,23,42,.6); color: #fff; cursor: pointer; }
-  .joinRow { display: flex; gap: 8px; margin-top: 12px; }
-  .joinRow input { margin: 0; text-transform: uppercase; letter-spacing: 3px; text-align: center; font-weight: 800; }
+  .joinRow { display: flex; gap: 8px; margin-top: 10px; }
+  .joinRow input { margin: 0; text-transform: uppercase; letter-spacing: .35em; text-align: center; font-family: "Oswald", sans-serif; }
   .joinRow .btn { width: 46%; }
-  #status { min-height: 20px; margin-top: 10px; font-size: 14px; color: #dc2626; text-align: center; font-weight: 600; }
+  #status { min-height: 20px; margin-top: 10px; font-family: "Kanit", sans-serif; font-size: 13px; color: #e0866f; text-align: center; }
   .howto { display: flex; gap: 8px; margin-top: 14px; width: min(92vw, 560px); }
-  .howto div { flex: 1; background: rgba(15,30,80,.55); color: #fff; border-radius: 16px; padding: 10px; font-size: 13px; text-align: center; line-height: 1.35; backdrop-filter: blur(4px); }
-  .howto b { display: block; font-size: 22px; color: #fde047; }
+  .howto div { flex: 1; background: rgba(13,15,19,.7); border: 1px solid var(--line); border-radius: 4px; padding: 10px; font-family: "Kanit", sans-serif; font-size: 12px; color: #b9b5ad; text-align: center; line-height: 1.4; }
+  .howto b { display: block; font-family: "Oswald", sans-serif; font-size: 20px; color: var(--acc); }
 
-  /* ---------- ล็อบบี้ ---------- */
-  .code { font-size: 46px; font-weight: 900; letter-spacing: 10px; text-align: center; color: #f59e0b; -webkit-text-stroke: 2px #92400e; margin: -4px 0 8px; }
-  .lobbyHead { display: flex; justify-content: space-between; margin: 14px 0 6px; }
-  #lobbyList { list-style: none; padding: 0; margin: 0 0 12px; max-height: 34vh; overflow-y: auto; }
-  #lobbyList li { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: #f1f5f9; border-radius: 12px; margin-bottom: 6px; font-weight: 600; }
-  #lobbyList .ava { width: 30px; height: 30px; margin: 0; border-width: 2px; }
-  #lobbyList .st { margin-left: auto; font-size: 13px; font-weight: 800; padding: 2px 10px; border-radius: 99px; }
-  #lobbyList .st.y { background: #dcfce7; color: #15803d; } #lobbyList .st.n { background: #fef3c7; color: #b45309; }
-  #readyBtn.on { background: linear-gradient(#94a3b8, #64748b); box-shadow: 0 5px 0 #475569; }
-  #muteBtn { position: absolute; right: 10px; top: 10px; width: 44px; height: 44px; border-radius: 50%; border: 0; font-size: 22px; cursor: pointer;
-             background: rgba(15,23,42,.55); color: #fff; z-index: 6; }
-  #roundResult { top: 62px !important; }
-  #netWarn { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-weight: 800; font-size: 14px;
-             padding: 6px 14px; border-radius: 99px; z-index: 5; pointer-events: none; }
+  .code { font-family: "Oswald", sans-serif; font-size: 44px; font-weight: 600; letter-spacing: .35em; text-align: center; color: var(--acc); margin: 0 0 6px; padding-left: .35em; }
+  .lobbyHead { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 7px; font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
+  .lobbyHead b { font-weight: 400; }
+  #lobbyList { list-style: none; padding: 0; margin: 0 0 12px; max-height: 30vh; overflow-y: auto; }
+  #lobbyList li { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: rgba(255,255,255,.035); border-left: 2px solid transparent; border-radius: 2px; margin-bottom: 4px; font-size: 15px; letter-spacing: .04em; }
+  #lobbyList .ava { width: 30px; height: 30px; }
+  #lobbyList .st { margin-left: auto; font-family: "Kanit", sans-serif; font-size: 12px; padding: 2px 9px; border-radius: 2px; }
+  #lobbyList .st.y { background: rgba(106,169,107,.16); color: #8fc690; } #lobbyList .st.n { background: rgba(255,255,255,.06); color: var(--mut); }
+  #readyBtn.on { background: rgba(255,255,255,.08); color: var(--txt); border-color: var(--ok); box-shadow: none; }
+  #netWarn { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--acc2); color: #fff; font-family: "Kanit", sans-serif; font-size: 13px;
+             padding: 6px 14px; border-radius: 3px; z-index: 5; pointer-events: none; }
+  #muteBtn, #camBtn { font-family: "Kanit", sans-serif; border: 1px solid var(--line); background: rgba(13,15,19,.7); color: var(--txt); cursor: pointer; backdrop-filter: blur(6px); }
+  #muteBtn { position: absolute; right: 10px; top: 10px; width: 40px; height: 40px; border-radius: 4px; font-size: 18px; z-index: 6; }
+  #camBtn { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); font-size: 13px; border-radius: 3px; padding: 7px 14px; }
 
-  /* ---------- HUD ---------- */
-  #rankBox { position: absolute; left: 14px; top: 8px; pointer-events: none; }
-  #rank { font-size: 64px; font-weight: 900; font-style: italic; color: #ffe14d; -webkit-text-stroke: 4px #7c2d12; paint-order: stroke fill;
-          line-height: 1; text-shadow: 0 4px 0 #7c2d12; }
-  #rank sup { font-size: 30px; }
-  #roundInfo { color: #fff; font-weight: 800; font-size: 16px; text-shadow: 0 2px 3px #000; }
-  #board { position: absolute; left: 10px; top: 104px; list-style: none; margin: 0; padding: 0; pointer-events: none; }
-  #board li { display: flex; align-items: center; gap: 6px; background: rgba(15,23,42,.55); color: #fff; border-radius: 999px; padding: 3px 12px 3px 3px;
-              margin-bottom: 5px; font-size: 13px; font-weight: 600; min-width: 150px; transition: transform .3s; }
-  #board li.me { background: rgba(245,158,11,.9); color: #1e293b; }
-  #board .ava { width: 24px; height: 24px; margin: 0; border-width: 2px; }
-  #board .pts { margin-left: auto; font-weight: 800; }
-  #board .ok { color: #4ade80; font-weight: 900; }
-  #progress { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); width: min(90vw, 640px); display: flex; align-items: center; gap: 10px;
-              color: #fff; font-weight: 800; font-size: 13px; text-shadow: 0 2px 3px #000; pointer-events: none; }
-  #bar { flex: 1; height: 8px; background: rgba(255,255,255,.45); border-radius: 99px; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
-  #dots div { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; transform: translate(-50%,-50%); border: 2px solid #fff; }
-  #dots div.me { width: 22px; height: 22px; border: 3px solid #fde047; z-index: 2; }
+  #rankBox { position: absolute; left: 16px; top: 10px; pointer-events: none; }
+  #rank { font-family: "Oswald", sans-serif; font-size: 60px; font-weight: 700; color: #f4f1ea; line-height: 1; text-shadow: 0 4px 24px rgba(0,0,0,.85); }
+  #rank sup { font-size: 24px; color: var(--acc); margin-left: 2px; }
+  #roundInfo { font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; color: #c9c5bd; text-shadow: 0 2px 6px #000; margin-top: 2px; }
+  #board { position: absolute; left: 12px; top: 100px; list-style: none; margin: 0; padding: 0; pointer-events: none; }
+  #board li { display: flex; align-items: center; gap: 8px; background: rgba(10,12,15,.72); border-left: 3px solid transparent; border-radius: 2px; padding: 3px 10px 3px 4px;
+              margin-bottom: 3px; font-size: 13px; letter-spacing: .05em; min-width: 160px; }
+  #board li.me { border-left-color: var(--acc); background: rgba(40,32,18,.82); }
+  #board .ava { width: 22px; height: 22px; }
+  #board .pts { margin-left: auto; color: var(--acc); font-weight: 600; }
+  #board .ok { color: var(--ok); }
+  #progress { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(90vw, 640px); display: flex; align-items: center; gap: 10px;
+              font-size: 11px; letter-spacing: .2em; color: #c9c5bd; text-shadow: 0 2px 4px #000; pointer-events: none; }
+  #bar { flex: 1; height: 3px; background: rgba(255,255,255,.22); position: relative; }
+  #dots div { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%,-50%); border: 2px solid #0a0b0d; }
+  #dots div.me { width: 16px; height: 16px; border: 2px solid var(--acc); z-index: 2; box-shadow: 0 0 10px rgba(217,164,65,.6); }
 
-  /* ---------- กล่องโจทย์ ---------- */
-  #qpanel { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); width: min(94vw, 560px); background: rgba(255,255,255,.95);
-            border-radius: 24px; padding: 12px 14px 14px; box-shadow: 0 8px 0 rgba(15,40,90,.25), 0 16px 40px rgba(0,0,0,.35); border: 4px solid #fff; }
-  #timer { height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
-  #timerFill { height: 100%; width: 100%; background: linear-gradient(90deg, #22c55e, #facc15, #ef4444); background-size: 560px 100%; border-radius: 99px; }
-  #qtext { text-align: center; font-size: clamp(38px, 10vw, 54px); font-weight: 900; margin: 4px 0 8px; color: #1e3a8a; letter-spacing: 1px; }
-  #choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .ch { font-family: inherit; font-size: 30px; font-weight: 900; border: 0; border-radius: 16px; padding: 10px 0; color: #fff; cursor: pointer;
-        text-shadow: 0 2px 0 rgba(0,0,0,.25); position: relative; top: 0; transition: opacity .2s, transform .15s; }
-  .ch:active { top: 4px; box-shadow: none !important; }
-  .ch small { position: absolute; left: 10px; top: 4px; font-size: 12px; opacity: .7; }
-  .ch0 { background: #ef4444; box-shadow: 0 5px 0 #b91c1c; } .ch1 { background: #3b82f6; box-shadow: 0 5px 0 #1d4ed8; }
-  .ch2 { background: #f59e0b; box-shadow: 0 5px 0 #b45309; } .ch3 { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
+  #qpanel { position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%); width: min(94vw, 580px); background: var(--panel); border: 1px solid var(--line);
+            border-radius: 6px; padding: 12px 14px 14px; box-shadow: 0 24px 60px rgba(0,0,0,.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  #timer { height: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+  #timerFill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--acc2), var(--acc)); }
+  #qtext { text-align: center; font-family: "Oswald", "Kanit", sans-serif; font-size: clamp(36px, 9.5vw, 52px); font-weight: 600; margin: 6px 0 10px; color: #f4f1ea; letter-spacing: .04em; }
+  #choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ch { font-family: "Oswald", "Kanit", sans-serif; font-size: 28px; font-weight: 500; border: 1px solid var(--line); border-left: 3px solid var(--k, var(--acc)); border-radius: 3px;
+        padding: 11px 0; color: var(--txt); background: rgba(255,255,255,.05); cursor: pointer; position: relative; transition: background .15s, border-color .15s, opacity .2s; }
+  .ch:hover:not(:disabled) { background: rgba(255,255,255,.1); }
+  .ch:active { transform: translateY(1px); }
+  .ch small { position: absolute; left: 9px; top: 5px; font-size: 11px; color: var(--mut); }
+  .ch0 { --k: #d9a441; } .ch1 { --k: #6f8aa6; } .ch2 { --k: #7d8f5a; } .ch3 { --k: #b4432e; }
   .ch:disabled { cursor: default; opacity: .4; }
-  #choices.vocab .ch { font-size: clamp(16px, 4.6vw, 22px); padding: 14px 8px; line-height: 1.2; min-height: 58px; }
-  #qtext .word { color: #1e3a8a; } #qtext .say { font-size: 26px; border: 0; background: #e0f2fe; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; vertical-align: middle; }
-  #qtext .qsub { font-size: 16px; color: #64748b; font-weight: 600; margin-top: -4px; }
-  .ch.picked { opacity: 1; outline: 4px solid #1e293b; outline-offset: 2px; }
-  .ch.right { opacity: 1; background: #16a34a; box-shadow: 0 5px 0 #14532d; transform: scale(1.04); }
-  .ch.wrong { opacity: 1; background: #64748b; box-shadow: 0 5px 0 #334155; text-decoration: line-through; }
-  #qmsg { text-align: center; font-weight: 800; font-size: 17px; margin-top: 10px; min-height: 24px; }
-  #roundResult { position: absolute; top: 10px; right: 10px; background: rgba(15,23,42,.72); color: #fff; border-radius: 18px; padding: 10px 14px;
-                 font-size: 14px; min-width: 190px; pointer-events: none; animation: slide .35s both; }
-  #roundResult h4 { margin: 0 0 6px; color: #fde047; font-size: 15px; }
-  #roundResult div { display: flex; gap: 8px; } #roundResult span:last-child { margin-left: auto; font-weight: 800; }
-  @keyframes slide { from { transform: translateX(40px); opacity: 0; } }
-  #big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-size: 160px; font-weight: 900;
-         font-style: italic; color: #ffe14d; -webkit-text-stroke: 6px #7c2d12; paint-order: stroke fill; text-shadow: 0 8px 0 #7c2d12; }
+  .ch.picked { opacity: 1; border-color: var(--acc); background: rgba(217,164,65,.16); }
+  .ch.right { opacity: 1; border-color: var(--ok); background: rgba(106,169,107,.28); }
+  .ch.wrong { opacity: 1; border-color: var(--bad); background: rgba(192,80,58,.25); text-decoration: line-through; }
+  #choices.vocab .ch { font-family: "Kanit", sans-serif; font-size: clamp(15px, 4.4vw, 20px); padding: 14px 8px; line-height: 1.2; min-height: 56px; }
+  #qtext .word { color: #f4f1ea; } #qtext .say { font-size: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--txt); border-radius: 3px; width: 38px; height: 38px; cursor: pointer; vertical-align: middle; }
+  #qtext .qsub { font-family: "Kanit", sans-serif; font-size: 13px; letter-spacing: .1em; color: var(--mut); font-weight: 400; margin-top: -2px; }
+  #qmsg { text-align: center; font-family: "Kanit", sans-serif; font-size: 15px; margin-top: 10px; min-height: 22px; color: #cfcac2; }
+  #qmsg b { color: var(--acc) !important; }
+  #roundResult { position: absolute; top: 58px; right: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 10px 14px;
+                 font-size: 13px; min-width: 200px; pointer-events: none; animation: slide .35s both; backdrop-filter: blur(8px); }
+  #roundResult h4 { margin: 0 0 6px; color: var(--acc); font-family: "Kanit", sans-serif; font-weight: 400; font-size: 12px; letter-spacing: .1em; }
+  #roundResult div { display: flex; gap: 8px; padding: 1px 0; } #roundResult span:last-child { margin-left: auto; color: var(--acc); }
+  @keyframes slide { from { transform: translateX(30px); opacity: 0; } }
+  #big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-family: "Oswald", sans-serif;
+         font-size: 150px; font-weight: 700; letter-spacing: .08em; color: #f4f1ea; text-shadow: 0 0 60px rgba(217,164,65,.45), 0 6px 30px rgba(0,0,0,.8); }
 
-  /* ---------- ผลสุดท้าย ---------- */
   #final { justify-content: flex-end; padding-bottom: 14px; }
-  #final .panel { width: min(94vw, 520px); padding: 14px 16px; animation: up .6s 1.2s both cubic-bezier(.2,1.3,.4,1); }
+  #final .panel { width: min(94vw, 520px); padding: 14px 16px; animation: up .7s 1.2s both cubic-bezier(.2,.9,.3,1); }
   @keyframes up { from { transform: translateY(120%); } }
-  #final h2 { margin: 0 0 8px; text-align: center; font-size: 24px; color: #1e3a8a; }
+  #final h2 { margin: 0 0 10px; text-align: center; font-weight: 500; font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); }
+  #final h2 span { color: var(--txt); }
   #podium { margin-bottom: 10px; max-height: 32vh; overflow-y: auto; }
+  #podium .r { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-left: 2px solid transparent; background: rgba(255,255,255,.035); margin-bottom: 4px; border-radius: 2px; }
+  #podium .r.me { border-left-color: var(--acc); background: rgba(217,164,65,.1); }
+  #podium .m { font-size: 22px; width: 34px; text-align: center; font-weight: 600; color: var(--mut); }
+  #podium .n { font-size: 16px; letter-spacing: .04em; } #podium .d { font-family: "Kanit", sans-serif; font-size: 11px; color: var(--mut); }
+  #podium .p { margin-left: auto; font-size: 18px; font-weight: 600; color: var(--acc); }
   #final .row .btn { margin: 0 !important; }
-  #winTitle { position: absolute; top: 12px; left: 0; right: 0; text-align: center; pointer-events: none; font-size: clamp(34px, 9vw, 64px); font-weight: 900; font-style: italic;
-              color: #ffe14d; -webkit-text-stroke: 4px #7c2d12; paint-order: stroke fill; text-shadow: 0 5px 0 #7c2d12; animation: pop .8s .3s both cubic-bezier(.2,1.6,.4,1); }
-  #podium .r { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: #f1f5f9; margin-bottom: 6px; }
-  #podium .r.me { background: #fff3c4; }
-  #podium .m { font-size: 26px; width: 36px; text-align: center; font-weight: 900; }
-  #podium .n { font-weight: 800; } #podium .d { font-size: 12px; color: #64748b; }
-  #podium .p { margin-left: auto; font-weight: 900; font-size: 18px; color: #1e3a8a; }
-  #final .btn + .btn { margin-top: 10px; }
+  #winTitle { position: absolute; top: 18px; left: 0; right: 0; text-align: center; pointer-events: none; font-family: "Oswald", sans-serif; font-size: clamp(30px, 8vw, 60px);
+              font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: #f4f1ea; text-shadow: 0 0 40px rgba(217,164,65,.45), 0 4px 20px #000; animation: rise 1s .3s both; }
 
   @media (max-height: 640px) {
-    #qtext { font-size: 34px; margin: 0 0 6px; } .ch { font-size: 24px; padding: 6px 0; } #qpanel { bottom: 32px; padding: 8px 10px 10px; }
-    #rank { font-size: 46px; } #board { top: 80px; } #board li { font-size: 12px; min-width: 120px; }
+    #qtext { font-size: 32px; margin: 2px 0 6px; } .ch { font-size: 22px; padding: 7px 0; } #qpanel { bottom: 30px; padding: 8px 10px 10px; }
+    #rank { font-size: 44px; } #board { top: 76px; } #board li { font-size: 12px; min-width: 130px; }
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="vignette"></div>
+<div id="grain"></div>
 <div id="ui">
   <!-- หน้าแรก -->
   <section id="home" class="screen">
     <div class="logo"><span class="h">H</span><span class="dash">-</span><span class="run">Runner</span></div>
-    <div class="tagline">⚡ แข่งตอบไว วิ่งเข้าเส้นชัย ⚡</div>
+    <div class="tagline">ตอบไว · วิ่งไกล · เข้าเส้นชัย</div>
     <div class="panel">
       <label>ชื่อนักวิ่ง</label>
       <input id="nameInput" maxlength="12" placeholder="ใส่ชื่อของคุณ">
       <label>เลือกตัวละคร</label>
       <div id="looks" class="looks"></div>
-      <button id="createBtn" class="btn green big">🏁 สร้างห้องใหม่</button>
+      <button id="createBtn" class="btn green big">สร้างห้องใหม่</button>
       <div class="joinRow">
         <input id="codeInput" maxlength="5" placeholder="รหัสห้อง">
         <button id="joinBtn" class="btn blue">เข้าห้อง</button>
@@ -188,7 +187,7 @@
       <div class="small">รหัสห้อง</div>
       <div id="roomCode" class="code"></div>
       <div id="roomNet" class="small" style="font-weight:800;margin:-4px 0 8px"></div>
-      <button id="copyBtn" class="btn ghost">📋 คัดลอกลิงก์เชิญเพื่อน</button>
+      <button id="copyBtn" class="btn ghost">คัดลอกลิงก์เชิญ</button>
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
       <div class="lobbyHead"><b>ฉากแข่งขัน</b></div>
@@ -197,9 +196,9 @@
       <div id="cats" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ระดับความยาก</b><span id="diffDesc" class="small"></span></div>
       <div id="diffs" class="diffs"></div>
-      <div id="botRow" class="row"><button id="addBot" class="btn ghost">🤖 เพิ่มบอท</button><button id="removeBot" class="btn ghost">➖ ลบบอท</button></div>
+      <div id="botRow" class="row"><button id="addBot" class="btn ghost">+ เพิ่มบอท</button><button id="removeBot" class="btn ghost">− ลบบอท</button></div>
       <button id="startBtn" class="btn green big">เริ่มแข่ง!</button>
-      <button id="readyBtn" class="btn green big">✋ กดพร้อม</button>
+      <button id="readyBtn" class="btn green big">พร้อม</button>
       <div id="lobbyHint" class="small" style="margin-top:10px"></div>
     </div>
   </section>
@@ -208,8 +207,8 @@
   <div id="hud" class="hidden">
     <div id="rankBox"><div id="rank"></div><div id="roundInfo"></div></div>
     <ol id="board"></ol>
-    <button id="camBtn">🎥 มุมกว้าง</button>
-    <div id="progress"><span>START</span><div id="bar"><div id="dots"></div></div><span>GOAL 🏁</span></div>
+    <button id="camBtn">มุมกว้าง</button>
+    <div id="progress"><span>START</span><div id="bar"><div id="dots"></div></div><span>GOAL</span></div>
   </div>
   <div id="qpanel" class="hidden">
     <div id="timer"><div id="timerFill"></div></div>
@@ -224,18 +223,19 @@
 
   <!-- ผลสุดท้าย -->
   <section id="final" class="screen hidden">
-    <div id="winTitle">🏆 WINNERS 🏆</div>
+    <div id="winTitle">Results</div>
     <div class="panel">
       <h2>ผลการแข่งขัน · <span id="finalDiff"></span></h2>
       <div id="podium"></div>
       <div id="waitHost" class="small" style="margin-bottom:8px"></div>
-      <div class="row" style="margin:0"><button id="againBtn" class="btn green">🔁 เล่นอีกครั้ง</button><button id="leaveBtn" class="btn ghost">ออกจากห้อง</button></div>
+      <div class="row" style="margin:0"><button id="againBtn" class="btn green">เล่นอีกครั้ง</button><button id="leaveBtn" class="btn ghost">ออกจากห้อง</button></div>
     </div>
   </section>
 </div>
 
 <script type="module">
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 /* ======================================================================
    ค่าตั้งต้นของเกม
@@ -247,14 +247,14 @@ const POINTS = [16, 13, 11, 9, 8, 7, 6, 5]; // ระยะที่ได้ต
 const MAX_PLAYERS = 8;
 const SKIN = '#ffd9b8';
 const LOOKS = [
-  { name: 'ไคโตะ สายฟ้า', skin: '#f6d3b3', hair: '#e8f1ff', hairStyle: 'swept', top: '#0f766e', pants: '#e5e7eb', boots: '#111827', trim: '#ffffff', armor: null, cape: null, weapon: 'gauntlet', eyes: '#0891b2', glow: '#22d3ee' },
-  { name: 'รินะ ซากุระ', skin: '#fbe0cc', hair: '#f472b6', hairStyle: 'buns', top: '#fdf2f8', pants: '#be185d', boots: '#831843', trim: '#ec4899', armor: null, cape: null, weapon: 'fan', eyes: '#db2777', glow: '#f9a8d4' },
-  { name: 'บอส ภูผา', skin: '#b07850', hair: '#b91c1c', hairStyle: 'mohawk', top: '#4d5d3a', pants: '#3f3f46', boots: '#27272a', trim: '#a3a3a3', armor: '#78716c', cape: null, weapon: 'hammer', eyes: '#92400e', glow: '#fb923c', build: 1.28 },
-  { name: 'เมฆา', skin: '#fbe0cc', hair: '#f8fafc', hairStyle: 'fluffy', top: '#a78bfa', pants: '#6d28d9', boots: '#ede9fe', trim: '#ddd6fe', armor: null, cape: '#c4b5fd', weapon: 'cloudstaff', eyes: '#7c3aed', glow: '#bae6fd' },
-  { name: 'เชฟต้มยำ', skin: '#e8b98f', hair: '#3f2a1d', hairStyle: 'short', top: '#ffffff', pants: '#1f2937', boots: '#111827', trim: '#dc2626', armor: null, cape: null, weapon: 'ladle', eyes: '#78350f', glow: '#f97316', hat: 'chef', scarf: '#dc2626' },
-  { name: 'นาคา', skin: '#d9a679', hair: '#111827', hairStyle: 'short', top: '#047857', pants: '#7f1d1d', boots: '#f5c518', trim: '#f5c518', armor: '#f5c518', cape: '#065f46', weapon: 'spear', eyes: '#065f46', glow: '#34d399', hat: 'chada' },
-  { name: 'พิกเซล', skin: '#f6d3b3', hair: '#a3e635', hairStyle: 'spiky', top: '#312e81', pants: '#111827', boots: '#a3e635', trim: '#a3e635', armor: null, cape: null, weapon: 'orb', eyes: '#4f46e5', glow: '#a3e635', hat: 'visor' },
-  { name: 'เวโล', skin: '#e8b98f', hair: '#f8fafc', hairStyle: 'swept', top: '#2563eb', pants: '#f8fafc', boots: '#f8fafc', trim: '#facc15', armor: null, cape: null, weapon: null, eyes: '#1d4ed8', glow: '#fde047', hat: 'goggles', wings: true },
+  { name: 'GHOST', skin: '#c99a7a', hair: '#1c1a18', hairStyle: 'short', top: '#4a4d52', pants: '#26282c', boots: '#1a1b1e', trim: '#1f2125', gear: 'hood', mask: '#121315', vest: false, pack: true, glow: '#7d776d' },
+  { name: 'VIPER', skin: '#e0b796', hair: '#17130f', hairStyle: 'pony', top: '#3d4a33', pants: '#4f5141', boots: '#2a241e', trim: '#2d3527', gear: null, vest: false, knee: true, glow: '#7d776d' },
+  { name: 'TITAN', skin: '#8f6248', hair: '#1b1612', hairStyle: 'buzz', top: '#1d1f22', pants: '#8a7a5e', boots: '#3a2f24', trim: '#4f4a3a', gear: null, vest: '#5c5644', beard: true, build: 1.22, glow: '#7d776d' },
+  { name: 'FALCON', skin: '#d2a582', hair: '#2b2118', hairStyle: 'buzz', top: '#7d6e55', pants: '#6c6049', boots: '#3a2f24', trim: '#5a5040', gear: 'helmet', helmet: '#5f5a49', vest: '#6b6450', knee: true, glow: '#7d776d' },
+  { name: 'RAVEN', skin: '#e8c3a6', hair: '#0f0f12', hairStyle: 'bob', top: '#1a1a1c', pants: '#22252b', boots: '#111113', trim: '#6b2620', gear: null, vest: false, collar: true, glow: '#7d776d' },
+  { name: 'NOVA', skin: '#b98868', hair: '#141210', hairStyle: 'short', top: '#d9d6cf', pants: '#2b2d31', boots: '#e3e1dc', trim: '#c4602f', gear: 'capback', cap: '#2a2c30', phones: true, glow: '#7d776d' },
+  { name: 'KILO', skin: '#d8ad8a', hair: '#3a2c21', hairStyle: 'short', top: '#243246', pants: '#55585c', boots: '#2b2620', trim: '#18202c', gear: 'beanie', cap: '#3b3d40', beard: true, pack: true, glow: '#7d776d' },
+  { name: 'ECHO', skin: '#e3bb9b', hair: '#4a3121', hairStyle: 'long', top: '#5d6168', pants: '#4b4f3c', boots: '#2a241e', trim: '#3a3d33', gear: 'cap', cap: '#3c4030', vest: '#3e4134', glow: '#7d776d' },
 ].map(l => ({ ...l, shirt: l.top }));
 const DIFFS = [
   { name: 'ง่าย', icon: '🟢', time: 8000, acc: 0.88, desc: 'เช่น 7 + 5, 3 × 4' },
@@ -276,7 +276,7 @@ const VOCAB = [
 ].map(l => l.split('|').map(x => x.split('=')));
 const CATS = [{ name: 'คณิตคิดเร็ว', icon: '🔢', levels: DIFFS }, { name: 'ศัพท์อังกฤษ', icon: '🔤', levels: VLEVELS }];
 const LV = (cat, diff) => CATS[cat | 0].levels[diff | 0];
-const BOT_NAMES = ['บอทจิ๋ว', 'บอทซิ่ง', 'บอทเลขเทพ', 'บอทงง', 'บอทไว', 'บอทชิล', 'บอทเก่ง'];
+const BOT_NAMES = ['BOT ALPHA', 'BOT BRAVO', 'BOT DELTA', 'BOT SIERRA', 'BOT TANGO', 'BOT ZULU', 'BOT OSCAR'];
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -284,7 +284,7 @@ const THUMBS = [];
 const ava = i => { i = i % LOOKS.length; const l = LOOKS[i];
   return THUMBS[i] ? `<img class="ava" src="${THUMBS[i]}" alt="">` : `<span class="ava" style="background:linear-gradient(${l.hair} 0 38%, ${SKIN} 38% 70%, ${l.shirt} 70%)"></span>`; };
 const ord = n => n + `<sup>${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}</sup>`;
-const medal = i => ['🥇', '🥈', '🥉'][i] || (i + 1);
+const medal = i => String(i + 1);
 
 /* ======================================================================
    ฉาก 3D
@@ -293,16 +293,21 @@ const canvas = $('#c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0xcdeeff, 120, 330);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 const camera = new THREE.PerspectiveCamera(60, 1, 0.3, 1200);
 
 const gradMap = new THREE.DataTexture(new Uint8Array([120, 190, 255]), 3, 1, THREE.RedFormat);
 gradMap.minFilter = gradMap.magFilter = THREE.NearestFilter; gradMap.needsUpdate = true;
 const matCache = {};
-const toon = c => matCache[c] || (matCache[c] = new THREE.MeshToonMaterial({ color: c, gradientMap: gradMap }));
+const METALS = new Set(['#e5e7eb', '#d6dde3', '#9ca3af', '#f5c518', '#ffd54f', '#c9a227', '#a7adb5', '#a0673a', '#b08d57', '#4b5563', '#6b7280']);
+const pbr = (c, extra = {}) => { const m = METALS.has(c); return new THREE.MeshStandardMaterial({ color: c, roughness: m ? 0.38 : 0.82, metalness: m ? 0.75 : 0.02, envMapIntensity: m ? 0.9 : 0.45, ...extra }); };
+const toon = c => matCache[c] || (matCache[c] = pbr(c));
 const flat = (c, extra = {}) => new THREE.MeshLambertMaterial({ color: c, ...extra });
 
 function canvasTex(w, h, draw) {
@@ -325,9 +330,9 @@ const hemi = new THREE.HemisphereLight(0xffffff, 0x5a9a3a, 1.35); scene.add(hemi
 const sun = new THREE.DirectionalLight(0xfff3dd, 1.9);
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 160 });
-sun.shadow.bias = -0.0005;
+sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
-const SUN_OFF = new THREE.Vector3(30, 60, 25);
+const SUN_OFF = new THREE.Vector3(55, 38, 30);
 
 /* ---------- สนามวงรี ---------- */
 const L = 70, RIN = 26, LW = 1.7, LANES = 8, ROUT = RIN + LANES * LW;
@@ -368,14 +373,14 @@ function stripeTex(c1, c2) {
 function buildWorld() {
   const stad = new THREE.Group(); scene.add(stad); world.stad = stad;
   // พื้นหญ้า
-  const gt = stripeTex('#7fd451', '#74c947'); gt.repeat.set(60, 60);
+  const gt = stripeTex('#4e6f3a', '#486836'); gt.repeat.set(60, 60);
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshLambertMaterial({ map: gt }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; stad.add(ground);
 
   // สนามด้านใน (ลายหญ้าตัด)
   const shape = new THREE.Shape(); const n = 40;
   for (let i = 0; i < 4 * n; i++) { const p = segPt(i / n, RIN - 0.7); i ? shape.lineTo(p[0], -p[1]) : shape.moveTo(p[0], -p[1]); }
-  const it = stripeTex('#8de05c', '#7ccf4f'); it.repeat.set(1 / 16, 1 / 16);
+  const it = stripeTex('#577d3f', '#4f7539'); it.repeat.set(1 / 16, 1 / 16);
   const infield = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshLambertMaterial({ map: it }));
   infield.geometry.rotateX(-Math.PI / 2); infield.position.y = 0.02; infield.receiveShadow = true; stad.add(infield);
 
@@ -384,7 +389,7 @@ function buildWorld() {
   track.position.y = 0.03; track.receiveShadow = true; scene.add(track); world.trackMat = track.material;
   const white = flat('#ffffff', { side: THREE.DoubleSide });
   for (let i = 0; i <= LANES; i++) { const r = RIN + i * LW, m = new THREE.Mesh(ringGeo(r - 0.06, r + 0.06), white); m.position.y = 0.05; scene.add(m); }
-  for (const [a, b, c] of [[RIN - 1.4, RIN - 0.7, '#ef4444'], [ROUT + 0.7, ROUT + 1.4, '#ef4444']]) {
+  for (const [a, b, c] of [[RIN - 1.4, RIN - 0.7, '#b9b6ae'], [ROUT + 0.7, ROUT + 1.4, '#b9b6ae']]) {
     const m = new THREE.Mesh(ringGeo(a, b), flat(c, { side: THREE.DoubleSide })); m.position.y = 0.04; stad.add(m);
   }
 
@@ -396,31 +401,31 @@ function buildWorld() {
 
   // ซุ้มเส้นชัย
   const gate = new THREE.Group(); scene.add(gate);
-  const pillarTex = canvasTex(64, 256, (x) => { for (let j = 0; j < 8; j++) { x.fillStyle = j % 2 ? '#ffffff' : '#ff4d4d'; x.fillRect(0, j * 32, 64, 32); } });
+  const pillarTex = canvasTex(64, 256, (x) => { for (let j = 0; j < 8; j++) { x.fillStyle = j % 2 ? '#2b2f36' : '#3a3f47'; x.fillRect(0, j * 32, 64, 32); } });
   for (const z of [RIN - 2, ROUT + 2]) {
-    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 9, 16), new THREE.MeshToonMaterial({ map: pillarTex, gradientMap: gradMap }));
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 9, 16), new THREE.MeshStandardMaterial({ map: pillarTex, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 }));
     p.position.set(0, 4.5, z); p.castShadow = true; gate.add(p);
-    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 12), toon('#facc15')); ball.position.set(0, 9.4, z); ball.castShadow = true; gate.add(ball);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 12), toon('#b08d57')); ball.position.set(0, 9.4, z); ball.castShadow = true; gate.add(ball);
   }
   const bw = ROUT - RIN + 4;
   const bannerTex = canvasTex(1024, 160, (x, w, h) => {
-    const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#2563eb'); g.addColorStop(1, '#1e3a8a');
-    x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = '#facc15'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
-    x.font = 'italic 900 100px Kanit, Arial Black, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.lineWidth = 12; x.strokeStyle = '#0b1a45'; x.strokeText('🏁 H-RUNNER 🏁', w / 2, h / 2 + 6); x.fillStyle = '#fff'; x.fillText('🏁 H-RUNNER 🏁', w / 2, h / 2 + 6);
+    const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#1a1e25'); g.addColorStop(1, '#0b0e13');
+    x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = '#d9a441'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
+    x.font = '700 96px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ece9e2'; x.fillText('H-RUNNER  ·  FINISH', w / 2, h / 2 + 4);
   });
   world.bannerTex = bannerTex;
-  const bannerBox = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2.4, bw), toon('#1e3a8a')); bannerBox.position.set(0, 7.6, (RIN + ROUT) / 2); gate.add(bannerBox);
+  const bannerBox = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2.4, bw), toon('#15181d')); bannerBox.position.set(0, 7.6, (RIN + ROUT) / 2); gate.add(bannerBox);
   for (const s of [-1, 1]) {
     const pl = new THREE.Mesh(new THREE.PlaneGeometry(bw, 2.4), new THREE.MeshBasicMaterial({ map: bannerTex }));
     pl.rotation.y = s * Math.PI / 2; pl.position.set(s * 0.27, 7.6, (RIN + ROUT) / 2); gate.add(pl); (world.bannerMats = world.bannerMats || []).push(pl.material);
   }
 
   // ป้ายโฆษณารอบสนาม
-  const boardDefs = [['H-RUNNER', '#1e3a8a', '#fde047'], ['คิดไว วิ่งไว!', '#f97316', '#ffffff'], ['MATH RACE', '#16a34a', '#ffffff'], ['+ − × ÷', '#db2777', '#ffffff']];
+  const boardDefs = [['H-RUNNER', '#14171c', '#d9a441'], ['คิดไว วิ่งไว', '#22262d', '#e7e5e0'], ['MATH RACE', '#101317', '#cfd3d8'], ['+ − × ÷', '#2a2118', '#d9a441']];
   const boardTex = boardDefs.map(([t, bg, fg]) => canvasTex(512, 96, (x, w, h) => {
-    x.fillStyle = bg; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(255,255,255,.18)'; x.fillRect(0, 0, w, h / 2);
-    x.font = 'italic 900 64px Kanit, Arial Black, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = fg; x.fillText(t, w / 2, h / 2 + 4);
+    x.fillStyle = bg; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(255,255,255,.04)'; x.fillRect(0, 0, w, h / 2);
+    x.font = '700 60px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = fg; x.fillText(t, w / 2, h / 2 + 4);
   }));
   let bi = 0;
   for (const side of [1, -1]) for (let x = -30; x <= 30; x += 10) {
@@ -430,11 +435,11 @@ function buildWorld() {
   }
 
   // อัฒจันทร์ + คนดู
-  const crowdColors = ['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#a855f7', '#f97316', '#ec4899', '#ffffff', '#14b8a6'];
+  const crowdColors = ['#3d3f44', '#5a4a3c', '#2f3b4a', '#6b6255', '#4a2f2f', '#8a8579', '#283228', '#9a9488', '#40362c'];
   const seats = [];
   for (const [side, tiers] of [[-1, 7], [1, 4]]) for (let t = 0; t < tiers; t++) {
     const z = side * (ROUT + 6 + t * 2), y = 0.5 + t * 0.9;
-    const step = new THREE.Mesh(new THREE.BoxGeometry(68, 1 + t * 1.8, 2), toon(t % 2 ? '#dbe4f0' : '#c3cfe0'));
+    const step = new THREE.Mesh(new THREE.BoxGeometry(68, 1 + t * 1.8, 2), toon(t % 2 ? '#7d8086' : '#6f7277'));
     step.position.set(0, (1 + t * 1.8) / 2, z); step.receiveShadow = true; stad.add(step);
     for (let x = -32.5; x <= 32.5; x += 1.25) if (Math.random() < 0.82) seats.push([x + (Math.random() - .5) * .3, 1 + t * 1.8 + 0.55, z, Math.random() * 6]);
   }
@@ -446,10 +451,10 @@ function buildWorld() {
 
   // ต้นไม้
   const trunkG = new THREE.CylinderGeometry(0.3, 0.45, 2, 7), leafG = new THREE.IcosahedronGeometry(1, 1);
-  const leafCols = ['#3fae49', '#56c35a', '#2f9e44', '#6fd06a'];
+  const leafCols = ['#2f4f2b', '#3a5d33', '#284426', '#44663a'];
   function tree(x, z, s) {
     const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); g.rotation.y = Math.random() * 6;
-    const tr = new THREE.Mesh(trunkG, toon('#8b5a2b')); tr.position.y = 1; tr.castShadow = true; g.add(tr);
+    const tr = new THREE.Mesh(trunkG, toon('#4a3a2c')); tr.position.y = 1; tr.castShadow = true; g.add(tr);
     for (const [px, py, pz, r] of [[0, 2.9, 0, 1.7], [0.9, 2.4, 0.3, 1.2], [-0.8, 2.5, -0.2, 1.25], [0.1, 3.9, 0.1, 1.15]]) {
       const l = new THREE.Mesh(leafG, toon(leafCols[(Math.random() * 4) | 0])); l.position.set(px, py, pz); l.scale.setScalar(r); l.castShadow = true; g.add(l);
     }
@@ -465,7 +470,7 @@ function buildWorld() {
   for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) tree(sx * (12 + i * 5.5) + (Math.random() - .5) * 2, (Math.random() - .5) * 12, 0.7 + Math.random() * .4);
 
   // ดอกไม้
-  const flowers = [], fc = ['#fde047', '#ffffff', '#f9a8d4', '#fb923c', '#fef08a'];
+  const flowers = [], fc = ['#8a7f52', '#a39e8e', '#7a5e58', '#6e6a4a', '#5e6b45'];
   guard = 0;
   while (flowers.length < 500 && guard++ < 5000) {
     const x = (Math.random() - .5) * 200, z = (Math.random() - .5) * 140, d = stadiumDist(x, z);
@@ -478,7 +483,7 @@ function buildWorld() {
   stad.add(fm);
 
   // ธงรอบสนาม
-  const flagCols = ['#ef4444', '#facc15', '#3b82f6', '#22c55e', '#a855f7', '#f97316'];
+  const flagCols = ['#2a2d33', '#5b2a24', '#2b3440', '#3b3f2c', '#4a4038', '#1f2228'];
   world.flags = [];
   for (let i = 0; i < 14; i++) {
     const v = 1 + (i % 7) / 6 * 1 + (i >= 7 ? 2 : 0); const p = segPt(v, ROUT + 5);
@@ -489,7 +494,7 @@ function buildWorld() {
 
   // เมฆ
   world.clouds = [];
-  const cg = new THREE.IcosahedronGeometry(1, 2), cm = new THREE.MeshLambertMaterial({ color: '#ffffff', emissive: '#c8dcff', emissiveIntensity: .35, fog: false });
+  const cg = new THREE.IcosahedronGeometry(1, 2), cm = new THREE.MeshLambertMaterial({ color: '#9aa0a8', emissive: '#3a3f47', emissiveIntensity: .4, fog: false, transparent: true, opacity: .85 });
   for (let i = 0; i < 16; i++) {
     const c = new THREE.Group(); const a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 200;
     c.position.set(Math.cos(a) * r, 55 + Math.random() * 45, Math.sin(a) * r);
@@ -615,7 +620,7 @@ function buildBangkok() {
   // วัด: พระปรางค์
   const dotTex = canvasTex(128, 128, (x) => { x.fillStyle = '#f3ede0'; x.fillRect(0, 0, 128, 128); const cs = ['#e57373', '#64b5f6', '#81c784', '#ffd54f', '#ba68c8']; for (let i = 0; i < 70; i++) { x.fillStyle = cs[i % 5]; x.beginPath(); x.arc(Math.random() * 128, Math.random() * 128, 2.5 + Math.random() * 3, 0, 7); x.fill(); } });
   dotTex.wrapS = dotTex.wrapT = THREE.RepeatWrapping; dotTex.repeat.set(6, 4);
-  const prangMat = new THREE.MeshToonMaterial({ map: dotTex, gradientMap: gradMap });
+  const prangMat = new THREE.MeshStandardMaterial({ map: dotTex, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 });
   const prof = [[6, 0], [6, 1.4], [5.2, 1.4], [5.2, 2.8], [4.4, 2.8], [4.4, 4.2], [3.7, 4.2], [3.55, 7], [3.25, 10], [2.8, 13], [2.2, 16], [1.55, 18.5], [1.0, 20.3], [0.6, 21.6], [0.3, 22.6], [0.05, 23.4]].map(([r, y]) => new THREE.Vector2(r, y));
   const prangGeo = new THREE.LatheGeometry(prof, 8);
   function prang(x, z, s) {
@@ -719,17 +724,17 @@ function buildBangkok() {
 
   // ป้ายบนซุ้มเส้นชัย
   world.bkkBanner = canvasTex(1024, 160, (x, w, h) => {
-    const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#b91c1c'); gr.addColorStop(1, '#7f1d1d');
+    const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2a1512'); gr.addColorStop(1, '#130a08');
     x.fillStyle = gr; x.fillRect(0, 0, w, h); x.fillStyle = '#f5c518'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
-    x.font = '900 84px Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.lineWidth = 10; x.strokeStyle = '#450a0a'; x.strokeText('กรุงเทพมหานคร · BANGKOK', w / 2, h / 2 + 6); x.fillStyle = '#fff7cc'; x.fillText('กรุงเทพมหานคร · BANGKOK', w / 2, h / 2 + 6);
+    x.font = '700 80px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ece4d4'; x.fillText('กรุงเทพมหานคร · BANGKOK', w / 2, h / 2 + 6);
   });
 }
 
 const MAPS = [
-  { name: 'สนามกีฬา', icon: '🏟️', track: '#56688c', top: '#2b86ff', bot: '#dff4ff', fog: 0xcdeeff, ground: 0x5a9a3a, sun: 0xfff3dd },
-  { name: 'ถนนกรุงเทพ', icon: '🛺', track: '#3b404a', top: '#3d7be0', bot: '#ffd8a8', fog: 0xf3dcc2, ground: 0x8a7f70, sun: 0xffe2b8 },
-];
+  { name: 'สนามกีฬา', icon: '🏟️', track: '#7a3b2e', top: '#1d2733', bot: '#b7896a', fog: 0x6f6a66, fogNear: 90, fogFar: 300, ground: 0x2a2a28, sky: 0xaab4c0, hemi: 0.55, sun: 0xffc48a, sunI: 2.6, exp: 1.0 },
+  { name: 'ถนนกรุงเทพ', icon: '🛺', track: '#2c3036', top: '#141b26', bot: '#c9784a', fog: 0x7a5d4d, fogNear: 110, fogFar: 380, ground: 0x2b2622, sky: 0xb0a39a, hemi: 0.5, sun: 0xffad6b, sunI: 2.4, exp: 1.05 },
+]
 let curMap = -1;
 function applyMap(m) {
   m = m | 0; if (m === curMap || !world.bkk) return; curMap = m;
@@ -737,165 +742,120 @@ function applyMap(m) {
   world.stad.visible = m === 0; world.bkk.visible = m === 1;
   world.trackMat.color.set(c.track);
   skyMat.uniforms.top.value.set(c.top); skyMat.uniforms.bot.value.set(c.bot);
-  scene.fog.color.set(c.fog); scene.fog.far = m ? 420 : 330;
-  hemi.groundColor.set(c.ground); sun.color.set(c.sun);
+  scene.fog.color.set(c.fog); scene.fog.near = c.fogNear; scene.fog.far = c.fogFar;
+  hemi.groundColor.set(c.ground); hemi.color.set(c.sky); hemi.intensity = c.hemi; sun.color.set(c.sun); sun.intensity = c.sunI;
+  renderer.toneMappingExposure = c.exp;
   (world.bannerMats || []).forEach(mt => { mt.map = m ? world.bkkBanner : world.bannerTex; mt.needsUpdate = true; });
 }
 
 
 /* ---------- ตัวละคร ---------- */
 const G = {
-  leg: new THREE.CapsuleGeometry(0.15, 0.62, 4, 10), boot: new THREE.CapsuleGeometry(0.17, 0.22, 4, 10), cuff: new THREE.CylinderGeometry(0.19, 0.19, 0.12, 12),
-  arm: new THREE.CapsuleGeometry(0.11, 0.42, 4, 8), glove: new THREE.CylinderGeometry(0.13, 0.12, 0.2, 10), hand: new THREE.SphereGeometry(0.12, 10, 8),
-  torso: new THREE.CapsuleGeometry(0.31, 0.46, 4, 14), pelvis: new THREE.CylinderGeometry(0.33, 0.37, 0.34, 14), belt: new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16),
-  gem: new THREE.OctahedronGeometry(0.07), plate: new THREE.SphereGeometry(1, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.5), pauldron: new THREE.SphereGeometry(0.25, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55),
-  neck: new THREE.CylinderGeometry(0.12, 0.14, 0.2, 10), head: new THREE.SphereGeometry(0.42, 28, 20),
-  eyeW: new THREE.SphereGeometry(0.085, 12, 10), iris: new THREE.SphereGeometry(0.058, 10, 8), hl: new THREE.SphereGeometry(0.022, 6, 6), brow: new THREE.BoxGeometry(0.15, 0.03, 0.03),
-  mouth: new THREE.TorusGeometry(0.05, 0.015, 6, 10, Math.PI),
-  cap: new THREE.SphereGeometry(0.455, 26, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), longHair: new THREE.SphereGeometry(1, 16, 12),
-  spike: new THREE.ConeGeometry(0.12, 0.42, 6), ball: new THREE.SphereGeometry(0.17, 12, 10), tail: new THREE.CapsuleGeometry(0.12, 0.5, 4, 8),
-  hood: new THREE.SphereGeometry(0.52, 22, 14, 0, Math.PI * 2, 0, Math.PI * 0.64), witchCone: new THREE.ConeGeometry(0.42, 1.0, 16, 1, true), brim: new THREE.CylinderGeometry(0.78, 0.78, 0.04, 24),
-  mask: new THREE.SphereGeometry(0.44, 18, 10, -Math.PI * 0.42, Math.PI * 0.84, Math.PI * 0.5, Math.PI * 0.3), band: new THREE.TorusGeometry(0.44, 0.045, 6, 24),
-  cape: new THREE.PlaneGeometry(0.95, 1.55, 1, 4).translate(0, -0.775, 0), scarf: new THREE.BoxGeometry(0.12, 0.6, 0.03).translate(0, -0.3, 0),
-  blade: new THREE.BoxGeometry(0.13, 1.25, 0.04), kblade: new THREE.BoxGeometry(0.07, 1.35, 0.03), guard: new THREE.BoxGeometry(0.42, 0.08, 0.1), kguard: new THREE.CylinderGeometry(0.11, 0.11, 0.04, 12),
-  grip: new THREE.CylinderGeometry(0.04, 0.04, 0.32, 8), staff: new THREE.CylinderGeometry(0.035, 0.045, 1.9, 8), crystal: new THREE.OctahedronGeometry(0.16),
-  bow: new THREE.TorusGeometry(0.62, 0.035, 6, 20, Math.PI), string: new THREE.CylinderGeometry(0.008, 0.008, 1.24, 4), quiver: new THREE.CylinderGeometry(0.11, 0.09, 0.7, 10),
-  orb: new THREE.SphereGeometry(0.15, 14, 12),
-  bun: new THREE.SphereGeometry(0.15, 12, 10), fanG: new THREE.CircleGeometry(0.75, 16, 0, Math.PI), chefT: new THREE.CylinderGeometry(0.33, 0.3, 0.55, 16), puff: new THREE.SphereGeometry(0.3, 14, 10),
-  chada: new THREE.CylinderGeometry(0.12, 0.4, 0.28, 12), visor: new THREE.BoxGeometry(0.72, 0.16, 0.12), phone: new THREE.CylinderGeometry(0.13, 0.13, 0.1, 12), goggle: new THREE.CylinderGeometry(0.1, 0.1, 0.1, 12),
-  hammerH: new THREE.BoxGeometry(0.42, 0.42, 0.75), ladleB: new THREE.SphereGeometry(0.2, 12, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), spearTip: new THREE.ConeGeometry(0.09, 0.4, 6), longPole: new THREE.CylinderGeometry(0.035, 0.035, 2.4, 6),
-  wing: new THREE.PlaneGeometry(0.42, 0.24).translate(-0.21, 0.04, 0), mohawk: new THREE.ConeGeometry(0.09, 0.42, 4), cloudPuff: new THREE.SphereGeometry(0.17, 10, 8), spark: new THREE.OctahedronGeometry(0.09),
+  leg: new THREE.CapsuleGeometry(0.14, 0.64, 4, 12), boot: new THREE.CapsuleGeometry(0.15, 0.2, 4, 10), knee: new THREE.BoxGeometry(0.24, 0.2, 0.12),
+  arm: new THREE.CapsuleGeometry(0.105, 0.44, 4, 10), glove: new THREE.SphereGeometry(0.11, 10, 8),
+  torso: new THREE.CapsuleGeometry(0.3, 0.46, 4, 16), pelvis: new THREE.CylinderGeometry(0.31, 0.34, 0.34, 16), belt: new THREE.CylinderGeometry(0.335, 0.335, 0.09, 16), buckle: new THREE.BoxGeometry(0.12, 0.08, 0.04),
+  plate: new THREE.BoxGeometry(0.64, 0.52, 0.12), pouch: new THREE.BoxGeometry(0.16, 0.16, 0.1), strap: new THREE.BoxGeometry(0.1, 0.4, 0.06), pack: new THREE.BoxGeometry(0.5, 0.6, 0.24),
+  collar: new THREE.TorusGeometry(0.17, 0.06, 8, 16), holster: new THREE.BoxGeometry(0.12, 0.26, 0.16),
+  neck: new THREE.CylinderGeometry(0.11, 0.13, 0.24, 12), head: new THREE.SphereGeometry(0.42, 32, 24), ear: new THREE.SphereGeometry(0.09, 10, 8),
+  eye: new THREE.SphereGeometry(0.045, 10, 8), brow: new THREE.BoxGeometry(0.15, 0.035, 0.04), nose: new THREE.ConeGeometry(0.06, 0.16, 6), lip: new THREE.BoxGeometry(0.14, 0.025, 0.03),
+  cap: new THREE.SphereGeometry(0.44, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.52), longHair: new THREE.SphereGeometry(1, 16, 12), bun: new THREE.SphereGeometry(0.13, 12, 10), tail: new THREE.CapsuleGeometry(0.09, 0.45, 4, 8),
+  hood: new THREE.SphereGeometry(0.5, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.66), lowMask: new THREE.SphereGeometry(0.44, 18, 10, Math.PI * 0.1, Math.PI * 0.8, Math.PI * 0.5, Math.PI * 0.3),
+  helmet: new THREE.SphereGeometry(0.5, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.5), rim: new THREE.TorusGeometry(0.5, 0.035, 6, 28), lens: new THREE.CylinderGeometry(0.09, 0.09, 0.08, 14),
+  brim: new THREE.CylinderGeometry(0.34, 0.34, 0.035, 20, 1, false, -Math.PI / 2, Math.PI), beanie: new THREE.SphereGeometry(0.47, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), fold: new THREE.TorusGeometry(0.45, 0.07, 8, 28),
+  phone: new THREE.CylinderGeometry(0.13, 0.13, 0.09, 14), band: new THREE.TorusGeometry(0.45, 0.03, 6, 24, Math.PI), spark: new THREE.IcosahedronGeometry(0.12, 0),
 };
-const glowCache = {};
-const glowMat = c => glowCache[c] || (glowCache[c] = new THREE.MeshBasicMaterial({ color: c }));
 const dsCache = {};
-const toonDS = c => dsCache[c] || (dsCache[c] = new THREE.MeshToonMaterial({ color: c, gradientMap: gradMap, side: THREE.DoubleSide }));
-
+const toonDS = c => dsCache[c] || (dsCache[c] = pbr(c, { side: THREE.DoubleSide }));
 function nameSprite(name, isMe) {
   const tex = canvasTex(384, 112, (x, w) => {
-    x.font = '800 44px Kanit, sans-serif'; const tw = Math.min(w - 16, x.measureText(name).width + 44);
-    x.fillStyle = isMe ? '#facc15' : 'rgba(15,23,42,.72)'; x.beginPath(); x.roundRect ? x.roundRect((w - tw) / 2, 8, tw, 62, 31) : x.rect((w - tw) / 2, 8, tw, 62); x.fill();
-    if (isMe) { x.beginPath(); x.moveTo(w / 2 - 14, 68); x.lineTo(w / 2 + 14, 68); x.lineTo(w / 2, 90); x.fill(); }
-    x.fillStyle = isMe ? '#1e293b' : '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(name, w / 2, 41);
+    x.font = '600 42px Oswald, Kanit, sans-serif'; const tw = Math.min(w - 16, x.measureText(name).width + 40);
+    x.fillStyle = isMe ? '#d9a441' : 'rgba(10,12,16,.78)'; x.beginPath(); x.roundRect ? x.roundRect((w - tw) / 2, 10, tw, 58, 6) : x.rect((w - tw) / 2, 10, tw, 58); x.fill();
+    if (isMe) { x.beginPath(); x.moveTo(w / 2 - 12, 68); x.lineTo(w / 2 + 12, 68); x.lineTo(w / 2, 86); x.fill(); }
+    x.fillStyle = isMe ? '#15120c' : '#f1eee8'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(name, w / 2, 41);
   });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
-  sp.scale.set(3.3, 0.96, 1); sp.position.y = 4.25; sp.renderOrder = 10; return sp;
+  sp.scale.set(3.1, 0.9, 1); sp.position.y = 3.75; sp.renderOrder = 10; return sp;
 }
-
 function makeRunner(lookIdx, name, isMe, parent = scene) {
   const lk = LOOKS[lookIdx % LOOKS.length];
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   const add = (p, geo, mat, x, y, z, shadow = true) => { const m = new THREE.Mesh(geo, typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); m.castShadow = shadow; p.add(m); return m; };
   const legs = [], arms = [];
   for (const sd of [-1, 1]) {
-    const hip = new THREE.Group(); hip.position.set(sd * 0.17, 1.2, 0); body.add(hip);
-    add(hip, G.leg, lk.pants, 0, -0.46, 0);
-    add(hip, G.boot, lk.boots, 0, -0.98, 0.05).scale.set(1, 1, 1.25);
-    add(hip, G.cuff, lk.trim, 0, -0.78, 0);
+    const hip = new THREE.Group(); hip.position.set(sd * 0.16, 1.2, 0); body.add(hip);
+    add(hip, G.leg, lk.pants, 0, -0.47, 0);
+    add(hip, G.boot, lk.boots, 0, -1.0, 0.06).scale.set(1, 0.9, 1.45);
+    if (lk.knee) add(hip, G.knee, '#1d1f22', 0, -0.5, 0.13);
+    if (sd === 1 && (lk.vest || lk.knee)) add(hip, G.holster, '#1b1c1f', 0.17, -0.22, 0);
     legs.push(hip);
-    const sh = new THREE.Group(); sh.position.set(sd * 0.43, 2.06, 0); sh.rotation.z = sd * 0.12; body.add(sh);
-    add(sh, G.arm, lk.top, 0, -0.3, 0); add(sh, G.glove, lk.armor || lk.trim, 0, -0.55, 0); add(sh, G.hand, lk.skin, 0, -0.7, 0);
-    if (lk.weapon === 'orb' && sd === 1) { add(sh, G.orb, glowMat(lk.glow), 0, -0.9, 0.12, false); }
+    const sh = new THREE.Group(); sh.position.set(sd * 0.41, 2.04, 0); sh.rotation.z = sd * 0.1; body.add(sh);
+    add(sh, G.arm, lk.top, 0, -0.31, 0); add(sh, G.glove, (lk.vest || lk.gear === 'hood') ? '#1b1c1f' : lk.skin, 0, -0.66, 0).scale.set(1, 1.2, 1);
     arms.push(sh);
-    if (lk.armor) { const pd = add(body, G.pauldron, lk.armor, sd * 0.45, 2.1, 0); pd.scale.set(1.1, 0.8, 1.05); pd.rotation.z = -sd * 0.35; }
   }
   add(body, G.pelvis, lk.pants, 0, 1.25, 0);
-  add(body, G.belt, lk.trim, 0, 1.42, 0);
-  add(body, G.gem, glowMat(lk.glow), 0, 1.42, 0.36, false);
-  const torso = add(body, G.torso, lk.top, 0, 1.78, 0); torso.scale.set(1.12, 1, 0.82);
-  if (lk.armor) { const pl = add(body, G.plate, lk.armor, 0, 1.86, 0.1); pl.scale.set(0.34, 0.3, 0.2); pl.rotation.x = Math.PI / 2; }
-  add(body, G.neck, lk.skin, 0, 2.22, 0);
-  // ผ้าคลุม
-  let cape = null;
-  if (lk.cape) { cape = new THREE.Group(); cape.position.set(0, 2.12, -0.24); body.add(cape); const c = new THREE.Mesh(G.cape, toonDS(lk.cape)); c.castShadow = true; cape.add(c); }
-  // อาวุธบนหลัง
-  const wp = new THREE.Group(); wp.position.set(0, 1.82, -0.32); wp.rotation.z = 0.72; body.add(wp);
-  if (lk.weapon === 'sword') { add(wp, G.blade, '#e5e7eb', 0, 0.35, 0); add(wp, G.guard, lk.trim, 0, -0.3, 0); add(wp, G.grip, '#3f2a1d', 0, -0.5, 0); add(wp, G.gem, glowMat(lk.glow), 0, -0.3, 0.07, false); }
-  else if (lk.weapon === 'katana') { add(wp, G.kblade, '#e5e7eb', 0, 0.38, 0); add(wp, G.kguard, '#111827', 0, -0.3, 0).rotation.x = Math.PI / 2; add(wp, G.grip, lk.trim, 0, -0.5, 0); }
-  else if (lk.weapon === 'staff') { add(wp, G.staff, '#8b5a2b', 0, 0.1, 0); add(wp, G.crystal, glowMat(lk.glow), 0, 1.15, 0, false).scale.set(1, 1.6, 1); }
-  else if (lk.weapon === 'fan') { const f = add(wp, G.fanG, toonDS(lk.trim), 0, 0, 0); f.rotation.z = Math.PI / 2; add(wp, G.grip, '#7f1d1d', 0, -0.05, 0.01).scale.set(0.8, 0.5, 0.8); }
-  else if (lk.weapon === 'hammer') { add(wp, G.staff, '#5b3a24', 0, 0, 0).scale.set(1.4, 0.7, 1.4); add(wp, G.hammerH, lk.armor || '#9ca3af', 0, 0.68, 0); add(wp, G.gem, glowMat(lk.glow), 0, 0.68, 0.39, false); }
-  else if (lk.weapon === 'cloudstaff') { add(wp, G.staff, '#e2e8f0', 0, 0.1, 0); for (let k = 0; k < 5; k++) add(wp, G.cloudPuff, '#ffffff', Math.sin(k) * 0.16, 1.1 + (k % 2) * 0.1, Math.cos(k) * 0.12); add(wp, G.gem, glowMat(lk.glow), 0, 1.15, 0.18, false); }
-  else if (lk.weapon === 'ladle') { add(wp, G.staff, '#a8a29e', 0, 0, 0).scale.set(1, 0.6, 1); add(wp, G.ladleB, toonDS('#d6d3d1'), 0, 0.62, 0.05).rotation.x = -0.4; }
-  else if (lk.weapon === 'spear') { wp.rotation.z = 0.5; add(wp, G.longPole, '#7f1d1d', 0, 0.2, 0); add(wp, G.spearTip, '#f5c518', 0, 1.6, 0); add(wp, G.bun, '#dc2626', 0, 1.33, 0).scale.set(0.8, 1.2, 0.8); }
-  else if (lk.weapon === 'gauntlet') { arms[1].children[1].scale.set(1.6, 1.4, 1.6); arms[1].children[1].material = glowMat(lk.glow); arms[1].children[2].scale.setScalar(1.5); }
-  else if (lk.weapon === 'bow') { wp.rotation.z = -0.5; const b = add(wp, G.bow, '#7c4a1e', 0, 0, 0); b.rotation.z = -Math.PI / 2; add(wp, G.string, '#f1f5f9', 0, 0, 0, false); add(body, G.quiver, '#6d4c41', 0.2, 1.95, -0.33).rotation.z = -0.4; }
+  add(body, G.belt, '#1a1b1d', 0, 1.42, 0); add(body, G.buckle, '#6b6f75', 0, 1.42, 0.34);
+  const torso = add(body, G.torso, lk.top, 0, 1.78, 0); torso.scale.set(1.1, 1, 0.78);
+  if (lk.vest) {
+    add(body, G.plate, lk.vest, 0, 1.84, 0.2); add(body, G.plate, lk.vest, 0, 1.84, -0.2);
+    for (const px of [-0.2, 0, 0.2]) add(body, G.pouch, lk.vest, px, 1.58, 0.29);
+    for (const sd of [-1, 1]) add(body, G.strap, lk.vest, sd * 0.22, 2.12, 0);
+  }
+  if (lk.pack) add(body, G.pack, '#2b2d30', 0, 1.82, -0.36);
+  if (lk.collar) { const c = add(body, G.collar, lk.top, 0, 2.2, 0); c.rotation.x = Math.PI / 2; }
+  add(body, G.neck, lk.skin, 0, 2.24, 0);
   // หัว
-  const head = new THREE.Group(); head.position.set(0, 2.62, 0); body.add(head);
-  add(head, G.head, lk.skin, 0, 0, 0).scale.set(1, 1.06, 1);
+  const head = new THREE.Group(); head.position.set(0, 2.52, 0); head.scale.setScalar(0.7); body.add(head);
+  add(head, G.head, lk.skin, 0, 0, 0).scale.set(0.92, 1.08, 0.98);
   for (const sd of [-1, 1]) {
-    const w = add(head, G.eyeW, '#ffffff', sd * 0.15, -0.01, 0.35, false); w.scale.set(0.95, 1.25, 0.45);
-    add(head, G.iris, lk.eyes, sd * 0.15, -0.02, 0.39, false).scale.set(0.9, 1.2, 0.45);
-    add(head, G.hl, '#ffffff', sd * 0.15 + 0.025, 0.03, 0.42, false);
-    const br = add(head, G.brow, lk.hair, sd * 0.15, 0.14, 0.38, false); br.rotation.z = sd * -0.15;
+    add(head, G.ear, lk.skin, sd * 0.39, -0.02, 0).scale.set(0.5, 1, 0.8);
+    add(head, G.eye, '#16130f', sd * 0.14, 0.02, 0.38, false).scale.set(1.3, 0.75, 0.5);
+    const br = add(head, G.brow, lk.hair, sd * 0.14, 0.12, 0.38, false); br.rotation.z = sd * 0.08;
   }
-  if (lk.hat !== 'mask') { const m = add(head, G.mouth, '#9f1239', 0, -0.17, 0.38, false); m.rotation.z = Math.PI; }
-  const cap = add(head, G.cap, lk.hair, 0, 0.03, -0.02); cap.rotation.x = -0.38;
-  if (lk.hairStyle === 'spiky') {
-    for (let i = 0; i < 9; i++) { const a = (i / 9) * Math.PI * 2, s = add(head, G.spike, lk.hair, Math.sin(a) * 0.24, 0.36, Math.cos(a) * 0.24 - 0.1); s.rotation.set(Math.cos(a) * 0.8 - 0.35, 0, -Math.sin(a) * 0.8); }
-  } else if (lk.hairStyle === 'long') {
-    const b = add(head, G.longHair, lk.hair, 0, -0.32, -0.16); b.scale.set(0.46, 0.62, 0.3);
-    for (const sd of [-1, 1]) { const s = add(head, G.longHair, lk.hair, sd * 0.36, -0.22, 0.02); s.scale.set(0.1, 0.42, 0.18); }
-  } else if (lk.hairStyle === 'pony') {
-    add(head, G.ball, lk.hair, 0, 0.18, -0.44); const t = add(head, G.tail, lk.hair, 0, -0.22, -0.55); t.rotation.x = 0.35;
-    add(head, G.gem, glowMat(lk.glow), 0, 0.12, -0.5, false);
-  } else if (lk.hairStyle === 'swept') {
-    for (let i = 0; i < 7; i++) { const s = add(head, G.spike, lk.hair, (i - 3) * 0.1, 0.32 - Math.abs(i - 3) * 0.03, -0.22); s.rotation.set(-1.25, 0, (i - 3) * 0.12); s.scale.set(1.1, 1.5, 1.1); }
-  } else if (lk.hairStyle === 'buns') {
-    for (const sd of [-1, 1]) { add(head, G.bun, lk.hair, sd * 0.3, 0.36, -0.08); add(head, G.gem, glowMat(lk.glow), sd * 0.36, 0.4, -0.02, false); }
-    const f = add(head, G.longHair, lk.hair, 0, 0.22, 0.3); f.scale.set(0.34, 0.1, 0.12);
-  } else if (lk.hairStyle === 'mohawk') {
-    cap.scale.set(1, 0.6, 1); cap.material = toon(lk.skin);
-    for (let i = 0; i < 6; i++) { const m = add(head, G.mohawk, lk.hair, 0, 0.44 - Math.abs(i - 2) * 0.04, 0.26 - i * 0.12); m.rotation.x = -0.3 - i * 0.12; m.scale.set(1, 1.3, 2.2); }
-  } else if (lk.hairStyle === 'fluffy') {
-    for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; add(head, G.cloudPuff, lk.hair, Math.sin(a) * 0.32, 0.3 + Math.cos(a * 2) * 0.05, Math.cos(a) * 0.3 - 0.08).scale.setScalar(1.3); }
-    add(head, G.cloudPuff, lk.hair, 0, 0.45, 0).scale.setScalar(1.6);
-  } else {
-    const f = add(head, G.longHair, lk.hair, 0, 0.2, 0.3); f.scale.set(0.3, 0.1, 0.12); f.rotation.z = 0.2;
+  add(head, G.nose, lk.skin, 0, -0.06, 0.43, false).rotation.x = Math.PI / 2;
+  add(head, G.lip, '#7a4a3c', 0, -0.22, 0.37, false);
+  if (lk.beard) add(head, G.lowMask, lk.hair, 0, 0, 0).scale.set(1.02, 1.04, 1.03);
+  const cap = add(head, G.cap, lk.hair, 0, 0.03, -0.02); cap.rotation.x = -0.32;
+  if (lk.hairStyle === 'buzz') { cap.scale.set(0.99, 0.95, 0.99); }
+  else if (lk.hairStyle === 'long') { const b = add(head, G.longHair, lk.hair, 0, -0.34, -0.16); b.scale.set(0.42, 0.6, 0.26); }
+  else if (lk.hairStyle === 'pony') { add(head, G.bun, lk.hair, 0, 0.12, -0.42); const t = add(head, G.tail, lk.hair, 0, -0.25, -0.5); t.rotation.x = 0.3; }
+  else if (lk.hairStyle === 'bob') { const b = add(head, G.longHair, lk.hair, 0, -0.06, -0.06); b.scale.set(0.47, 0.42, 0.45); const f = add(head, G.longHair, lk.hair, 0.06, 0.22, 0.3); f.scale.set(0.34, 0.1, 0.12); f.rotation.z = -0.25; }
+  else { const f = add(head, G.longHair, lk.hair, 0, 0.24, 0.28); f.scale.set(0.3, 0.08, 0.12); }
+  if (lk.gear === 'hood') { const h = add(head, G.hood, toonDS(lk.top), 0, 0.04, -0.06); h.rotation.x = -0.6; }
+  if (lk.mask) add(head, G.lowMask, lk.mask, 0, 0, 0).scale.set(1.05, 1.05, 1.07);
+  if (lk.gear === 'helmet') {
+    const hm = add(head, G.helmet, lk.helmet, 0, 0.05, -0.02); hm.rotation.x = -0.12;
+    const rm = add(head, G.rim, lk.helmet, 0, 0.06, -0.02); rm.rotation.x = Math.PI / 2 - 0.12;
+    for (const sd of [-1, 1]) { const l = add(head, G.lens, '#0e1114', sd * 0.13, 0.42, 0.3); l.rotation.x = 0.9; }
   }
-  if (lk.hat === 'chef') { add(head, G.chefT, '#ffffff', 0, 0.55, -0.04); add(head, G.puff, '#ffffff', 0, 0.9, -0.04).scale.set(1.25, 0.8, 1.25); }
-  if (lk.hat === 'chada') { for (let k = 0; k < 4; k++) add(head, G.chada, '#f5c518', 0, 0.42 + k * 0.2, -0.02).scale.setScalar(1 - k * 0.22); add(head, G.spearTip, '#f5c518', 0, 1.25, -0.02); add(head, G.gem, glowMat(lk.glow), 0, 0.42, 0.38, false); }
-  if (lk.hat === 'visor') { add(head, G.visor, glowMat(lk.glow), 0, 0.0, 0.38, false).rotation.x = -0.05; for (const sd of [-1, 1]) { const p = add(head, G.phone, lk.trim, sd * 0.43, 0, 0); p.rotation.z = Math.PI / 2; } const b = add(head, G.band, lk.trim, 0, 0.05, 0); b.rotation.y = Math.PI / 2; }
-  if (lk.hat === 'goggles') { const b = add(head, G.band, '#1f2937', 0, 0.22, 0); b.rotation.x = Math.PI / 2 - 0.3; b.scale.setScalar(1.05); for (const sd of [-1, 1]) { const g2 = add(head, G.goggle, glowMat(lk.glow), sd * 0.14, 0.3, 0.37, false); g2.rotation.x = Math.PI / 2 - 0.5; } }
-  if (lk.hat === 'hood') { const h = add(head, G.hood, lk.cape || lk.top, 0, 0.04, -0.06); h.rotation.x = -0.62; h.material = toonDS(lk.cape || lk.top); add(head, G.gem, glowMat(lk.glow), 0, 0.36, 0.34, false); }
-  if (lk.hat === 'witch') {
-    add(head, G.brim, lk.top, 0, 0.3, 0).rotation.x = -0.12;
-    const c = add(head, G.witchCone, toonDS(lk.top), 0, 0.82, -0.08); c.rotation.x = -0.28;
-    const band = add(head, G.band, lk.trim, 0, 0.36, -0.02); band.rotation.x = Math.PI / 2 - 0.12; band.scale.setScalar(0.93);
-    add(head, G.gem, glowMat(lk.glow), 0, 0.38, 0.4, false);
+  if (lk.gear === 'cap' || lk.gear === 'capback') {
+    const c = add(head, G.cap, lk.cap, 0, 0.06, -0.02); c.scale.setScalar(1.06); c.rotation.x = -0.2;
+    const b = add(head, G.brim, lk.cap, 0, 0.2, lk.gear === 'cap' ? 0.3 : -0.3); b.rotation.x = lk.gear === 'cap' ? 0.12 : -0.12; if (lk.gear === 'capback') b.rotation.y = Math.PI;
   }
-  let scarf = null;
-  if (lk.hat === 'mask') {
-    add(head, G.mask, toonDS(lk.top), 0, 0, 0).scale.set(1.04, 1.04, 1.06);
-    const b = add(head, G.band, lk.scarf, 0, 0.17, 0); b.rotation.x = Math.PI / 2 - 0.2; b.scale.setScalar(1.06);
-    scarf = new THREE.Group(); scarf.position.set(0, 0.17, -0.44); head.add(scarf);
-    for (const sd of [-1, 1]) { const s = add(scarf, G.scarf, lk.scarf, sd * 0.07, 0, 0); s.rotation.z = sd * 0.25; }
-  }
-  if (lk.wings) for (const l of legs) for (const sd of [-1, 1]) { const w = add(l, G.wing, toonDS('#ffffff'), sd * 0.18, -0.95, -0.12); w.rotation.set(0, sd > 0 ? 0 : Math.PI, 0.5); }
-  if (lk.build) body.scale.set(lk.build, 1.04, lk.build);
+  if (lk.gear === 'beanie') { const c = add(head, G.beanie, lk.cap, 0, 0.08, -0.02); c.rotation.x = -0.18; const f = add(head, G.fold, lk.cap, 0, 0.12, -0.02); f.rotation.x = Math.PI / 2 - 0.18; }
+  if (lk.phones) { for (const sd of [-1, 1]) { const p = add(head, G.phone, '#1b1c1f', sd * 0.43, 0, 0); p.rotation.z = Math.PI / 2; } const b = add(head, G.band, '#1b1c1f', 0, 0.02, 0); b.rotation.y = Math.PI / 2; }
+  if (lk.build) body.scale.set(lk.build, 1.03, lk.build * 0.95);
   root.scale.setScalar(0.92);
   if (name) root.add(nameSprite(name, isMe));
-  const blob = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: .2, depthWrite: false }));
+  const blob = new THREE.Mesh(new THREE.CircleGeometry(0.55, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: .32, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2; blob.position.y = 0.08; root.add(blob);
   parent.add(root);
   const aura = [];
-  if (name) for (let k = 0; k < 12; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
-  return { root, body, legs, arms, head, cape, scarf, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
+  if (name) for (let k = 0; k < 14; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
+  return { root, body, legs, arms, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
 }
-// อนุภาคพลังตอนวิ่ง
+function flutter() {}
+// ฝุ่นจากรองเท้าตอนวิ่ง
 function updateAura(r, dt) {
   if (!r.aura || !r.aura.length) return;
   r.auraT -= dt;
   if (r.speed > 3 && r.auraT <= 0) {
-    r.auraT = 0.05; const p = r.aura.find(a => a.life <= 0);
-    if (p) { p.life = 0.6; p.vy = 0.8 + Math.random(); p.m.visible = true; p.m.position.set(r.root.position.x + (Math.random() - .5) * 0.8, 0.3 + Math.random() * 1.6, r.root.position.z + (Math.random() - .5) * 0.8); p.m.scale.setScalar(0.6 + Math.random() * 0.8); }
+    r.auraT = 0.045; const p = r.aura.find(a => a.life <= 0);
+    if (p) { p.life = 0.9; p.vy = 0.25 + Math.random() * 0.35; p.m.visible = true; p.m.position.set(r.root.position.x + (Math.random() - .5) * 0.6, 0.12 + Math.random() * 0.25, r.root.position.z + (Math.random() - .5) * 0.6); p.s0 = 0.5 + Math.random() * 0.5; }
   }
-  for (const p of r.aura) if (p.life > 0) { p.life -= dt; p.m.position.y += p.vy * dt; p.m.rotation.y += dt * 6; p.m.material.opacity = Math.max(0, p.life / 0.6) * 0.85; if (p.life <= 0) p.m.visible = false; }
-}
-function flutter(r, dt, speed) {
-  const k = Math.min(1, speed / 15);
-  if (r.cape) r.cape.rotation.x = 0.12 + k * 0.95 + Math.sin(r.phase * 1.7) * (0.05 + k * 0.08);
-  if (r.scarf) r.scarf.rotation.x = 0.3 + k * 1.1 + Math.sin(r.phase * 2.1) * 0.12;
+  for (const p of r.aura) if (p.life > 0) {
+    p.life -= dt; p.m.position.y += p.vy * dt; const k = 1 - p.life / 0.9;
+    p.m.scale.setScalar(p.s0 * (1 + k * 2.2)); p.m.material.opacity = Math.max(0, p.life / 0.9) * 0.35; if (p.life <= 0) p.m.visible = false;
+  }
 }
 function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.parent.remove(p.m); p.m.material.dispose(); }); if (r.scoreSp) r.root.remove(r.scoreSp); scene.remove(r.root); r.root.traverse(o => { if (o.material && o.material.map && o.isSprite) { o.material.map.dispose(); o.material.dispose(); } }); }
 
@@ -903,14 +863,14 @@ function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.p
 function buildThumbs() {
   try {
     const tr = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-    tr.setSize(192, 192, false); tr.outputColorSpace = THREE.SRGBColorSpace;
+    tr.setSize(192, 192, false); tr.outputColorSpace = THREE.SRGBColorSpace; tr.toneMapping = THREE.ACESFilmicToneMapping; tr.toneMappingExposure = 1.15;
     const ts = new THREE.Scene();
-    ts.add(new THREE.HemisphereLight(0xffffff, 0x88aa77, 1.6));
-    const dl = new THREE.DirectionalLight(0xffffff, 1.8); dl.position.set(2, 4, 5); ts.add(dl);
-    const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.position.set(0.55, 2.55, 3.7); cam.lookAt(0, 2.22, 0);
+    ts.add(new THREE.HemisphereLight(0xdfe6ee, 0x3a3530, 1.4)); const rim = new THREE.DirectionalLight(0xffc48a, 2.2); rim.position.set(-4, 3, -3); ts.add(rim);
+    const dl = new THREE.DirectionalLight(0xffffff, 2.6); dl.position.set(3, 4, 5); ts.add(dl);
+    const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.position.set(0.45, 2.45, 3.2); cam.lookAt(0, 2.25, 0);
     LOOKS.forEach((_, i) => {
       const r = makeRunner(i, null, false, ts);
-      r.root.rotation.y = -0.3; r.arms[0].rotation.x = -0.3; r.arms[1].rotation.x = 0.3; r.head.rotation.y = 0.15;
+      r.root.rotation.y = -0.35; r.head.rotation.y = 0.12;
       flutter(r, 0, 0);
       tr.render(ts, cam); THUMBS[i] = tr.domElement.toDataURL('image/png'); ts.remove(r.root);
     });
@@ -922,16 +882,16 @@ function buildThumbs() {
 const PODIUM = { 0: [0, 2.2], 1: [-2.9, 1.5], 2: [2.9, 1.0] };
 function buildPodium() {
   const g = new THREE.Group(); scene.add(g);
-  const cols = { 0: '#facc15', 1: '#e2e8f0', 2: '#f59e0b' };
+  const cols = { 0: '#c9a227', 1: '#a7adb5', 2: '#a0673a' };
   for (const k of [0, 1, 2]) {
     const [x, h] = PODIUM[k];
     const num = canvasTex(256, 256, (c, w) => {
-      c.fillStyle = cols[k]; c.fillRect(0, 0, w, w); c.fillStyle = 'rgba(255,255,255,.25)'; c.fillRect(0, 0, w, 40);
-      c.font = 'italic 900 170px Kanit, Arial Black, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.lineWidth = 14; c.strokeStyle = '#7c2d12'; c.strokeText(k + 1, w / 2, w / 2 + 14); c.fillStyle = '#fff'; c.fillText(k + 1, w / 2, w / 2 + 14);
+      c.fillStyle = cols[k]; c.fillRect(0, 0, w, w); c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(0, w - 40, w, 40);
+      c.font = '700 170px Oswald, Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillStyle = 'rgba(0,0,0,.55)'; c.fillText(k + 1, w / 2 + 4, w / 2 + 18); c.fillStyle = '#f4f1ea'; c.fillText(k + 1, w / 2, w / 2 + 14);
     });
     const side = toon(cols[k]);
-    const b = new THREE.Mesh(new THREE.BoxGeometry(2.7, h, 2.4), [side, side, toon('#ffffff'), side, new THREE.MeshToonMaterial({ map: num, gradientMap: gradMap }), side]);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(2.7, h, 2.4), [side, side, toon('#2a2d33'), side, new THREE.MeshStandardMaterial({ map: num, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 }), side]);
     b.position.set(x, h / 2, 0); b.castShadow = b.receiveShadow = true; g.add(b);
   }
   const back = new THREE.Mesh(new THREE.PlaneGeometry(11, 2.6), new THREE.MeshBasicMaterial({ map: world.bannerTex }));
@@ -939,17 +899,17 @@ function buildPodium() {
   for (const x of [-5.6, 5.6]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 7, 10), toon('#e5e7eb')); p.position.set(x, 3.5, -2.2); g.add(p); }
   // พลุกระดาษ
   const n = 400, cf = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.22, 0.12), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), n);
-  const cc = ['#ef4444', '#facc15', '#3b82f6', '#22c55e', '#ec4899', '#a855f7', '#ffffff', '#f97316'], col = new THREE.Color();
+  const cc = ['#d9a441', '#e7e5e0', '#c9a227', '#b8b2a7', '#d9a441', '#8a8f96'], col = new THREE.Color();
   world.conf = []; for (let i = 0; i < n; i++) { cf.setColorAt(i, col.set(cc[i % cc.length])); world.conf.push({ x: (Math.random() - .5) * 16, y: Math.random() * 14, z: (Math.random() - .5) * 8 + 1, r: Math.random() * 6, s: 0.6 + Math.random() }); }
   cf.visible = false; scene.add(cf); world.confMesh = cf;
 }
 function scoreSprite(text, gold) {
   const tex = canvasTex(320, 96, (x, w) => {
-    x.fillStyle = gold ? '#dc2626' : '#2563eb'; x.beginPath(); x.roundRect ? x.roundRect(20, 12, w - 40, 70, 35) : x.rect(20, 12, w - 40, 70); x.fill();
-    x.font = '900 46px Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff'; x.fillText(text, w / 2, 49);
+    x.fillStyle = gold ? '#d9a441' : 'rgba(14,17,22,.85)'; x.beginPath(); x.roundRect ? x.roundRect(20, 12, w - 40, 70, 35) : x.rect(20, 12, w - 40, 70); x.fill();
+    x.font = '600 44px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = gold ? '#15120c' : '#f4f1ea'; x.fillText(text, w / 2, 49);
   });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
-  sp.scale.set(2.6, 0.78, 1); sp.position.y = 5.0; sp.renderOrder = 11; return sp;
+  sp.scale.set(2.6, 0.78, 1); sp.position.y = 4.5; sp.renderOrder = 11; return sp;
 }
 function posePodium(r, slot, dt, t, pts) {
   let x, y, z = 0;
@@ -1014,9 +974,11 @@ const Music = (() => {
     return out;
   }
   const SONGS = {
-    lobby: { bpm: 96, chords: [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], scale: [69, 72, 74, 76, 79, 81, 84], mel: melody(7, 64, 0.25, 7), lead: 'triangle', drums: 1, pad: true, vol: 0.9 },
-    race: { bpm: 142, chords: [[45, 52, 57], [41, 48, 53], [48, 55, 60], [43, 50, 55]], scale: [69, 72, 74, 76, 79, 81, 84, 86], mel: melody(42, 64, 0.55, 8), lead: 'square', drums: 2, pad: false, vol: 0.8 },
-    bkk: { bpm: 134, chords: [[50, 57, 62], [48, 55, 60], [45, 52, 57], [47, 54, 59]], scale: [74, 76, 79, 81, 83, 86, 88, 91], mel: melody(1234, 64, 0.62, 8), lead: 'ranat', drums: 3, pad: false, vol: 0.85 },
+    // ห้องรอ: บรรยากาศมืด ตึงเครียด ช้า
+    lobby: { bpm: 76, chords: [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [40, 47, 52, 56]], scale: [57, 60, 62, 64, 67, 69, 72], mel: melody(311, 64, 0.12, 7), lead: 'sine', drums: 1, pad: true, vol: 0.85 },
+    // แข่ง: จังหวะหนัก เบสกระแทก แบบหนังแอ็กชัน
+    race: { bpm: 128, chords: [[45, 52, 57], [41, 48, 53], [38, 45, 50], [40, 47, 52]], scale: [57, 60, 62, 64, 65, 67, 69, 72], mel: melody(97, 64, 0.35, 8), lead: 'triangle', drums: 2, pad: false, vol: 0.85 },
+    bkk: { bpm: 122, chords: [[38, 45, 50], [36, 43, 48], [33, 40, 45], [35, 42, 47]], scale: [62, 64, 67, 69, 71, 74, 76, 79], mel: melody(1234, 64, 0.45, 8), lead: 'ranat', drums: 3, pad: false, vol: 0.8 },
   };
   function init() {
     if (ctx) return;
@@ -1046,16 +1008,16 @@ const Music = (() => {
   function schedule(i, t) {
     const S = song, s16 = i % 16, bar = Math.floor(i / 16) % 4, ch = S.chords[bar], beat = 60 / S.bpm, st = beat / 4, v = S.vol;
     // เบส
-    if (S.drums >= 2) { if ([0, 3, 6, 8, 10, 14].includes(s16)) tone(t, midi(ch[0] - 12), st * 1.6, 'sawtooth', 0.16 * v, musicBus); }
+    if (S.drums >= 2) { if (s16 % 2 === 0) tone(t, midi(ch[0] - 12), st * 1.5, 'sawtooth', (s16 % 4 === 0 ? 0.16 : 0.1) * v, musicBus); if (s16 === 0) tone(t, midi(ch[0] - 24), beat * 3.5, 'sine', 0.22 * v, musicBus, 0.02); }
     else if (s16 % 8 === 0) tone(t, midi(ch[0] - 12), beat * 1.8, 'triangle', 0.22 * v, musicBus);
     // คอร์ด
-    if (S.pad && s16 === 0) ch.forEach(n => tone(t, midi(n), beat * 3.8, 'sine', 0.06 * v, musicBus, 0.25));
-    if (!S.pad && s16 % 4 === 2) ch.forEach(n => tone(t, midi(n + 12), st * 1.2, 'square', 0.025 * v, musicBus));
+    if (S.pad && s16 === 0) ch.forEach(n => { tone(t, midi(n), beat * 4.2, 'sine', 0.055 * v, musicBus, 0.6); tone(t, midi(n) * 1.004, beat * 4.2, 'triangle', 0.02 * v, musicBus, 0.6); });
+    if (!S.pad && s16 === 0) ch.forEach(n => tone(t, midi(n + 12), beat * 3.6, 'sawtooth', 0.012 * v, musicBus, 0.3));
     // กลอง
-    if (S.drums === 1) { if (s16 % 8 === 0) kick(t, 0.35 * v); if (s16 % 4 === 2) noise(t, 0.04, 0.05 * v, 7000); }
+    if (S.drums === 1) { if (s16 === 0) kick(t, 0.4 * v); if (s16 === 8) tone(t, 80, 0.5, 'sine', 0.18 * v, musicBus, 0.002, 40); if (s16 % 4 === 2) noise(t, 0.03, 0.025 * v, 9000); }
     else {
       if (s16 % 4 === 0) kick(t, 0.6 * v);
-      if (s16 === 4 || s16 === 12) noise(t, 0.16, 0.22 * v, 1800, 'bandpass');
+      if (s16 === 4 || s16 === 12) { noise(t, 0.22, 0.26 * v, 1400, 'bandpass'); tone(t, 180, 0.12, 'triangle', 0.1 * v, musicBus, 0.002, 90); }
       if (s16 % 2 === 0) noise(t, 0.03, (s16 % 4 === 2 ? 0.12 : 0.06) * v, 8000);
       if (S.drums === 3 && (s16 === 6 || s16 === 14)) { tone(t, 1250, 0.25, 'sine', 0.08 * v, musicBus, 0.001); tone(t, 1870, 0.18, 'sine', 0.05 * v, musicBus, 0.001); } // ฉิ่ง
     }
@@ -1064,7 +1026,7 @@ const Music = (() => {
     if (m >= 0) {
       const f = midi(S.scale[m]);
       if (S.lead === 'ranat') { ranat(t, f, 0.16 * v); if (s16 % 2 === 1) ranat(t + st / 2, f, 0.08 * v); }
-      else tone(t, f, st * (S.lead === 'square' ? 1.4 : 2.4), S.lead, (S.lead === 'square' ? 0.05 : 0.11) * v, musicBus);
+      else tone(t, f, st * (S.pad ? 6 : 2.2), S.lead, (S.pad ? 0.05 : 0.06) * v, musicBus, S.pad ? 0.08 : 0.01);
     }
   }
   function pump() {
@@ -1078,12 +1040,12 @@ const Music = (() => {
   }
   function sfx(kind) {
     if (!ctx || muted) return; const t = ctx.currentTime + 0.01;
-    if (kind === 'tick') tone(t, 880, 0.15, 'square', 0.18, sfxBus);
-    else if (kind === 'go') { tone(t, 1320, 0.45, 'square', 0.2, sfxBus); tone(t, 660, 0.45, 'square', 0.12, sfxBus); }
+    if (kind === 'tick') { tone(t, 120, 0.25, 'sine', 0.45, sfxBus, 0.002, 60); tone(t, 1760, 0.05, 'triangle', 0.06, sfxBus); }
+    else if (kind === 'go') { tone(t, 90, 0.8, 'sine', 0.6, sfxBus, 0.002, 40); noise(t, 0.6, 0.25, 600, 'lowpass', sfxBus); tone(t, 440, 0.6, 'sawtooth', 0.06, sfxBus, 0.01, 880); }
     else if (kind === 'click') tone(t, 600, 0.06, 'triangle', 0.25, sfxBus);
-    else if (kind === 'right') [72, 76, 79, 84].forEach((n, i) => tone(t + i * 0.07, midi(n), 0.25, 'triangle', 0.3, sfxBus));
+    else if (kind === 'right') [69, 76, 81].forEach((n, i) => tone(t + i * 0.06, midi(n), 0.4, 'sine', 0.28, sfxBus));
     else if (kind === 'wrong') { tone(t, 220, 0.35, 'sawtooth', 0.18, sfxBus, 0.005, 110); tone(t + 0.12, 180, 0.35, 'sawtooth', 0.14, sfxBus, 0.005, 90); }
-    else if (kind === 'win') [[60, 0], [64, .12], [67, .24], [72, .36], [67, .6], [72, .72], [76, .84], [79, 1.0]].forEach(([n, d]) => { tone(t + d, midi(n + 12), 0.5, 'square', 0.12, sfxBus); tone(t + d, midi(n), 0.5, 'triangle', 0.2, sfxBus); });
+    else if (kind === 'win') { tone(t, 55, 2.2, 'sine', 0.4, sfxBus, 0.01, 50); [[57, 0], [64, .25], [69, .5], [72, .9]].forEach(([n, d]) => { tone(t + d, midi(n), 1.6, 'sawtooth', 0.06, sfxBus, 0.05); tone(t + d, midi(n + 12), 1.6, 'sine', 0.12, sfxBus, 0.05); }); }
     else if (kind === 'step') noise(t, 0.05, 0.06, 900, 'lowpass', sfxBus);
   }
   function toggleMute() { muted = !muted; localStorage.hrMute = muted ? '1' : '0'; if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.05); return muted; }
@@ -1357,9 +1319,9 @@ async function joinRoom() {
     if (!d || typeof d !== 'object') return;
     if (d.closed) {
       if (!S) { stopJoin(); lockBtns(false); return status(`ห้อง ${code} ปิดไปแล้ว ให้เจ้าของห้องสร้างห้องใหม่`); }
-      hostAway = Date.now() - 100000; return setNet(false, '⏳ เจ้าของห้องออกจากหน้าเกม รอสักครู่…');
+      hostAway = Date.now() - 100000; return setNet(false, 'เจ้าของห้องออกจากหน้าเกม รอสักครู่…');
     }
-    if (d.hostAway) { hostAway = Date.now(); return setNet(false, '⏳ เจ้าของห้องหลุดชั่วคราว รอสักครู่…'); }
+    if (d.hostAway) { hostAway = Date.now(); return setNet(false, 'เจ้าของห้องหลุดชั่วคราว รอสักครู่…'); }
     if (d.error === 'full') { if (d.to === myId) { stopJoin(); lockBtns(false); status('ห้องเต็มแล้ว (สูงสุด 8 คน)'); } return; }
     if (!d.players) return;
     if (!S && Date.now() - d.now > 15 * 60000) return; // ห้องเก่าที่ค้างอยู่
@@ -1409,14 +1371,14 @@ $('#removeBot').onclick = () => send('removeBot');
 $('#maps').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setMap', { map: +b.dataset.m }); };
 $('#cats').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setCat', { cat: +b.dataset.c }); };
 $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setDiff', { diff: +b.dataset.d }); };
-let camMode = 0; const CAM_NAMES = ['🎥 มุมกว้าง', '🎥 มุมใกล้', '🎥 มุมสูง'];
+let camMode = 0; const CAM_NAMES = ['มุมกว้าง', 'มุมใกล้', 'มุมสูง'];
 $('#camBtn').onclick = () => { camMode = (camMode + 1) % 3; $('#camBtn').textContent = CAM_NAMES[camMode]; };
 $('#againBtn').onclick = () => send('lobby');
 $('#leaveBtn').onclick = () => { if (isHost) pub('down', { closed: true }, true); else if (myId) pub('up', { id: myId, type: 'leave' }); setTimeout(() => location.href = location.pathname, 300); };
 $('#copyBtn').onclick = async () => {
   const link = location.origin + location.pathname + '?room=' + roomCode;
-  try { await navigator.clipboard.writeText(link); $('#copyBtn').textContent = '✅ คัดลอกแล้ว ส่งให้เพื่อนได้เลย!'; } catch { prompt('คัดลอกลิงก์นี้:', link); }
-  setTimeout(() => $('#copyBtn').textContent = '📋 คัดลอกลิงก์เชิญเพื่อน', 1800);
+  try { await navigator.clipboard.writeText(link); $('#copyBtn').textContent = 'คัดลอกแล้ว ✓'; } catch { prompt('คัดลอกลิงก์นี้:', link); }
+  setTimeout(() => $('#copyBtn').textContent = 'คัดลอกลิงก์เชิญ', 1800);
 };
 // กลับมาที่หน้าเว็บ (เช่น หลังสลับไปส่งลิงก์ใน LINE) → ต่อห้องกับระบบใหม่ทันที
 const wake = () => { if (client && !client.connected && !client.disconnecting) { try { client.reconnect(); } catch {} } };
@@ -1468,26 +1430,26 @@ function render() {
   if (st === 'lobby') {
     $('#roomCode').textContent = roomCode;
     $('#count').textContent = `${S.players.length}/${MAX_PLAYERS} คน`;
-    $('#lobbyList').innerHTML = S.players.map(p => `<li>${ava(p.look)}${esc(p.name)}${p.id === myId ? ' <span class="small">(คุณ)</span>' : ''}${p.id === 'host' ? ' 👑' : ''}${p.bot ? ' 🤖' : ''}
-      <span class="st ${p.ready ? 'y' : 'n'}">${p.id === 'host' ? 'เจ้าของห้อง' : p.ready ? '✅ พร้อม' : '⏳ ยังไม่พร้อม'}</span></li>`).join('');
+    $('#lobbyList').innerHTML = S.players.map(p => `<li>${ava(p.look)}${esc(p.name)}${p.id === myId ? ' <span class="small">(คุณ)</span>' : ''}${p.bot ? ' <span class="small">BOT</span>' : ''}
+      <span class="st ${p.ready ? 'y' : 'n'}">${p.id === 'host' ? 'เจ้าของห้อง' : p.ready ? 'พร้อม' : 'รอ'}</span></li>`).join('');
     const notReady = S.players.filter(p => !p.ready).length, me = S.players.find(p => p.id === myId);
     show('#startBtn', isHost); show('#readyBtn', !isHost);
     $('#startBtn').disabled = notReady > 0;
-    $('#startBtn').textContent = notReady > 0 ? `รออีก ${notReady} คนกดพร้อม…` : (S.players.length > 1 ? '🏁 เริ่มแข่ง!' : '🏁 เริ่มแข่ง (คนเดียว)');
+    $('#startBtn').textContent = notReady > 0 ? `รออีก ${notReady} คนกดพร้อม…` : (S.players.length > 1 ? 'เริ่มการแข่งขัน' : 'เริ่มการแข่งขัน (คนเดียว)');
     $('#readyBtn').classList.toggle('on', !!(me && me.ready));
-    $('#readyBtn').textContent = me && me.ready ? '✅ พร้อมแล้ว · กดเพื่อยกเลิก' : '✋ กดพร้อม';
+    $('#readyBtn').textContent = me && me.ready ? 'พร้อมแล้ว · แตะเพื่อยกเลิก' : 'พร้อม';
     show('#botRow', isHost); show('#roomNet', isHost);
     if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
-    $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${m.icon} ${m.name}</button>`).join('');
-    $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.icon} ${c.name}</button>`).join('');
-    $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
+    $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${m.name}</button>`).join('');
+    $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
+    $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.name}</button>`).join('');
     $('#diffDesc').textContent = `${LV(S.cat, S.diff).desc} · ${LV(S.cat, S.diff).time / 1000} วิ/ข้อ`;
-    $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
+    $('#lobbyHint').textContent = isHost ? 'คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
   }
   if (st === 'countdown' || st === 'question' || st === 'reveal') {
     const sorted = standings(), myRank = sorted.findIndex(p => p.id === myId) + 1;
     $('#rank').innerHTML = ord(myRank);
-    $('#roundInfo').textContent = (st === 'countdown' ? 'เตรียมตัว!' : `ข้อที่ ${S.round}`) + ` · ${CATS[S.cat].icon} ${LV(S.cat, S.diff).icon} ${LV(S.cat, S.diff).name}`;
+    $('#roundInfo').textContent = (st === 'countdown' ? 'เตรียมตัว!' : `ข้อที่ ${S.round}`) + ` · ${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#board').innerHTML = sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}">${ava(p.look)}${esc(p.name)}${st === 'question' && p.answered ? ' <span class="ok">✓</span>' : ''}<span class="pts">${Math.min(p.points, GOAL)}</span></li>`).join('');
     $('#dots').innerHTML = S.players.map(p => `<div data-id="${p.id}" class="${p.id === myId ? 'me' : ''}" style="background:${LOOKS[p.look].shirt}"></div>`).join('');
   }
@@ -1501,17 +1463,17 @@ function render() {
   if (st === 'reveal' && S.results) {
     $('#roundResult').innerHTML = `<h4>ผลข้อที่ ${S.round} · ตอบ ${S.q.answer}</h4>` + S.results.map(x => {
       const p = S.players.find(q => q.id === x.id); if (!p) return '';
-      return `<div><span>${x.correct ? medal(x.rank - 1) : (x.choice == null ? '⌛' : '❌')}</span><span>${esc(p.name)}</span><span>${x.correct ? (x.time / 1000).toFixed(2) + 'วิ' : ''}</span><span>+${x.gain}</span></div>`;
+      return `<div><span>${x.correct ? medal(x.rank - 1) : (x.choice == null ? '—' : '✕')}</span><span>${esc(p.name)}</span><span>${x.correct ? (x.time / 1000).toFixed(2) + 'วิ' : ''}</span><span>+${x.gain}</span></div>`;
     }).join('');
   }
   if (st === 'finished') {
     show('#againBtn', isHost);
-    $('#waitHost').textContent = isHost ? '' : '⏳ รอเจ้าของห้องเริ่มรอบใหม่…';
+    $('#waitHost').textContent = isHost ? '' : 'รอเจ้าของห้องเริ่มรอบใหม่…';
   }
   if (st === 'finished' && S.final) {
-    $('#finalDiff').textContent = `${CATS[S.cat].icon} ${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
+    $('#finalDiff').textContent = `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#podium').innerHTML = S.final.map((p, i) => `<div class="r ${p.id === myId ? 'me' : ''}"><span class="m">${medal(i)}</span>${ava(p.look)}
-      <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · 🏁 ถึงเส้นชัย' : ''}</div></div>
+      <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}</div></div>
       <span class="p">${p.points} คะแนน</span></div>`).join('');
   }
 }
@@ -1551,8 +1513,8 @@ function renderQuestion() {
       b.classList.toggle('wrong', !!r && r.choice === val && val !== q.answer);
     });
     $('#qmsg').innerHTML = !r ? '' : r.correct
-      ? `✅ ถูกต้อง! อันดับ ${r.rank} ของข้อนี้ · ${(r.time / 1000).toFixed(2)} วิ · <b style="color:#16a34a">วิ่ง +${r.gain}</b>`
-      : r.choice == null ? '⌛ หมดเวลา! รอบนี้ไม่ได้วิ่ง' : `❌ ผิด! คำตอบคือ ${q.answer} · รอบนี้ไม่ได้วิ่ง`;
+      ? `✓ ถูกต้อง · อันดับ ${r.rank} ของข้อนี้ · ${(r.time / 1000).toFixed(2)} วิ · <b style="color:#16a34a">วิ่ง +${r.gain}</b>`
+      : r.choice == null ? 'หมดเวลา · รอบนี้ไม่ได้วิ่ง' : `✕ ผิด · คำตอบคือ ${q.answer} · รอบนี้ไม่ได้วิ่ง`;
   }
 }
 
@@ -1677,8 +1639,9 @@ function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.asp
 addEventListener('resize', resize);
 
 // เริ่ม (รอฟอนต์ไม่เกิน 1.5 วิ เพื่อให้ป้ายในสนามใช้ฟอนต์สวย)
-await Promise.race([document.fonts.load('italic 900 40px Kanit'), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
+await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
+$('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
 resize(); buildWorld(); buildBangkok(); applyMap(0); buildPodium(); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
