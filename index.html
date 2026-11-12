@@ -147,6 +147,41 @@
   #winTitle { position: absolute; top: 18px; left: 0; right: 0; text-align: center; pointer-events: none; font-family: "Oswald", sans-serif; font-size: clamp(30px, 8vw, 60px);
               font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: #f4f1ea; text-shadow: 0 0 40px rgba(217,164,65,.45), 0 4px 20px #000; animation: rise 1s .3s both; }
 
+  #shootHud { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
+  #dmgFlash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 40%, rgba(170,20,10,.75) 100%); }
+  #crosshair { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+  #crosshair i { position: absolute; background: rgba(255,255,255,.92); box-shadow: 0 0 2px #000; }
+  #crosshair i:nth-child(1) { left: -1px; top: -14px; width: 2px; height: 8px; } #crosshair i:nth-child(2) { left: -1px; top: 6px; width: 2px; height: 8px; }
+  #crosshair i:nth-child(3) { left: -14px; top: -1px; width: 8px; height: 2px; } #crosshair i:nth-child(4) { left: 6px; top: -1px; width: 8px; height: 2px; }
+  #crosshair.mg i:nth-child(1) { top: -18px; } #crosshair.mg i:nth-child(2) { top: 10px; } #crosshair.mg i:nth-child(3) { left: -18px; } #crosshair.mg i:nth-child(4) { left: 10px; }
+  #hitMark { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: #ff6b5a; font-size: 30px; font-weight: 700; opacity: 0; pointer-events: none; text-shadow: 0 0 6px #000; }
+  #bTimer { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); font-family: "Oswald", sans-serif; font-size: 26px; font-weight: 600; letter-spacing: .08em;
+            background: rgba(10,12,15,.7); border: 1px solid var(--line); padding: 2px 16px; border-radius: 3px; pointer-events: none; }
+  #bScore { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 6px; background: rgba(10,12,15,.68); border: 1px solid var(--line); border-radius: 4px; pointer-events: none; font-size: 13px; min-width: 190px; }
+  #bScore li { display: grid; grid-template-columns: 26px 1fr 24px 24px; align-items: center; gap: 6px; padding: 2px 4px; }
+  #bScore li.hd { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #bScore li.me { background: rgba(217,164,65,.18); } #bScore li.dead { opacity: .45; }
+  #bScore .ava { width: 22px; height: 22px; } #bScore li span:nth-child(3) { color: var(--acc); text-align: right; } #bScore li span:nth-child(4) { color: var(--mut); text-align: right; }
+  #killFeed { position: absolute; right: 60px; top: 12px; text-align: right; pointer-events: none; font-size: 13px; }
+  #killFeed div { background: rgba(10,12,15,.7); padding: 3px 10px; margin-bottom: 3px; border-radius: 2px; animation: slide .3s both; }
+  #killFeed b { color: var(--acc); font-weight: 500; } #killFeed span { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #killFeed i { font-style: normal; color: #e0866f; }
+  #bToast { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); font-family: "Kanit", sans-serif; font-size: 16px; color: #fff; text-shadow: 0 2px 6px #000; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  #hpBox { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: rgba(10,12,15,.72); border: 1px solid var(--line);
+           padding: 8px 14px; border-radius: 4px; pointer-events: none; }
+  #hpBox .lbl { font-size: 13px; color: var(--mut); letter-spacing: .1em; } #hpBar { width: min(34vw, 220px); height: 10px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
+  #hpFill { height: 100%; width: 100%; background: #6aa96b; transition: width .15s; } #hpNum { font-size: 20px; font-weight: 600; min-width: 36px; text-align: right; }
+  #ammoBox { position: absolute; right: 16px; bottom: 18px; text-align: right; background: rgba(10,12,15,.72); border: 1px solid var(--line); padding: 6px 14px; border-radius: 4px; pointer-events: none; }
+  #wName { font-family: "Kanit", sans-serif; font-size: 12px; color: var(--mut); } #ammoNum { font-size: 34px; font-weight: 600; line-height: 1; } #ammoNum.low { color: #e0866f; }
+  #fireBtn, #swapBtn { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); color: #fff; font-family: "Kanit", sans-serif; display: none; touch-action: none; }
+  #fireBtn { right: 26px; bottom: 120px; width: 92px; height: 92px; background: rgba(192,80,58,.55); font-size: 18px; }
+  #swapBtn { right: 134px; bottom: 150px; width: 62px; height: 62px; background: rgba(13,15,19,.6); font-size: 12px; }
+  #joy { position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); display: none; pointer-events: none; }
+  #joy.on { display: block; } #joyKnob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.35); }
+  #respawnMsg { position: absolute; left: 50%; top: 40%; transform: translate(-50%,-50%); text-align: center; font-size: 40px; font-weight: 600; letter-spacing: .06em; color: #f4f1ea;
+                text-shadow: 0 4px 20px #000; pointer-events: none; font-family: "Oswald", "Kanit", sans-serif; }
+  #respawnMsg small { display: block; font-family: "Kanit", sans-serif; font-size: 16px; color: var(--mut); }
+  #lockHint { position: absolute; left: 50%; top: 64%; transform: translateX(-50%); background: rgba(10,12,15,.78); border: 1px solid var(--line); padding: 8px 16px; border-radius: 4px;
+              font-family: "Kanit", sans-serif; font-size: 13px; color: #d9d5cd; pointer-events: none; white-space: nowrap; }
+  @media (pointer: coarse) { #fireBtn, #swapBtn { display: block; } #ammoBox { bottom: auto; top: 52px; right: 10px; } #hpBox { bottom: 10px; } #bScore { font-size: 11px; min-width: 150px; } #killFeed { top: 110px; right: 10px; } }
   @media (max-height: 640px) {
     #qtext { font-size: 32px; margin: 2px 0 6px; } .ch { font-size: 22px; padding: 7px 0; } #qpanel { bottom: 30px; padding: 8px 10px 10px; }
     #rank { font-size: 44px; } #board { top: 76px; } #board li { font-size: 12px; min-width: 130px; }
@@ -190,14 +225,19 @@
       <button id="copyBtn" class="btn ghost">คัดลอกลิงก์เชิญ</button>
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
+      <div class="lobbyHead"><b>โหมดเกม</b></div>
+      <div id="modes" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ฉากแข่งขัน</b></div>
       <div id="maps" class="diffs" style="grid-template-columns:repeat(3,1fr)"></div>
       <div class="lobbyHead"><b>ช่วงเวลา</b></div>
       <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
+      <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · กระสุน 50 นัด · ปืนสั้น / ปืนกล (สลับได้ระหว่างเล่น)<br>เก็บกล่องแดงเพิ่มเลือด +50 · กล่องเขียวเติมกระสุน +50 · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
+      <div id="quizOpts">
       <div class="lobbyHead"><b>หมวดคำถาม</b></div>
       <div id="cats" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ระดับความยาก</b><span id="diffDesc" class="small"></span></div>
       <div id="diffs" class="diffs"></div>
+      </div>
       <div id="botRow" class="row"><button id="addBot" class="btn ghost">+ เพิ่มบอท</button><button id="removeBot" class="btn ghost">− ลบบอท</button></div>
       <button id="startBtn" class="btn green big">เริ่มแข่ง!</button>
       <button id="readyBtn" class="btn green big">พร้อม</button>
@@ -211,6 +251,20 @@
     <ol id="board"></ol>
     <button id="camBtn">มุมกว้าง</button>
     <div id="progress"><span>START</span><div id="bar"><div id="dots"></div></div><span>GOAL</span></div>
+  </div>
+  <div id="shootHud" class="hidden">
+    <div id="dmgFlash"></div>
+    <div id="crosshair"><i></i><i></i><i></i><i></i></div><div id="hitMark">✕</div>
+    <div id="bTimer"></div>
+    <ol id="bScore"></ol>
+    <div id="killFeed"></div>
+    <div id="bToast"></div>
+    <div id="hpBox"><span class="lbl">HP</span><div id="hpBar"><div id="hpFill"></div></div><span id="hpNum">100</span></div>
+    <div id="ammoBox"><div id="wName"></div><div id="ammoNum">50</div></div>
+    <button id="swapBtn">สลับปืน</button><button id="fireBtn">ยิง</button>
+    <div id="joy"><div id="joyKnob"></div></div>
+    <div id="respawnMsg" class="hidden"></div>
+    <div id="lockHint">คลิกที่จอเพื่อเล็ง · WASD เดิน · Shift วิ่ง · คลิกยิง · Q สลับปืน · Esc ปล่อยเมาส์</div>
   </div>
   <div id="qpanel" class="hidden">
     <div id="timer"><div id="timerFill"></div></div>
@@ -401,7 +455,7 @@ function buildWorld() {
   line.rotation.x = -Math.PI / 2; line.position.set(0, 0.07, (RIN + ROUT) / 2); scene.add(line);
 
   // ซุ้มเส้นชัย
-  const gate = new THREE.Group(); scene.add(gate);
+  const gate = new THREE.Group(); scene.add(gate); world.gate = gate;
   const pillarTex = canvasTex(64, 256, (x) => { for (let j = 0; j < 8; j++) { x.fillStyle = j % 2 ? '#2b2f36' : '#3a3f47'; x.fillRect(0, j * 32, 64, 32); } });
   for (const z of [RIN - 2, ROUT + 2]) {
     const p = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 9, 16), new THREE.MeshStandardMaterial({ map: pillarTex, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 }));
@@ -1114,7 +1168,7 @@ function buildThumbs() {
 // แท่นรับรางวัล (อยู่กลางสนาม)
 const PODIUM = { 0: [0, 2.2], 1: [-2.9, 1.5], 2: [2.9, 1.0] };
 function buildPodium() {
-  const g = new THREE.Group(); scene.add(g);
+  const g = new THREE.Group(); scene.add(g); world.podiumG = g;
   const cols = { 0: '#c9a227', 1: '#a7adb5', 2: '#a0673a' };
   for (const k of [0, 1, 2]) {
     const [x, h] = PODIUM[k];
@@ -1148,7 +1202,7 @@ function posePodium(r, slot, dt, t, pts) {
   let x, y, z = 0;
   if (slot < 3) { [x, y] = PODIUM[slot]; } else { const k = slot - 3; x = (k - 2) * 1.9 + (k % 2 ? 0.4 : 0); y = 0; z = 3.4 + (k > 4 ? 1.8 : 0); }
   r.u = 0; r.root.position.set(x, y + 0.02, z); r.root.rotation.y = 0; flutter(r, dt, 2); r.speed = 0; updateAura(r, dt);
-  const label = `${pts} คะแนน`;
+  const label = `${pts} ${S && S.mode === 'shoot' ? 'KILLS' : 'คะแนน'}`;
   if (!r.scoreSp || r.scoreLabel !== label) { if (r.scoreSp) r.root.remove(r.scoreSp); r.scoreSp = scoreSprite(label, slot === 0); r.scoreLabel = label; r.root.add(r.scoreSp); }
   r.phase += dt * (slot === 0 ? 7 : 5);
   if (slot < 3) {
@@ -1283,9 +1337,19 @@ const Music = (() => {
     else if (kind === 'wrong') { tone(t, 220, 0.35, 'sawtooth', 0.18, sfxBus, 0.005, 110); tone(t + 0.12, 180, 0.35, 'sawtooth', 0.14, sfxBus, 0.005, 90); }
     else if (kind === 'win') { tone(t, 55, 2.2, 'sine', 0.4, sfxBus, 0.01, 50); [[57, 0], [64, .25], [69, .5], [72, .9]].forEach(([n, d]) => { tone(t + d, midi(n), 1.6, 'sawtooth', 0.06, sfxBus, 0.05); tone(t + d, midi(n + 12), 1.6, 'sine', 0.12, sfxBus, 0.05); }); }
     else if (kind === 'step') noise(t, 0.05, 0.06, 900, 'lowpass', sfxBus);
+    else if (kind === 'hit') { tone(t, 1900, 0.05, 'square', 0.12, sfxBus); tone(t + 0.03, 2500, 0.04, 'square', 0.08, sfxBus); }
+    else if (kind === 'hurt') { tone(t, 110, 0.25, 'sine', 0.5, sfxBus, 0.002, 50); noise(t, 0.15, 0.25, 500, 'lowpass', sfxBus); }
+    else if (kind === 'pick') { tone(t, 660, 0.15, 'triangle', 0.25, sfxBus); tone(t + 0.08, 990, 0.2, 'triangle', 0.25, sfxBus); }
+    else if (kind === 'empty') tone(t, 420, 0.03, 'square', 0.15, sfxBus);
+    else if (kind === 'swap') { noise(t, 0.05, 0.2, 3000, 'highpass', sfxBus); noise(t + 0.09, 0.04, 0.2, 2500, 'highpass', sfxBus); }
+  }
+  function shot(w, vol = 1) {
+    if (!ctx || muted) return; const t = ctx.currentTime + 0.005;
+    if (w) { noise(t, 0.07, 0.4 * vol, 1500, 'bandpass', sfxBus); tone(t, 130, 0.07, 'sine', 0.35 * vol, sfxBus, 0.001, 60); }
+    else { noise(t, 0.16, 0.55 * vol, 1200, 'bandpass', sfxBus); tone(t, 170, 0.16, 'sine', 0.5 * vol, sfxBus, 0.001, 50); noise(t + 0.02, 0.25, 0.08 * vol, 400, 'lowpass', sfxBus); }
   }
   function toggleMute() { muted = !muted; localStorage.hrMute = muted ? '1' : '0'; if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.05); return muted; }
-  return { init, play, sfx, toggleMute, get muted() { return muted; }, resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); } };
+  return { init, play, sfx, shot, toggleMute, get muted() { return muted; }, resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); } };
 })();
 
 /* ======================================================================
@@ -1351,7 +1415,10 @@ function snapshot() {
     q: H.q ? { id: H.q.id, kind: H.q.kind || 'math', text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, lane: p.lane, points: p.points, gain: p.gain,
-      correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready })),
+      correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready,
+      hp: p.hp, kills: p.kills || 0, deaths: p.deaths || 0, alive: p.alive !== false, rsp: p.rsp || 0, sp: p.sp || null, ag: p.ag || 0 })),
+    mode: H.mode, killTarget: KILL_TARGET, feed: H.mode === 'shoot' ? H.feed : null,
+    pickups: H.mode === 'shoot' && (H.state === 'battle' || H.state === 'countdown') ? H.pickups.map(k => ({ id: k.id, k: k.k, x: k.x, z: k.z, a: k.a })) : null,
   };
 }
 function broadcast() {
@@ -1405,6 +1472,7 @@ function handleAction(a) {
       else {
         if (H.players.size >= MAX_PLAYERS) { pub('down', { error: 'full', to: a.id }); return; }
         H.players.set(a.id, { name, look, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0, ready: a.id === 'host' });
+        if (H.mode === 'shoot' && (H.state === 'battle' || H.state === 'countdown')) initBattlePlayer(a.id, H.players.get(a.id));
       }
       break;
     }
@@ -1434,9 +1502,17 @@ function handleAction(a) {
     case 'ready':
       if (!p || H.state !== 'lobby' || a.id === 'host') return;
       p.ready = !!a.ready; break;
+    case 'setMode':
+      if (a.id !== 'host' || H.state !== 'lobby') return;
+      H.mode = a.mode === 'shoot' ? 'shoot' : 'race'; break;
+    case 'hit':
+      if (!p) return; applyHit(a.id, String(a.target), a.dmg, a.w); return;
+    case 'pick':
+      if (!battlePick(a, p)) return; break;
     case 'start':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       if ([...H.players.values()].some(x => !x.ready)) return;
+      if (H.mode === 'shoot') { startBattle(); break; }
       clearTimers();
       for (const q of H.players.values()) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0 });
       H.round = 0; H.q = null; H.results = null; H.answers.clear(); H.used.clear();
@@ -1453,7 +1529,7 @@ function handleAction(a) {
       if (a.id !== 'host' || H.state !== 'finished') return;
       clearTimers();
       for (const [qid, q] of H.players) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0, ready: qid === 'host' || !!q.bot });
-      H.state = 'lobby'; H.round = 0; H.q = null; H.final = null;
+      H.state = 'lobby'; H.round = 0; H.q = null; H.final = null; H.bots.clear(); H.pickups = []; H.feed = [];
       break;
     default: return;
   }
@@ -1463,7 +1539,127 @@ function removePlayer(id) {
   seen.delete(id); if (!H.players.delete(id)) return;
   H.answers.delete(id);
   if (H.state === 'question' && H.players.size && H.answers.size >= H.players.size) { clearTimers(); later(endQuestion, 300); }
+  H.bots.delete(id);
   H.dirty = true;
+}
+/* ======================================================================
+   โหมดยิงกันเอง: ค่าตั้งต้น + ฝั่งโฮสต์
+   ====================================================================== */
+const WEAPONS = [
+  { name: 'ปืนสั้น', dmg: 26, near: 10, far: 45, min: 0.4, range: 60, rate: 330, spread: 0.004, auto: false },
+  { name: 'ปืนกล', dmg: 11, near: 6, far: 35, min: 0.3, range: 50, rate: 95, spread: 0.02, auto: true },
+];
+const BATTLE_TIME = 180000, KILL_TARGET = 15, AMMO_START = 50, AMMO_MAX = 150, HP_MAX = 100, RESPAWN_MS = 3000, PICK_RESPAWN = 15000;
+const PR = 0.5;
+function dmgAt(w, d) {
+  const W = WEAPONS[w | 0]; if (d > W.range) return 0; if (d <= W.near) return W.dmg;
+  const k = Math.min(1, (d - W.near) / (W.far - W.near)); return Math.max(1, Math.round(W.dmg * (1 - k * (1 - W.min))));
+}
+const bdist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+H.mode = 'race'; H.pickups = []; H.feed = []; H.bots = new Map(); H.bt = null;
+
+function posOf(id) {
+  if (id === myId && typeof me !== 'undefined') return me;
+  if (H.bots.has(id)) return H.bots.get(id);
+  return remotes.get(id) || null;
+}
+function chooseSpawn(exceptId) {
+  const spots = arenaSpots(H.map), others = [];
+  for (const [id, p] of H.players) if (id !== exceptId && p.alive) { const ps = posOf(id); if (ps) others.push(ps); }
+  let best = spots[(Math.random() * spots.length) | 0], bestD = -1;
+  for (let i = 0; i < 8; i++) {
+    const s = spots[(Math.random() * spots.length) | 0];
+    const d = others.length ? Math.min(...others.map(o => bdist(o, s))) : Math.random() * 10;
+    if (d > bestD) { bestD = d; best = s; }
+  }
+  return best;
+}
+function spawnPlayer(id, p) {
+  const s = chooseSpawn(id);
+  Object.assign(p, { hp: HP_MAX, alive: true, rsp: 0, sp: [+s.x.toFixed(2), +s.z.toFixed(2), ((p.sp && p.sp[2]) || 0) + 1] });
+  if (p.bot) { const b = H.bots.get(id) || { w: Math.random() < 0.5 ? 0 : 1, next: 0, sd: 1, flip: 0 }; Object.assign(b, { x: s.x, z: s.z, yaw: 0, pitch: 0, mv: 0 }); H.bots.set(id, b); }
+}
+function initBattlePlayer(id, p) { Object.assign(p, { kills: 0, deaths: 0, ag: 0 }); spawnPlayer(id, p); }
+function freePickupSpot() {
+  const spots = pickupSpots(H.map).filter(s => !H.pickups.some(k => k.a && Math.hypot(k.x - s.x, k.z - s.z) < 3));
+  return spots[(Math.random() * spots.length) | 0];
+}
+function startBattle() {
+  clearTimers();
+  H.feed = []; H.pickups = []; H.bots.clear();
+  for (let i = 0; i < 8; i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: i % 2 ? 'ammo' : 'hp', x: +s.x.toFixed(2), z: +s.z.toFixed(2), a: true, re: 0 }); }
+  for (const [id, p] of H.players) initBattlePlayer(id, p);
+  H.state = 'countdown'; H.endsAt = Date.now() + 3200;
+  later(() => { H.state = 'battle'; H.endsAt = Date.now() + BATTLE_TIME; H.dirty = true; }, 3200);
+  if (!H.bt) H.bt = setInterval(battleTick, 100);
+}
+function endBattle() {
+  H.final = [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, points: p.kills || 0, correct: p.kills || 0, deaths: p.deaths || 0, ctime: p.deaths || 0 }))
+    .sort((a, b) => (b.points - a.points) || (a.deaths - b.deaths));
+  H.state = 'finished'; H.dirty = true;
+}
+function applyHit(sid, tid, dmg, w) {
+  const s = H.players.get(sid), tg = H.players.get(tid);
+  if (H.state !== 'battle' || !s || !tg || !s.alive || !tg.alive || sid === tid) return;
+  dmg = Math.max(0, Math.min((WEAPONS[w | 0] || WEAPONS[0]).dmg, Math.round(+dmg || 0))); if (!dmg) return;
+  tg.hp -= dmg;
+  if (tg.hp <= 0) {
+    tg.hp = 0; tg.alive = false; tg.deaths++; tg.rsp = Date.now() + RESPAWN_MS; s.kills++;
+    H.feed.push({ k: s.name, v: tg.name, w: w | 0, t: Date.now() }); if (H.feed.length > 5) H.feed.shift();
+  }
+  H.dirty = true;
+}
+function losClear(a, b) {
+  const o = new THREE.Vector3(a.x, 1.9, a.z), d = new THREE.Vector3(b.x - a.x, 0, b.z - a.z); const len = d.length(); if (!len) return true; d.divideScalar(len);
+  const h = rayCast(o, d, len, null, 0, true); return h.t >= len - 0.6;
+}
+function botTick(now) {
+  const dt = 0.1;
+  for (const [id, b] of H.bots) {
+    const p = H.players.get(id); if (!p) { H.bots.delete(id); continue; }
+    if (!p.alive || H.state !== 'battle') { b.mv = 0; continue; }
+    let tgt = null, td = 1e9, tid = null;
+    for (const [oid, op] of H.players) { if (oid === id || !op.alive) continue; const ps = posOf(oid); if (!ps) continue; const d = bdist(b, ps); if (d < td) { td = d; tgt = ps; tid = oid; } }
+    let mx = 0, mz = 0;
+    if (tgt) {
+      const dx = tgt.x - b.x, dz = tgt.z - b.z, dl = Math.hypot(dx, dz) || 1; b.yaw = Math.atan2(dx, dz);
+      if (now > b.flip) { b.sd = Math.random() < .5 ? -1 : 1; b.flip = now + 1500 + Math.random() * 2500; }
+      if (td > 16) { mx = dx / dl; mz = dz / dl; } else if (td < 7) { mx = -dx / dl; mz = -dz / dl; }
+      else { mx = -dz / dl * b.sd; mz = dx / dl * b.sd; }
+      if (now >= b.next && td < 38 && losClear(b, tgt)) {
+        b.next = now + (b.w ? 140 : 520) + Math.random() * 380;
+        const acc = (b.w ? 0.32 : 0.5) * (1 - td / 70), hit = Math.random() < acc;
+        const fx = Math.sin(b.yaw), fz = Math.cos(b.yaw);
+        const mxz = [b.x + fx * 0.8 - fz * 0.3, 1.95, b.z + fz * 0.8 + fx * 0.3];
+        const off = hit ? 0 : 1.2;
+        pub('fx', [id, ...mxz.map(v => +v.toFixed(2)), +(tgt.x + (Math.random() - .5) * off * 2).toFixed(2), +(1.6 + (Math.random() - .5) * off).toFixed(2), +(tgt.z + (Math.random() - .5) * off * 2).toFixed(2), b.w]);
+        if (isHost) onFx([id, ...mxz, tgt.x, 1.6, tgt.z, b.w], true);
+        if (hit) applyHit(id, tid, dmgAt(b.w, td), b.w);
+      }
+    } else { mx = Math.sin(now / 1500 + b.x); mz = Math.cos(now / 1700 + b.z); }
+    const nx = b.x + mx * 5.2 * dt, nz = b.z + mz * 5.2 * dt, r = moveCollide(b.x, b.z, nx, nz);
+    b.mv = Math.hypot(r.x - b.x, r.z - b.z) > 0.05 ? 1 : 0; b.x = r.x; b.z = r.z;
+    pub('pos', [id, +b.x.toFixed(2), +b.z.toFixed(2), +b.yaw.toFixed(2), 0, b.w, b.mv, 1]);
+    onPos([id, b.x, b.z, b.yaw, 0, b.w, b.mv, 1], true);
+  }
+}
+function battleTick() {
+  if (!isHost || H.mode !== 'shoot' || (H.state !== 'battle' && H.state !== 'countdown')) return;
+  const now = Date.now();
+  if (H.state === 'battle') {
+    if (now >= H.endsAt || [...H.players.values()].some(p => (p.kills || 0) >= KILL_TARGET)) return endBattle();
+    for (const [id, p] of H.players) if (!p.alive && p.rsp && now >= p.rsp) { spawnPlayer(id, p); H.dirty = true; }
+    for (const k of H.pickups) if (!k.a && now >= k.re) { const s = freePickupSpot(); Object.assign(k, { x: +s.x.toFixed(2), z: +s.z.toFixed(2), a: true }); H.dirty = true; }
+  }
+  botTick(now);
+}
+function battlePick(a, p) {
+  if (H.state !== 'battle' || !p || !p.alive) return false;
+  const k = H.pickups.find(x => x.id === a.pid && x.a), ps = posOf(a.id);
+  if (!k || !ps || Math.hypot(ps.x - k.x, ps.z - k.z) > 3.5) return false;
+  k.a = false; k.re = Date.now() + PICK_RESPAWN;
+  if (k.k === 'hp') p.hp = Math.min(HP_MAX, p.hp + 50); else p.ag = (p.ag || 0) + 1;
+  return true;
 }
 
 /* ======================================================================
@@ -1512,16 +1708,19 @@ async function createRoom() {
   if (!client) { lockBtns(false); return status('เชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'); }
   isHost = true; myId = 'host'; status('');
   const up = TOPIC + roomCode + '/up';
-  client.subscribe(up);
-  client.on('connect', () => { client.subscribe(up); setNet(true); H.dirty = true; });
+  const subAll = () => { client.subscribe(up); client.subscribe(TOPIC + roomCode + '/pos'); client.subscribe(TOPIC + roomCode + '/fx'); };
+  subAll();
+  client.on('connect', () => { subAll(); setNet(true); H.dirty = true; });
   client.on('offline', () => setNet(false)); client.on('close', () => setNet(false));
   client.on('message', (topic, buf) => {
     let a; try { a = JSON.parse(buf.toString()); } catch { return; }
+    if (topic.endsWith('/pos')) { if (Array.isArray(a) && !String(a[0]).startsWith('bot-')) { onPos(a); seen.set(a[0], Date.now()); } return; }
+    if (topic.endsWith('/fx')) { if (Array.isArray(a) && !String(a[0]).startsWith('bot-')) onFx(a); return; }
     if (!a || typeof a !== 'object' || typeof a.id !== 'string' || a.id === 'host' || a.id.startsWith('bot-')) return;
     seen.set(a.id, Date.now());
     if (a.type === 'leave') return removePlayer(a.id);
     if (a.type === 'ping') { if (!H.players.has(a.id)) return; H.dirty = true; return; }
-    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'setTod', 'start', 'lobby'].includes(a.type)) return;
+    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'setTod', 'setMode', 'start', 'lobby'].includes(a.type)) return;
     handleAction(a);
   });
   // ลบคนที่หายไปนาน (ปิดเว็บไปแล้ว)
@@ -1547,14 +1746,17 @@ async function joinRoom() {
   try { client = await connectBroker(idx); } catch { lockBtns(false); return status('เชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'); }
   roomCode = code;
   const down = TOPIC + code + '/down';
-  client.subscribe(down);
-  client.on('connect', () => { client.subscribe(down); setNet(true); });
+  const subAll = () => { client.subscribe(down); client.subscribe(TOPIC + code + '/pos'); client.subscribe(TOPIC + code + '/fx'); };
+  subAll();
+  client.on('connect', () => { subAll(); setNet(true); });
   client.on('offline', () => setNet(false)); client.on('close', () => setNet(false));
   let found = false, hostAway = 0;
   const started = Date.now();
   status(`กำลังค้นหาห้อง ${code} …`);
   client.on('message', (topic, buf) => {
     let d; try { d = JSON.parse(buf.toString()); } catch { return; }
+    if (topic.endsWith('/pos')) { if (Array.isArray(d)) onPos(d); return; }
+    if (topic.endsWith('/fx')) { if (Array.isArray(d)) onFx(d); return; }
     if (!d || typeof d !== 'object') return;
     if (d.closed) {
       if (!S) { stopJoin(); lockBtns(false); return status(`ห้อง ${code} ปิดไปแล้ว ให้เจ้าของห้องสร้างห้องใหม่`); }
@@ -1608,6 +1810,7 @@ $('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === my
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
 $('#tods').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setTod', { tod: +b.dataset.t }); };
+$('#modes').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setMode', { mode: b.dataset.mode }); };
 $('#maps').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setMap', { map: +b.dataset.m }); };
 $('#cats').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setCat', { cat: +b.dataset.c }); };
 $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setDiff', { diff: +b.dataset.d }); };
@@ -1659,7 +1862,9 @@ function render() {
   const st = inRoom ? S.state : null;
   show('#home', !inRoom);
   show('#lobby', st === 'lobby');
-  show('#hud', st === 'countdown' || st === 'question' || st === 'reveal');
+  const shootMode = inRoom && S.mode === 'shoot';
+  show('#hud', !shootMode && (st === 'countdown' || st === 'question' || st === 'reveal'));
+  show('#shootHud', shootMode && (st === 'countdown' || st === 'battle'));
   show('#qpanel', st === 'question' || st === 'reveal');
   show('#roundResult', st === 'reveal');
   show('#final', st === 'finished');
@@ -1680,6 +1885,8 @@ function render() {
     $('#readyBtn').textContent = me && me.ready ? 'พร้อมแล้ว · แตะเพื่อยกเลิก' : 'พร้อม';
     show('#botRow', isHost); show('#roomNet', isHost);
     if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
+    $('#modes').innerHTML = [['race', 'ตอบคำถามแข่งวิ่ง'], ['shoot', 'ยิงกันเอง']].map(([k, n]) => `<button class="diff${(S.mode || 'race') === k ? ' sel' : ''}" data-mode="${k}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:10px 0">${n}</button>`).join('');
+    show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
     $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${m.name}</button>`).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
@@ -1700,7 +1907,8 @@ function render() {
   }
   if (st === 'finished' && !sfxFinished) { sfxFinished = true; Music.sfx('win'); }
   if (st !== 'finished') sfxFinished = false;
-  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' ? (S.map === 2 ? 'zombie' : S.map === 1 ? 'bkk' : 'race') : 'lobby');
+  if (st === 'battle' || (shootMode && st === 'countdown')) renderBattleHud();
+  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' || st === 'battle' ? (S.map === 2 ? 'zombie' : S.map === 1 ? 'bkk' : 'race') : 'lobby');
   if (st === 'reveal' && S.results) {
     $('#roundResult').innerHTML = `<h4>ผลข้อที่ ${S.round} · ตอบ ${S.q.answer}</h4>` + S.results.map(x => {
       const p = S.players.find(q => q.id === x.id); if (!p) return '';
@@ -1712,10 +1920,10 @@ function render() {
     $('#waitHost').textContent = isHost ? '' : 'รอเจ้าของห้องเริ่มรอบใหม่…';
   }
   if (st === 'finished' && S.final) {
-    $('#finalDiff').textContent = `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
+    $('#finalDiff').textContent = shootMode ? `ยิงกันเอง · ${MAPS[S.map | 0].name}` : `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#podium').innerHTML = S.final.map((p, i) => `<div class="r ${p.id === myId ? 'me' : ''}"><span class="m">${medal(i)}</span>${ava(p.look)}
-      <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}</div></div>
-      <span class="p">${p.points} คะแนน</span></div>`).join('');
+      <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">${shootMode ? `ยิงได้ ${p.points} · ถูกยิง ${p.deaths || 0}` : `ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}`}</div></div>
+      <span class="p">${p.points} ${shootMode ? 'KILLS' : 'คะแนน'}</span></div>`).join('');
   }
 }
 
@@ -1760,6 +1968,145 @@ function renderQuestion() {
 }
 
 /* ======================================================================
+   โหมดยิงกันเอง: สนาม ที่กำบัง การชน และการยิงเรย์
+   ====================================================================== */
+const ARENA = [ROUT + 4.4, ROUT + 12.6, ROUT + 13.2];
+function seeded(seed) { let x = (seed * 9301 + 49297) % 2147483647; if (x <= 0) x += 2147483646; return () => (x = x * 16807 % 2147483647) / 2147483647; }
+const COVERS = {}, COLS = {};
+function coverMats(m) {
+  if (coverMats[m]) return coverMats[m];
+  const crate = canvasTex(128, 128, (x) => { x.fillStyle = '#7a5a36'; x.fillRect(0, 0, 128, 128); x.fillStyle = '#6a4c2c'; for (let i = 0; i < 4; i++) x.fillRect(0, i * 32 + 28, 128, 4); x.strokeStyle = '#4f3820'; x.lineWidth = 10; x.strokeRect(5, 5, 118, 118); x.beginPath(); x.moveTo(8, 8); x.lineTo(120, 120); x.stroke(); });
+  const concrete = canvasTex(128, 128, (x) => { x.fillStyle = '#9b9890'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 400; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .1})`; x.fillRect(Math.random() * 128, Math.random() * 128, 3, 3); } x.fillStyle = '#d9a12b'; for (let k = -128; k < 128; k += 32) { x.beginPath(); x.moveTo(k, 128); x.lineTo(k + 16, 128); x.lineTo(k + 40, 104); x.lineTo(k + 24, 104); x.fill(); } });
+  const padded = canvasTex(128, 128, (x) => { x.fillStyle = '#2e4a6a'; x.fillRect(0, 0, 128, 128); x.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 4; i++) x.fillRect(i * 32 + 2, 4, 28, 120); x.fillStyle = '#e8e5df'; x.font = '700 22px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('H-RUNNER', 64, 70); });
+  const container = canvasTex(128, 128, (x) => { x.fillStyle = '#7a3f28'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.05)'; x.fillRect(i * 8, 0, 8, 128); } for (let i = 0; i < 60; i++) { x.fillStyle = `rgba(60,30,10,${Math.random() * .35})`; x.beginPath(); x.arc(Math.random() * 128, Math.random() * 128, Math.random() * 8, 0, 7); x.fill(); } });
+  const mk = (t) => new THREE.MeshStandardMaterial({ map: t, roughness: 0.85 });
+  return (coverMats[m] = { crate: mk(crate), wall: mk(m === 0 ? padded : m === 1 ? concrete : container) });
+}
+function buildCovers(m) {
+  if (COVERS[m]) return COVERS[m];
+  const g = new THREE.Group(); g.visible = false; scene.add(g);
+  const cols = [], R = seeded(1000 + m * 77), mats = coverMats(m);
+  const add = (x, z, w, d, h, mat) => {
+    if (Math.hypot(x, z) < 8 || (Math.abs(x) < 3 && (Math.abs(z - (RIN - 2)) < 3 || Math.abs(z - (ROUT + 2)) < 3))) return;
+    if (cols.some(c => x + w / 2 > c.x0 - 1.5 && x - w / 2 < c.x1 + 1.5 && z + d / 2 > c.z0 - 1.5 && z - d / 2 < c.z1 + 1.5)) return;
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); b.position.set(x, h / 2, z); b.castShadow = b.receiveShadow = true; g.add(b);
+    cols.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2, y0: 0, y1: h });
+  };
+  for (let k = 0; k < 20; k++) {
+    const [x, z] = posAt(k / 20 + R() * 0.02, laneR(1 + ((R() * 6) | 0)));
+    if (Math.abs(x) < L / 2 - 2) { if (k % 3 === 0) add(x, z, 2.2, 2.2, 2.2, mats.crate); else add(x, z, 5.5, 1, 2.3, mats.wall); }
+    else { add(x, z, 2.2, 2.2, 2.2, mats.crate); if (R() < .5) add(x + 2.3, z + 0.4, 2.2, 2.2, 1.6, mats.crate); }
+  }
+  for (let k = 0; k < 10; k++) {
+    const [x, z] = posAt(k / 10 + 0.05, RIN - 8 - R() * 6);
+    if (k % 2) { add(x, z, 4.5, 1, 2.3, mats.wall); add(x + 2, z + 2, 1, 4, 2.3, mats.wall); } else add(x, z, 2.2, 2.2, 2.2, mats.crate);
+  }
+  if (m > 0) for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.03, ROUT + 6 + R() * 4); add(x, z, m === 2 ? 6 : 2.2, m === 2 ? 2.4 : 2.2, m === 2 ? 2.6 : 2.2, m === 2 ? mats.wall : mats.crate); }
+  return (COVERS[m] = { g, cols });
+}
+function collidersFor(m) {
+  if (COLS[m]) return COLS[m];
+  scene.updateMatrixWorld(true);
+  const out = [], bx = new THREE.Box3(), bound = ARENA[m] + 3;
+  const skip = new Set(); (world.cars || []).forEach(c => skip.add(c.m)); (world.zombies || []).forEach(z => skip.add(z.g)); if (world.train) skip.add(world.train); if (world.searchlight) skip.add(world.searchlight);
+  for (const root of [m === 0 ? world.stad : m === 1 ? world.bkk : world.zom, world.podiumG, world.gate]) {
+    if (!root) continue;
+    root.traverse(o => {
+      if (!o.isMesh || o.isInstancedMesh) return;
+      for (let q = o; q; q = q.parent) if (skip.has(q)) return;
+      if (o.material && !Array.isArray(o.material) && o.material.transparent && !o.material.alphaTest) return;
+      bx.setFromObject(o);
+      const w = bx.max.x - bx.min.x, d = bx.max.z - bx.min.z, h = bx.max.y - bx.min.y;
+      if (bx.max.y < 0.4 || bx.min.y > 3.0 || h < 0.25 || Math.max(w, d) > 80 || (w < 0.12 && d < 0.12)) return;
+      const cx = (bx.min.x + bx.max.x) / 2, cz = (bx.min.z + bx.max.z) / 2;
+      if (stadiumDist(cx, cz) - Math.hypot(w, d) / 2 > bound) return;
+      out.push({ x0: bx.min.x, x1: bx.max.x, z0: bx.min.z, z1: bx.max.z, y0: bx.min.y, y1: bx.max.y });
+    });
+  }
+  out.push(...buildCovers(m).cols);
+  return (COLS[m] = out);
+}
+function insideAny(x, z, pad, m) { return collidersFor(m).some(c => c.y0 < 1.6 && c.y1 > 0.3 && x > c.x0 - pad && x < c.x1 + pad && z > c.z0 - pad && z < c.z1 + pad); }
+const SPOTS = {}, PSPOTS = {};
+function arenaSpots(m) {
+  if (SPOTS[m]) return SPOTS[m];
+  const c = [];
+  for (let k = 0; k < 32; k++) { const [x, z] = posAt(k / 32 + 0.012, laneR(k % 8)); c.push({ x, z }); }
+  for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.04, RIN - 5 - (k % 3) * 4); c.push({ x, z }); }
+  if (m > 0) for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.02, ROUT + 4); c.push({ x, z }); }
+  return (SPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 7 && !insideAny(s.x, s.z, 1.0, m)));
+}
+function pickupSpots(m) {
+  if (PSPOTS[m]) return PSPOTS[m];
+  const c = [];
+  for (let k = 0; k < 24; k++) { const [x, z] = posAt(k / 24 + 0.03, laneR((k * 3) % 8)); c.push({ x, z }); }
+  for (let k = 0; k < 8; k++) { const [x, z] = posAt(k / 8 + 0.08, RIN - 10); c.push({ x, z }); }
+  return (PSPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 7 && !insideAny(s.x, s.z, 1.2, m)));
+}
+function moveCollide(px, pz, nx, nz) {
+  const m = (S && S.map) | 0, cols = collidersFor(m);
+  let x = nx, z = nz;
+  for (let it = 0; it < 2; it++) for (const c of cols) {
+    if (c.y0 > 1.6 || c.y1 < 0.3) continue;
+    const qx = Math.max(c.x0, Math.min(x, c.x1)), qz = Math.max(c.z0, Math.min(z, c.z1)), dx = x - qx, dz = z - qz, d2 = dx * dx + dz * dz;
+    if (d2 < PR * PR) {
+      if (d2 > 1e-6) { const d = Math.sqrt(d2); x = qx + dx / d * PR; z = qz + dz / d * PR; }
+      else { const l = x - c.x0, r = c.x1 - x, f = z - c.z0, b = c.z1 - z, mn = Math.min(l, r, f, b); if (mn === l) x = c.x0 - PR; else if (mn === r) x = c.x1 + PR; else if (mn === f) z = c.z0 - PR; else z = c.z1 + PR; }
+    }
+  }
+  if (stadiumDist(x, z) > ARENA[m]) { if (stadiumDist(x, pz) <= ARENA[m]) z = pz; else if (stadiumDist(px, z) <= ARENA[m]) x = px; else { x = px; z = pz; } }
+  return { x, z };
+}
+function rayBox(o, d, c) {
+  let t0 = 0, t1 = 1e9;
+  for (const [oa, da, mn, mx] of [[o.x, d.x, c.x0, c.x1], [o.y, d.y, c.y0, c.y1], [o.z, d.z, c.z0, c.z1]]) {
+    if (Math.abs(da) < 1e-9) { if (oa < mn || oa > mx) return Infinity; continue; }
+    let a = (mn - oa) / da, b = (mx - oa) / da; if (a > b) [a, b] = [b, a];
+    t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) return Infinity;
+  }
+  return t0;
+}
+// ยิงเรย์: คืนสิ่งที่โดนก่อน (ผนัง/พื้น/ผู้เล่น)
+function rayCast(o, d, maxT, excludeId, tMin = 0, wallsOnly = false) {
+  let best = { t: maxT, kind: 'none', id: null };
+  for (const c of collidersFor((S && S.map) | 0)) { const t = rayBox(o, d, c); if (t > tMin && t < best.t) best = { t, kind: 'wall', id: null }; }
+  if (d.y < -1e-4) { const t = -o.y / d.y; if (t > tMin && t < best.t) best = { t, kind: 'ground', id: null }; }
+  if (!wallsOnly && S) for (const p of S.players) {
+    if (p.id === excludeId || p.alive === false) continue;
+    const ps = p.id === myId ? me : remotes.get(p.id); if (!ps) continue;
+    const px = ps.rx ?? ps.x, pz = ps.rz ?? ps.z, ox = o.x - px, oz = o.z - pz, a = d.x * d.x + d.z * d.z, b = 2 * (ox * d.x + oz * d.z), cc = ox * ox + oz * oz - 0.55 * 0.55, disc = b * b - 4 * a * cc;
+    if (disc < 0 || a < 1e-9) continue;
+    const t = (-b - Math.sqrt(disc)) / (2 * a); if (t <= tMin || t >= best.t) continue;
+    const y = o.y + d.y * t; if (y < 0 || y > 2.65) continue;
+    best = { t, kind: 'player', id: p.id };
+  }
+  return best;
+}
+// ไอเทม
+const pickMeshes = new Map();
+const pickTex = {
+  hp: canvasTex(64, 64, (x) => { x.fillStyle = '#f2f2ee'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#c62828'; x.fillRect(24, 10, 16, 44); x.fillRect(10, 24, 44, 16); }),
+  ammo: canvasTex(64, 64, (x) => { x.fillStyle = '#4a5233'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#d9a12b'; x.fillRect(0, 26, 64, 12); x.fillStyle = '#e8e2d2'; x.font = '700 14px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('AMMO', 32, 20); }),
+};
+function syncPickups(list) {
+  const ids = new Set((list || []).map(k => k.id));
+  for (const [id, m] of pickMeshes) if (!ids.has(id)) { scene.remove(m); pickMeshes.delete(id); }
+  for (const k of list || []) {
+    let m = pickMeshes.get(k.id);
+    if (!m || m.userData.k !== k.k) {
+      if (m) scene.remove(m);
+      m = new THREE.Group(); m.userData.k = k.k;
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.9), new THREE.MeshStandardMaterial({ map: pickTex[k.k], roughness: 0.6, emissive: k.k === 'hp' ? '#ff5a5a' : '#ffcc55', emissiveIntensity: 0.25 }));
+      b.castShadow = true; m.add(b);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 6, 28), new THREE.MeshBasicMaterial({ color: k.k === 'hp' ? '#ff6b6b' : '#ffd166', transparent: true, opacity: 0.7 }));
+      ring.rotation.x = Math.PI / 2; ring.position.y = -0.85; m.add(ring);
+      scene.add(m); pickMeshes.set(k.id, m);
+    }
+    m.position.set(k.x, 1.1, k.z); m.visible = !!k.a;
+  }
+}
+
+/* ======================================================================
    นักวิ่งในฉาก + กล้อง
    ====================================================================== */
 const runners = new Map(); // id -> runner
@@ -1789,8 +2136,11 @@ function frame() {
   const inRoom = !!(S && S.players.some(p => p.id === myId));
   const st = inRoom ? S.state : null;
 
+  const shooting = battleOn();
+  if (!shooting) leaveBattle();
   // ขยับนักวิ่ง
-  if (!inRoom) {
+  if (shooting) shooterFrame(dt, t);
+  else if (!inRoom) {
     for (const d of demo) {
       const P = 2 * L + 2 * Math.PI * laneR(d.lane);
       d.v += (Math.random() - .5) * 0.002; d.v = Math.min(0.034, Math.max(0.02, d.v));
@@ -1811,7 +2161,8 @@ function frame() {
   }
 
   // กล้อง
-  if (!inRoom) {
+  if (shooting) { /* กล้องตั้งใน shooterFrame */ }
+  else if (!inRoom) {
     const a = t * 0.06;
     tmpV.set(Math.cos(a) * 105, 42, Math.sin(a) * 85); tmpL.set(0, 0, 0);
   } else if (st === 'lobby') {
@@ -1832,9 +2183,11 @@ function frame() {
       }
     }
   }
-  const k = 1 - Math.exp(-dt * (inRoom ? 4 : 1.5));
-  camPos.lerp(tmpV, k); camLook.lerp(tmpL, k);
-  camera.position.copy(camPos); camera.lookAt(camLook);
+  if (!shooting) {
+    const k = 1 - Math.exp(-dt * (inRoom ? 4 : 1.5));
+    camPos.lerp(tmpV, k); camLook.lerp(tmpL, k);
+    camera.position.copy(camPos); camera.lookAt(camLook);
+  }
   sun.target.position.copy(camLook); sun.position.copy(camLook).add(sunOff);
 
   // ของประดับเคลื่อนไหว
@@ -1877,6 +2230,224 @@ function frame() {
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
+/* ======================================================================
+   โหมดยิงกันเอง: ฝั่งผู้เล่น (ควบคุม กล้องมุมบุคคลที่สาม ยิง HUD)
+   ====================================================================== */
+const me = { x: 0, z: 0, rx: 0, rz: 0, yaw: 0, pitch: 0.05, w: 0, ammo: AMMO_START, spSeq: -1, ag: 0, cool: 0, mv: 0, lastHp: HP_MAX, pickT: 0, pubT: 0, pressFired: false, flash: 0, hitFlash: 0 };
+const remotes = new Map();
+const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
+const battleOn = () => !!(S && S.mode === 'shoot' && (S.state === 'battle' || S.state === 'countdown') && S.players.some(p => p.id === myId));
+function onPos(a) {
+  const id = a[0]; if (id === myId) return;
+  let r = remotes.get(id); if (!r) { r = { rx: +a[1], rz: +a[2], ryaw: +a[3] }; remotes.set(id, r); }
+  Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, t: performance.now() });
+}
+// เส้นกระสุน + แสงปากกระบอก
+const tracers = [];
+function tracer(a, b) {
+  let tr = tracers.find(x => x.life <= 0);
+  if (!tr) {
+    if (tracers.length > 40) return;
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(6), 3));
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: '#ffe2a6', transparent: true, depthWrite: false }));
+    const fl = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({ color: '#ffcf6b', transparent: true, depthWrite: false }));
+    const sp = new THREE.Mesh(new THREE.IcosahedronGeometry(0.12, 0), new THREE.MeshBasicMaterial({ color: '#fff6dc', transparent: true, depthWrite: false }));
+    l.frustumCulled = false; scene.add(l, fl, sp); tr = { l, fl, sp, life: 0 }; tracers.push(tr);
+  }
+  const p = tr.l.geometry.attributes.position; p.setXYZ(0, a.x, a.y, a.z); p.setXYZ(1, b.x, b.y, b.z); p.needsUpdate = true;
+  tr.fl.position.copy(a); tr.sp.position.copy(b); tr.life = 0.09; tr.l.visible = tr.fl.visible = tr.sp.visible = true;
+}
+function updateTracers(dt) {
+  for (const tr of tracers) if (tr.life > 0) {
+    tr.life -= dt; const k = Math.max(0, tr.life / 0.09);
+    tr.l.material.opacity = k; tr.fl.material.opacity = k; tr.sp.material.opacity = k; tr.fl.scale.setScalar(0.6 + k);
+    if (tr.life <= 0) tr.l.visible = tr.fl.visible = tr.sp.visible = false;
+  }
+}
+function onFx(a, local) {
+  if (!local && a[0] === myId) return;
+  const A = new THREE.Vector3(+a[1], +a[2], +a[3]), B = new THREE.Vector3(+a[4], +a[5], +a[6]);
+  tracer(A, B);
+  const d = Math.hypot(A.x - me.x, A.z - me.z); Music.shot(a[7] | 0, clampN(1 - d / 80, 0.06, 0.8));
+}
+// ปืนในมือ
+function ensureGuns(r) {
+  if (r.guns) return r.guns;
+  const g = new THREE.Group(); g.position.set(0, -0.72, 0.02); r.arms[0].add(g);
+  const mk = (geo, c, x, y, z, par) => { const m = new THREE.Mesh(geo, toon(c)); m.position.set(x, y, z); m.castShadow = true; par.add(m); return m; };
+  const p = new THREE.Group(); g.add(p);
+  mk(new THREE.BoxGeometry(0.09, 0.36, 0.13), '#1c1e21', 0, -0.1, 0.02, p); mk(new THREE.BoxGeometry(0.07, 0.1, 0.2), '#2a2c30', 0, 0.04, -0.1, p);
+  const m = new THREE.Group(); g.add(m);
+  mk(new THREE.BoxGeometry(0.11, 0.82, 0.16), '#23262a', 0, -0.25, 0.03, m); mk(new THREE.CylinderGeometry(0.03, 0.03, 0.36, 8), '#4b5563', 0, -0.82, 0.05, m);
+  mk(new THREE.BoxGeometry(0.08, 0.13, 0.3), '#1a1b1e', 0, -0.2, -0.17, m); mk(new THREE.BoxGeometry(0.09, 0.3, 0.14), '#3a3326', 0, 0.26, -0.02, m);
+  g.visible = false;
+  return (r.guns = { g, p, m });
+}
+function poseShooter(r, mv, alive, pitch, w, dt) {
+  const gs = ensureGuns(r); gs.g.visible = alive; gs.p.visible = w === 0; gs.m.visible = w === 1;
+  if (!alive) { r.body.rotation.x = -1.5; r.body.position.y = 0.32; r.legs.forEach(l => l.rotation.x = 0.1); r.arms.forEach(a => a.rotation.set(-0.3, 0, 0)); return; }
+  r.body.rotation.x = 0; r.phase += dt * (mv ? 10 : 2);
+  const s = Math.sin(r.phase), amp = mv ? 0.75 : 0;
+  r.legs[0].rotation.x = s * amp; r.legs[1].rotation.x = -s * amp;
+  r.body.position.y = mv ? Math.abs(Math.cos(r.phase)) * 0.07 : 0;
+  const aim = -1.5 - pitch;
+  r.arms[0].rotation.set(aim, 0, -0.04); r.arms[1].rotation.set(aim + 0.2, 0, -0.6);
+  r.head.rotation.x = -pitch * 0.5;
+}
+function unposeShooter(r) {
+  if (r.guns) r.guns.g.visible = false;
+  r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0;
+  r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1);
+}
+function battleSprites(on) {
+  for (const r of runners.values()) for (const o of r.root.children) if (o.isSprite && o.renderOrder === 10) {
+    o.visible = !(on && r.isMe); o.material.depthTest = on; o.material.needsUpdate = true;
+  }
+}
+// การควบคุม
+const keys = {}; let firing = false, locked = false, joy = null, look = null;
+function swapWeapon(w) { me.w = w == null ? 1 - me.w : w; me.pressFired = false; Music.sfx('swap'); }
+addEventListener('keydown', e => {
+  if (!battleOn() || document.activeElement.tagName === 'INPUT') return;
+  keys[e.code] = true;
+  if (e.code === 'KeyQ') swapWeapon(); else if (e.code === 'Digit1') swapWeapon(0); else if (e.code === 'Digit2') swapWeapon(1);
+  if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
+});
+addEventListener('keyup', e => { keys[e.code] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; firing = false; });
+document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === $('#shootHud'); });
+addEventListener('mousemove', e => { if (!locked) return; me.yaw -= e.movementX * 0.0024; me.pitch = clampN(me.pitch - e.movementY * 0.002, -0.45, 0.55); });
+$('#shootHud').addEventListener('mousedown', e => {
+  if (isTouch || e.target.closest('button')) return;
+  if (!locked) { const el = $('#shootHud'); el.requestPointerLock && el.requestPointerLock(); return; }
+  if (e.button === 0) { firing = true; me.pressFired = false; }
+});
+addEventListener('mouseup', e => { if (e.button === 0 && !isTouch) firing = false; });
+$('#shootHud').addEventListener('touchstart', e => {
+  for (const t of e.changedTouches) {
+    if (t.target.closest && t.target.closest('button')) continue;
+    if (!joy && t.clientX < innerWidth * 0.42) { joy = { id: t.identifier, x0: t.clientX, y0: t.clientY, x: 0, y: 0 }; const j = $('#joy'); j.style.left = (t.clientX - 60) + 'px'; j.style.top = (t.clientY - 60) + 'px'; j.classList.add('on'); }
+    else if (!look) look = { id: t.identifier, x: t.clientX, y: t.clientY };
+  }
+  e.preventDefault();
+}, { passive: false });
+$('#shootHud').addEventListener('touchmove', e => {
+  for (const t of e.changedTouches) {
+    if (joy && t.identifier === joy.id) { joy.x = clampN((t.clientX - joy.x0) / 55, -1, 1); joy.y = clampN((t.clientY - joy.y0) / 55, -1, 1); $('#joyKnob').style.transform = `translate(${joy.x * 40}px,${joy.y * 40}px)`; }
+    if (look && t.identifier === look.id) { me.yaw -= (t.clientX - look.x) * 0.0062; me.pitch = clampN(me.pitch - (t.clientY - look.y) * 0.0045, -0.45, 0.55); look.x = t.clientX; look.y = t.clientY; }
+  }
+  e.preventDefault();
+}, { passive: false });
+const touchEnd = e => { for (const t of e.changedTouches) { if (joy && t.identifier === joy.id) { joy = null; $('#joy').classList.remove('on'); $('#joyKnob').style.transform = ''; } if (look && t.identifier === look.id) look = null; } };
+$('#shootHud').addEventListener('touchend', touchEnd); $('#shootHud').addEventListener('touchcancel', touchEnd);
+$('#fireBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firing = true; me.pressFired = false; });
+for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) $('#fireBtn').addEventListener(ev, () => { firing = false; });
+$('#swapBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); swapWeapon(); });
+let toastT = 0;
+function toast(msg) { $('#bToast').textContent = msg; $('#bToast').style.opacity = 1; toastT = 1.6; }
+// ยิง
+function fireShot() {
+  const W = WEAPONS[me.w], now = performance.now(); if (now < me.cool) return false;
+  if (me.ammo <= 0) { me.cool = now + 350; Music.sfx('empty'); toast('กระสุนหมด · ไปเก็บกล่องกระสุน'); return true; }
+  me.cool = now + W.rate; me.ammo--;
+  const o = camera.position.clone(), d = new THREE.Vector3(); camera.getWorldDirection(d);
+  d.x += (Math.random() - .5) * W.spread * 2; d.y += (Math.random() - .5) * W.spread * 2; d.z += (Math.random() - .5) * W.spread * 2; d.normalize();
+  const tMin = o.distanceTo(new THREE.Vector3(me.x, 2.3, me.z)) + 0.4;
+  let h = rayCast(o, d, W.range + 10, myId, tMin);
+  let end = o.clone().addScaledVector(d, h.t);
+  const fx = Math.sin(me.yaw), fz = Math.cos(me.yaw), rx = -Math.cos(me.yaw), rz = Math.sin(me.yaw);
+  const muzzle = new THREE.Vector3(me.x + fx * 0.95 + rx * 0.36, 1.95, me.z + fz * 0.95 + rz * 0.36);
+  const md = end.clone().sub(muzzle), ml = md.length(); md.normalize();
+  const hb = rayCast(muzzle, md, ml, myId, 0.05, true);
+  if (hb.t < ml - 0.15) { end = muzzle.clone().addScaledVector(md, hb.t); h = { kind: 'wall' }; }
+  if (h.kind === 'player') {
+    const tp = remotes.get(h.id), dist = tp ? Math.hypot(tp.rx - me.x, tp.rz - me.z) : 99, dmg = dmgAt(me.w, dist);
+    if (dmg > 0) { send('hit', { target: h.id, dmg, w: me.w }); me.hitFlash = 1; Music.sfx('hit'); }
+  }
+  tracer(muzzle, end);
+  pub('fx', [myId, +muzzle.x.toFixed(2), +muzzle.y.toFixed(2), +muzzle.z.toFixed(2), +end.x.toFixed(2), +end.y.toFixed(2), +end.z.toFixed(2), me.w]);
+  Music.shot(me.w, 1);
+  me.pitch = Math.min(0.55, me.pitch + (me.w ? 0.004 : 0.014));
+  return true;
+}
+// อัปเดตทุกเฟรมในโหมดยิง
+const headV = new THREE.Vector3(), dirV = new THREE.Vector3();
+let battleWasOn = false;
+function setCovers(m) { for (const k in COVERS) COVERS[k].g.visible = +k === m; }
+function shooterFrame(dt, t) {
+  if (!battleWasOn) { battleWasOn = true; battleSprites(true); me.spSeq = -1; const P0 = S.players.find(p => p.id === myId); me.ag = P0 ? P0.ag : 0; me.lastHp = HP_MAX; remotes.clear(); }
+  const m = S.map | 0; buildCovers(m); collidersFor(m); setCovers(m);
+  const P = S.players.find(p => p.id === myId), alive = !!P && P.alive !== false, battle = S.state === 'battle';
+  if (P && P.sp && P.sp[2] !== me.spSeq) { me.spSeq = P.sp[2]; me.x = me.rx = P.sp[0]; me.z = me.rz = P.sp[1]; me.yaw = Math.atan2(-me.x, -me.z); me.pitch = 0.05; me.ammo = AMMO_START; }
+  if (P && P.ag !== me.ag) { if (P.ag > me.ag) { me.ammo = Math.min(AMMO_MAX, me.ammo + 50 * (P.ag - me.ag)); Music.sfx('pick'); toast('+50 กระสุน'); } me.ag = P.ag; }
+  if (P) { if (P.hp < me.lastHp) { me.flash = 1; Music.sfx('hurt'); } else if (P.hp > me.lastHp && me.lastHp > 0) { Music.sfx('pick'); toast('+50 เลือด'); } me.lastHp = P.hp; }
+  let ix = 0, iz = 0;
+  if (alive && battle) {
+    if (keys.KeyW || keys.ArrowUp) iz++; if (keys.KeyS || keys.ArrowDown) iz--; if (keys.KeyD || keys.ArrowRight) ix++; if (keys.KeyA || keys.ArrowLeft) ix--;
+    if (joy) { ix += joy.x; iz -= joy.y; }
+  }
+  const il = Math.hypot(ix, iz); if (il > 1) { ix /= il; iz /= il; }
+  const spd = keys.ShiftLeft || keys.ShiftRight ? 9.5 : 7;
+  const fx = Math.sin(me.yaw), fz = Math.cos(me.yaw), rx = -Math.cos(me.yaw), rz = Math.sin(me.yaw);
+  if (il > 0.05) { const res = moveCollide(me.x, me.z, me.x + (fx * iz + rx * ix) * spd * dt, me.z + (fz * iz + rz * ix) * spd * dt); me.mv = Math.hypot(res.x - me.x, res.z - me.z) > 0.001 ? 1 : 0; me.x = res.x; me.z = res.z; } else me.mv = 0;
+  me.rx = me.x; me.rz = me.z;
+  if (firing && alive && battle) { if (WEAPONS[me.w].auto || !me.pressFired) { if (fireShot()) me.pressFired = true; } }
+  if (alive && battle && S.pickups && performance.now() > me.pickT) for (const k of S.pickups) if (k.a && Math.hypot(k.x - me.x, k.z - me.z) < 1.7) { send('pick', { pid: k.id }); me.pickT = performance.now() + 700; break; }
+  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0]); }
+  // ตัวละคร
+  for (const [id, r] of runners) {
+    const pl = S.players.find(p => p.id === id), src = id === myId ? me : remotes.get(id);
+    if (!pl || !src) { r.root.visible = false; continue; } r.root.visible = true;
+    if (id !== myId) {
+      const k = 1 - Math.exp(-dt * 12); src.rx += (src.x - src.rx) * k; src.rz += (src.z - src.rz) * k;
+      let dy = src.yaw - src.ryaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); src.ryaw += dy * k;
+      if (performance.now() - src.t > 600) src.mv = 0;
+    }
+    r.root.position.set(src.rx, 0.07, src.rz); r.root.rotation.y = id === myId ? me.yaw : src.ryaw;
+    poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt);
+    r.speed = src.mv ? 7 : 0; updateAura(r, dt);
+  }
+  // ไอเทมลอยหมุน
+  for (const mm of pickMeshes.values()) { mm.rotation.y = t * 1.6; mm.children[0].position.y = Math.sin(t * 2.4) * 0.15; }
+  updateTracers(dt);
+  // กล้องข้ามไหล่
+  const cp = Math.cos(me.pitch), f = [Math.sin(me.yaw) * cp, Math.sin(me.pitch), Math.cos(me.yaw) * cp];
+  headV.set(me.x + rx * 0.75, 2.35, me.z + rz * 0.75);
+  dirV.set(-f[0], -f[1] * 0.6 + 0.12, -f[2]).normalize();
+  const hcam = rayCast(headV, dirV, 4.4, null, 0, true), dist = Math.max(0.6, Math.min(4.4, hcam.t - 0.3));
+  camera.position.set(headV.x + dirV.x * dist, Math.max(0.4, headV.y + dirV.y * dist), headV.z + dirV.z * dist);
+  camLook.set(headV.x + f[0] * 20, headV.y + f[1] * 20, headV.z + f[2] * 20); camera.lookAt(camLook);
+  camPos.copy(camera.position);
+  // HUD
+  const hp = P ? P.hp : 0;
+  $('#hpFill').style.width = hp + '%'; $('#hpFill').style.background = hp > 50 ? '#6aa96b' : hp > 25 ? '#d9a441' : '#c0503a'; $('#hpNum').textContent = hp;
+  $('#ammoNum').textContent = me.ammo; $('#ammoNum').classList.toggle('low', me.ammo <= 10); $('#wName').textContent = WEAPONS[me.w].name;
+  const left = Math.max(0, S.endsAt - hostNow());
+  $('#bTimer').textContent = battle ? `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}` : 'เตรียมพร้อม';
+  me.flash = Math.max(0, me.flash - dt * 1.6); $('#dmgFlash').style.opacity = me.flash * 0.75;
+  me.hitFlash = Math.max(0, me.hitFlash - dt * 5); $('#hitMark').style.opacity = me.hitFlash;
+  toastT -= dt; if (toastT <= 0) $('#bToast').style.opacity = 0;
+  const dead = battle && P && P.alive === false;
+  show('#respawnMsg', !!dead); if (dead) $('#respawnMsg').innerHTML = `ถูกยิงตกรอบ<small>เกิดใหม่ใน ${Math.max(0, Math.ceil((P.rsp - hostNow()) / 1000))}</small>`;
+  $('#lockHint').style.display = !isTouch && !locked && battle && alive ? 'block' : 'none';
+  $('#crosshair').classList.toggle('mg', me.w === 1);
+}
+function leaveBattle() {
+  if (!battleWasOn) return; battleWasOn = false; firing = false; joy = null; look = null;
+  if (document.pointerLockElement) document.exitPointerLock();
+  battleSprites(false); setCovers(-1); syncPickups([]);
+  for (const r of runners.values()) { r.root.visible = true; unposeShooter(r); }
+  for (const tr of tracers) { tr.life = 0; tr.l.visible = tr.fl.visible = tr.sp.visible = false; }
+}
+function renderBattleHud() {
+  const sorted = [...S.players].sort((a, b) => (b.kills - a.kills) || (a.deaths - b.deaths));
+  $('#bScore').innerHTML = `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>D</span></li>` + sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span>${p.deaths}</span></li>`).join('');
+  const now = hostNow();
+  $('#killFeed').innerHTML = (S.feed || []).filter(f => now - f.t < 7000).map(f => `<div><b>${esc(f.k)}</b> <span>${WEAPONS[f.w] ? WEAPONS[f.w].name : ''}</span> <i>${esc(f.v)}</i></div>`).join('');
+  syncPickups(S.pickups);
+}
+
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize);
 
@@ -1884,7 +2455,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); buildWorld(); buildBangkok(); buildZombie(); applyMap(0, 0); buildPodium(); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
+resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); Math.random = _r; } applyMap(0, 0); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
