@@ -1194,64 +1194,72 @@ function updateAura(r, dt) {
 }
 function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.parent.remove(p.m); p.m.material.dispose(); }); if (r.scoreSp) r.root.remove(r.scoreSp); scene.remove(r.root); r.root.traverse(o => { if (o.material && o.material.map && o.isSprite) { o.material.map.dispose(); o.material.dispose(); } }); }
 
-/* ---------- ตึกเดินขึ้นได้ (ตึก 2 ชั้น + ตึก 3 ชั้น ทุกฉาก) ---------- */
-const FH = 4.2;
+/* ---------- ตึกโครงคอนกรีต (ยังสร้างไม่เสร็จ) เดินขึ้นได้ถึงดาดฟ้า ---------- */
+const FH = 6.3;
 const BLD = [
-  [{ x: -22, z: 11, f: 2, w: 10, d: 8 }, { x: 22, z: -13, f: 3, w: 12, d: 10 }],
-  [{ x: -21, z: -13, f: 2, w: 10, d: 8 }, { x: 22, z: -12, f: 3, w: 12, d: 10 }],
-  [{ x: -24, z: 4, f: 2, w: 10, d: 8 }, { x: 24, z: -4, f: 3, w: 12, d: 10 }],
+  [{ x: -22, z: 11, f: 2, w: 10, d: 12 }, { x: 22, z: -13, f: 3, w: 12, d: 13 }],
+  [{ x: -21, z: -13, f: 2, w: 10, d: 12 }, { x: 22, z: -12, f: 3, w: 12, d: 13 }],
+  [{ x: -24, z: 4, f: 2, w: 10, d: 12 }, { x: 24, z: -4, f: 3, w: 12, d: 13 }],
 ];
 world.bcols = [[], [], []]; world.bRects = [[], [], []]; world.bFloors = [[], [], []]; world.bGroups = new Set();
 function buildBuildings() {
-  const STY = [
-    { wall: '#b9b6ae', trim: '#5b6470', floor: '#8d8a83', stair: '#6e6b66', win: '#20262e' },
-    { wall: '#e6d9bf', trim: '#a6532a', floor: '#9a8f7c', stair: '#7a6f5f', win: '#2b2a28' },
-    { wall: '#6e6a62', trim: '#3a3631', floor: '#4f4c47', stair: '#47443f', win: '#0e0f10' },
-  ];
-  const wallTex = (base, trim) => { const t = canvasTex(128, 128, (x) => { x.fillStyle = base; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 260; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .07})`; x.fillRect(Math.random() * 128, Math.random() * 128, 4, 4); } x.fillStyle = trim; x.fillRect(0, 0, 128, 5); x.strokeStyle = 'rgba(0,0,0,.12)'; x.lineWidth = 2; x.strokeRect(1, 1, 126, 126); }); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 1); return t; };
+  const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
+  const TINT = ['#a9a69f', '#b3aa98', '#8d8a83'];
+  const concrete = (base) => { const t = canvasTex(128, 128, (x) => { x.fillStyle = base; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 500; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .08})`; x.fillRect(Math.random() * 128, Math.random() * 128, 3, 3); } x.strokeStyle = 'rgba(0,0,0,.13)'; x.lineWidth = 2; for (let k = 0; k <= 128; k += 32) { x.beginPath(); x.moveTo(0, k); x.lineTo(128, k); x.stroke(); } for (let k = 0; k < 3; k++) { x.fillStyle = 'rgba(90,60,30,.15)'; x.fillRect(Math.random() * 128, 0, 6, 128); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  const brickT = canvasTex(128, 128, (x) => { x.fillStyle = '#8b4a32'; x.fillRect(0, 0, 128, 128); x.fillStyle = '#b9b1a3'; for (let r = 0; r < 8; r++) { x.fillRect(0, r * 16, 128, 2); for (let c = 0; c < 5; c++) x.fillRect(((r % 2) * 16 + c * 32) % 128, r * 16, 2, 16); } });
+  const brick = new THREE.MeshStandardMaterial({ map: brickT, roughness: 0.95 }), rebar = toon('#5a3a26');
   for (let m = 0; m < 3; m++) {
-    const st = STY[m], root = [world.stad, world.bkk, world.zom][m];
-    const wm = new THREE.MeshStandardMaterial({ map: wallTex(st.wall, st.trim), roughness: 0.9 }), fm = toon(st.floor), sm = toon(st.stair), tm = toon(st.trim);
+    const root = [world.stad, world.bkk, world.zom][m];
+    const cm = new THREE.MeshStandardMaterial({ map: concrete(TINT[m]), roughness: 0.95 }), sm = toon('#7d7a74');
     for (const b of BLD[m]) {
       const g = new THREE.Group(); root.add(g); world.bGroups.add(g);
       const x0 = b.x - b.w / 2, x1 = b.x + b.w / 2, z0 = b.z - b.d / 2, z1 = b.z + b.d / 2, T = 0.3, front = b.z > 0 ? 'z0' : 'z1';
       world.bRects[m].push({ x0: x0 - 1.5, x1: x1 + 1.5, z0: z0 - (front === 'z0' ? 7 : 1.5), z1: z1 + (front === 'z1' ? 7 : 1.5) });
-      const box = (ax0, ax1, ay0, ay1, az0, az1, mat) => {
+      const box = (ax0, ax1, ay0, ay1, az0, az1, mat, col = true) => {
         if (ax1 - ax0 < 0.01 || ay1 - ay0 < 0.01 || az1 - az0 < 0.01) return;
-        const me2 = new THREE.Mesh(new THREE.BoxGeometry(ax1 - ax0, ay1 - ay0, az1 - az0), mat); me2.position.set((ax0 + ax1) / 2, (ay0 + ay1) / 2, (az0 + az1) / 2);
-        me2.castShadow = me2.receiveShadow = true; g.add(me2);
-        world.bcols[m].push({ x0: ax0, x1: ax1, y0: ay0, y1: ay1, z0: az0, z1: az1 });
+        const o = new THREE.Mesh(new THREE.BoxGeometry(ax1 - ax0, ay1 - ay0, az1 - az0), mat); o.position.set((ax0 + ax1) / 2, (ay0 + ay1) / 2, (az0 + az1) / 2);
+        o.castShadow = o.receiveShadow = true; g.add(o);
+        if (col) world.bcols[m].push({ x0: ax0, x1: ax1, y0: ay0, y1: ay1, z0: az0, z1: az1 });
       };
-      // ผนังที่มีช่องเปิด (ประตู/หน้าต่าง) ตามแกน a
-      const wall = (axis, fixed, a0, a1, yb, yt, opens) => {
-        let cur = a0; const put = (p0, p1, y0, y1) => axis === 'x' ? box(p0, p1, y0, y1, fixed - T / 2, fixed + T / 2, wm) : box(fixed - T / 2, fixed + T / 2, y0, y1, p0, p1, wm);
-        for (const o of opens.sort((p, q) => p.a - q.a)) { put(cur, o.a, yb, yt); put(o.a, o.b, yb, o.y0); put(o.a, o.b, o.y1, yt); cur = o.b; }
-        put(cur, a1, yb, yt);
+      // ผนังโครง: เสา + คานบน + กำแพงเตี้ย (บางช่องก่ออิฐครึ่งเดียว)
+      const frame = (axis, fixed, a0, a1, yb, yt, door, seed) => {
+        const put = (p0, p1, y0, y1, mat) => axis === 'x' ? box(p0, p1, y0, y1, fixed - T / 2, fixed + T / 2, mat) : box(fixed - T / 2, fixed + T / 2, y0, y1, p0, p1, mat);
+        const len = a1 - a0, nb = 3, cw = 0.6, cols = [];
+        for (let k = 0; k <= nb; k++) cols.push(a0 + len * k / nb);
+        cols.forEach(c => put(clampN(c - cw / 2, a0, a1 - cw), clampN(c + cw / 2, a0 + cw, a1), yb, yt, cm));
+        put(a0, a1, yt - 0.6, yt, cm);
+        for (let k = 0; k < nb; k++) {
+          const s0 = cols[k] + cw / 2, s1 = cols[k + 1] - cw / 2;
+          if (door && k === 1) continue;
+          if ((k + seed) % 4 === 0) put(s0, s1, yb, yb + 2.6, brick);
+          else put(s0, s1, yb, yb + 1.0, cm);
+        }
       };
-      const wins = (a0, a1, yb) => [{ a: a0 + (a1 - a0) * 0.25 - 0.8, b: a0 + (a1 - a0) * 0.25 + 0.8, y0: yb + 1.1, y1: yb + 2.9 }, { a: a0 + (a1 - a0) * 0.75 - 0.8, b: a0 + (a1 - a0) * 0.75 + 0.8, y0: yb + 1.1, y1: yb + 2.9 }];
-      for (let i = 0; i < b.f; i++) {
+      const ROOF = b.f; // ชั้นดาดฟ้า
+      for (let i = 0; i <= ROOF; i++) {
         const yb = i * FH, yt = (i + 1) * FH;
-        const fo = i === 0 ? [{ a: b.x - 1.4, b: b.x + 1.4, y0: yb, y1: yb + 3.5 }] : wins(x0, x1, yb);
-        wall('x', front === 'z0' ? z0 + T / 2 : z1 - T / 2, x0, x1, yb, yt, fo);
-        wall('x', front === 'z0' ? z1 - T / 2 : z0 + T / 2, x0, x1, yb, yt, wins(x0, x1, yb));
-        wall('z', x0 + T / 2, z0 + T, z1 - T, yb, yt, wins(z0, z1, yb));
-        wall('z', x1 - T / 2, z0 + T, z1 - T, yb, yt, wins(z0, z1, yb));
-        // บันไดขึ้นชั้นถัดไป (สลับซ้าย/ขวา)
-        if (i < b.f - 1) {
-          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 1.4, sx1 = sx0 + 1.4, zs = z0 + T + 1.4, n = 12, dz = 0.42, rise = FH / n;
+        if (i < ROOF) {
+          frame('x', front === 'z0' ? z0 + T / 2 : z1 - T / 2, x0, x1, yb, yt, i === 0, i);
+          frame('x', front === 'z0' ? z1 - T / 2 : z0 + T / 2, x0, x1, yb, yt, false, i + 1);
+          frame('z', x0 + T / 2, z0 + T, z1 - T, yb, yt, false, i + 2);
+          frame('z', x1 - T / 2, z0 + T, z1 - T, yb, yt, false, i + 3);
+          // บันไดขึ้นชั้นถัดไป/ดาดฟ้า (สลับซ้าย-ขวา)
+          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 1.5, sx1 = sx0 + 1.5, zs = z0 + T + 1.4, n = 16, dz = 0.42, rise = FH / n;
           for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, sm);
-          // พื้นชั้นบน (เว้นช่องบันได)
-          const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz;
-          const yb2 = yt - 0.25;
-          box(x0, hx0, yb2, yt, z0, z1, fm); box(hx1, x1, yb2, yt, z0, z1, fm); box(hx0, hx1, yb2, yt, z0, hz0, fm); box(hx0, hx1, yb2, yt, hz1, z1, fm);
-          world.bFloors[m].push({ x: left ? b.x + b.w * 0.22 : b.x - b.w * 0.22, z: b.z + b.d * 0.2, y: yt });
+          const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.3;
+          box(x0, hx0, ys, yt, z0, z1, cm); box(hx1, x1, ys, yt, z0, z1, cm); box(hx0, hx1, ys, yt, z0, hz0, cm); box(hx0, hx1, ys, yt, hz1, z1, cm);
+          world.bFloors[m].push({ x: left ? b.x + b.w * 0.22 : b.x - b.w * 0.22, z: b.z + b.d * 0.25, y: yt });
+        } else {
+          // ดาดฟ้า: ขอบกำแพงเตี้ย + เหล็กเส้นโผล่จากหัวเสา
+          box(x0, x1, yb, yb + 1.1, z0, z0 + T, cm); box(x0, x1, yb, yb + 1.1, z1 - T, z1, cm);
+          box(x0, x0 + T, yb, yb + 1.1, z0, z1, cm); box(x1 - T, x1, yb, yb + 1.1, z0, z1, cm);
+          for (const [cx, cz] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1], [b.x, z0], [b.x, z1]]) for (let r = 0; r < 4; r++) {
+            const rb = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.8, 5), rebar); rb.position.set(clampN(cx + (r % 2 ? 0.15 : -0.15), x0 + 0.1, x1 - 0.1), yb + 1.8, clampN(cz + (r < 2 ? 0.15 : -0.15), z0 + 0.1, z1 - 0.1)); rb.rotation.z = (r - 1.5) * 0.06; g.add(rb);
+          }
+          world.bFloors[m].push({ x: b.x, z: b.z + b.d * 0.25, y: yb });
         }
       }
-      // หลังคา + ขอบ
-      box(x0 - 0.2, x1 + 0.2, b.f * FH - 0.25, b.f * FH + 0.05, z0 - 0.2, z1 + 0.2, tm);
-      box(x0 - 0.2, x1 + 0.2, b.f * FH + 0.05, b.f * FH + 0.7, z0 - 0.2, z0 + 0.1, tm); box(x0 - 0.2, x1 + 0.2, b.f * FH + 0.05, b.f * FH + 0.7, z1 - 0.1, z1 + 0.2, tm);
-      // พื้นชั้นล่าง (ขอบพื้นเตี้ย ก้าวขึ้นได้)
-      const pl = new THREE.Mesh(new THREE.BoxGeometry(b.w, 0.12, b.d), fm); pl.position.set(b.x, 0.06, b.z); pl.receiveShadow = true; g.add(pl);
+      const pl = new THREE.Mesh(new THREE.BoxGeometry(b.w, 0.12, b.d), cm); pl.position.set(b.x, 0.06, b.z); pl.receiveShadow = true; g.add(pl);
     }
     // เคลียร์ของตกแต่ง (ต้นไม้ รถ กระสอบทราย ฯลฯ) ที่ทับตัวตึกหรือบังหน้าประตู
     root.updateMatrixWorld(true);
