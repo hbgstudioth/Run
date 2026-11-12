@@ -116,6 +116,9 @@
   .ch0 { background: #ef4444; box-shadow: 0 5px 0 #b91c1c; } .ch1 { background: #3b82f6; box-shadow: 0 5px 0 #1d4ed8; }
   .ch2 { background: #f59e0b; box-shadow: 0 5px 0 #b45309; } .ch3 { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
   .ch:disabled { cursor: default; opacity: .4; }
+  #choices.vocab .ch { font-size: clamp(16px, 4.6vw, 22px); padding: 14px 8px; line-height: 1.2; min-height: 58px; }
+  #qtext .word { color: #1e3a8a; } #qtext .say { font-size: 26px; border: 0; background: #e0f2fe; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; vertical-align: middle; }
+  #qtext .qsub { font-size: 16px; color: #64748b; font-weight: 600; margin-top: -4px; }
   .ch.picked { opacity: 1; outline: 4px solid #1e293b; outline-offset: 2px; }
   .ch.right { opacity: 1; background: #16a34a; box-shadow: 0 5px 0 #14532d; transform: scale(1.04); }
   .ch.wrong { opacity: 1; background: #64748b; box-shadow: 0 5px 0 #334155; text-decoration: line-through; }
@@ -156,7 +159,7 @@
   <!-- หน้าแรก -->
   <section id="home" class="screen">
     <div class="logo"><span class="h">H</span><span class="dash">-</span><span class="run">Runner</span></div>
-    <div class="tagline">⚡ แข่งคิดเลข วิ่งเข้าเส้นชัย ⚡</div>
+    <div class="tagline">⚡ แข่งตอบไว วิ่งเข้าเส้นชัย ⚡</div>
     <div class="panel">
       <label>ชื่อนักวิ่ง</label>
       <input id="nameInput" maxlength="12" placeholder="ใส่ชื่อของคุณ">
@@ -170,7 +173,7 @@
       <div id="status"></div>
     </div>
     <div class="howto">
-      <div><b>1</b>โจทย์ บวก ลบ คูณ หาร โผล่ขึ้นมา</div>
+      <div><b>1</b>โจทย์เลข หรือศัพท์อังกฤษ โผล่ขึ้นมา</div>
       <div><b>2</b>ตอบให้ถูก และไวที่สุด</div>
       <div><b>3</b>ยิ่งตอบไว ยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ!</div>
     </div>
@@ -185,6 +188,8 @@
       <button id="copyBtn" class="btn ghost">📋 คัดลอกลิงก์เชิญเพื่อน</button>
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
+      <div class="lobbyHead"><b>หมวดคำถาม</b></div>
+      <div id="cats" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ระดับความยาก</b><span id="diffDesc" class="small"></span></div>
       <div id="diffs" class="diffs"></div>
       <div id="botRow" class="row"><button id="addBot" class="btn ghost">🤖 เพิ่มบอท</button><button id="removeBot" class="btn ghost">➖ ลบบอท</button></div>
@@ -249,6 +254,20 @@ const DIFFS = [
   { name: 'ยาก', icon: '🟠', time: 14000, acc: 0.62, desc: 'เช่น 584 − 167, 18 × 7' },
   { name: 'ยากมาก', icon: '🔴', time: 20000, acc: 0.5, desc: 'เช่น 8 × 7 + 29, (14 + 9) × 6' },
 ];
+const VLEVELS = [
+  { name: 'อนุบาล', icon: '🧸', time: 8000, acc: 0.88, desc: 'เช่น cat, red, apple' },
+  { name: 'ประถม', icon: '🎒', time: 10000, acc: 0.75, desc: 'เช่น teacher, umbrella, hungry' },
+  { name: 'มัธยม', icon: '📘', time: 12000, acc: 0.62, desc: 'เช่น environment, honest, borrow' },
+  { name: 'มหาลัย', icon: '🎓', time: 15000, acc: 0.5, desc: 'เช่น hypothesis, sustainable, mitigate' },
+];
+const VOCAB = [
+  "cat=แมว|dog=สุนัข|bird=นก|fish=ปลา|cow=วัว|pig=หมู|duck=เป็ด|chicken=ไก่|horse=ม้า|elephant=ช้าง|monkey=ลิง|rabbit=กระต่าย|tiger=เสือ|lion=สิงโต|frog=กบ|red=สีแดง|blue=สีน้ำเงิน|green=สีเขียว|yellow=สีเหลือง|black=สีดำ|white=สีขาว|pink=สีชมพู|one=หนึ่ง|two=สอง|three=สาม|four=สี่|five=ห้า|ten=สิบ|eye=ตา|ear=หู|nose=จมูก|mouth=ปาก|hand=มือ|foot=เท้า|head=ศีรษะ|hair=ผม|mother=แม่|father=พ่อ|baby=ทารก|apple=แอปเปิล|banana=กล้วย|orange=ส้ม|mango=มะม่วง|egg=ไข่|milk=นม|water=น้ำ|rice=ข้าว|sun=ดวงอาทิตย์|moon=ดวงจันทร์|star=ดาว|tree=ต้นไม้|flower=ดอกไม้|ball=ลูกบอล|book=หนังสือ|pen=ปากกา|car=รถยนต์|house=บ้าน|door=ประตู|bed=เตียง|cup=ถ้วย|hat=หมวก|shoe=รองเท้า|big=ใหญ่|small=เล็ก|happy=มีความสุข",
+  "school=โรงเรียน|teacher=ครู|student=นักเรียน|friend=เพื่อน|family=ครอบครัว|brother=พี่ชาย/น้องชาย|sister=พี่สาว/น้องสาว|kitchen=ห้องครัว|bathroom=ห้องน้ำ|window=หน้าต่าง|table=โต๊ะ|chair=เก้าอี้|clock=นาฬิกา|umbrella=ร่ม|bicycle=จักรยาน|airplane=เครื่องบิน|train=รถไฟ|river=แม่น้ำ|mountain=ภูเขา|sea=ทะเล|rain=ฝน|cloud=เมฆ|wind=ลม|morning=ตอนเช้า|night=กลางคืน|today=วันนี้|tomorrow=พรุ่งนี้|yesterday=เมื่อวาน|Monday=วันจันทร์|Sunday=วันอาทิตย์|breakfast=อาหารเช้า|lunch=อาหารกลางวัน|dinner=อาหารเย็น|hungry=หิว|thirsty=กระหายน้ำ|tired=เหนื่อย|angry=โกรธ|sad=เศร้า|hot=ร้อน|cold=หนาว|fast=เร็ว|slow=ช้า|tall=สูง|new=ใหม่|beautiful=สวยงาม|clean=สะอาด|dirty=สกปรก|run=วิ่ง|swim=ว่ายน้ำ|sing=ร้องเพลง|dance=เต้นรำ|read=อ่าน|write=เขียน|sleep=นอนหลับ|cook=ทำอาหาร|open=เปิด|close=ปิด|buy=ซื้อ|sell=ขาย|doctor=หมอ|farmer=ชาวนา|police=ตำรวจ|market=ตลาด|hospital=โรงพยาบาล|butterfly=ผีเสื้อ|vegetable=ผัก|homework=การบ้าน|birthday=วันเกิด",
+  "environment=สิ่งแวดล้อม|government=รัฐบาล|experience=ประสบการณ์|knowledge=ความรู้|important=สำคัญ|dangerous=อันตราย|difficult=ยาก|necessary=จำเป็น|healthy=มีสุขภาพดี|honest=ซื่อสัตย์|polite=สุภาพ|patient=อดทน|brave=กล้าหาญ|lazy=ขี้เกียจ|careful=ระมัดระวัง|success=ความสำเร็จ|failure=ความล้มเหลว|opportunity=โอกาส|decision=การตัดสินใจ|information=ข้อมูล|education=การศึกษา|culture=วัฒนธรรม|tradition=ประเพณี|population=ประชากร|pollution=มลพิษ|energy=พลังงาน|weather=สภาพอากาศ|temperature=อุณหภูมิ|island=เกาะ|desert=ทะเลทราย|forest=ป่าไม้|ocean=มหาสมุทร|volunteer=อาสาสมัคร|celebrate=เฉลิมฉลอง|improve=ปรับปรุง|prepare=เตรียม|borrow=ยืม|explain=อธิบาย|describe=บรรยาย|compare=เปรียบเทียบ|protect=ปกป้อง|invent=ประดิษฐ์|discover=ค้นพบ|believe=เชื่อ|remember=จำ|forget=ลืม|choose=เลือก|increase=เพิ่มขึ้น|decrease=ลดลง|advantage=ข้อได้เปรียบ|disease=โรค|medicine=ยา|scientist=นักวิทยาศาสตร์|journey=การเดินทาง|neighbor=เพื่อนบ้าน|audience=ผู้ชม|competition=การแข่งขัน|effort=ความพยายาม|freedom=อิสรภาพ|equipment=อุปกรณ์|ingredient=ส่วนผสม|emergency=เหตุฉุกเฉิน|responsibility=ความรับผิดชอบ|community=ชุมชน",
+  "hypothesis=สมมติฐาน|phenomenon=ปรากฏการณ์|sustainable=ยั่งยืน|ambiguous=กำกวม|comprehensive=ครอบคลุม|inevitable=หลีกเลี่ยงไม่ได้|legitimate=ชอบด้วยกฎหมาย|controversial=เป็นที่ถกเถียง|meticulous=พิถีพิถัน|resilient=ฟื้นตัวได้เร็ว|ubiquitous=มีอยู่ทุกหนแห่ง|pragmatic=เน้นการปฏิบัติจริง|diligent=ขยันหมั่นเพียร|eloquent=มีวาทศิลป์|empirical=เชิงประจักษ์|criteria=เกณฑ์|methodology=ระเบียบวิธี|infrastructure=โครงสร้างพื้นฐาน|entrepreneur=ผู้ประกอบการ|negotiate=เจรจาต่อรอง|mitigate=บรรเทา|deteriorate=เสื่อมลง|facilitate=อำนวยความสะดวก|scrutinize=ตรวจสอบอย่างละเอียด|advocate=สนับสนุน|consensus=ฉันทามติ|discrepancy=ความไม่สอดคล้องกัน|paradigm=กระบวนทัศน์|prerequisite=ข้อกำหนดเบื้องต้น|plagiarism=การลอกเลียนผลงาน|thesis=วิทยานิพนธ์|curriculum=หลักสูตร|scholarship=ทุนการศึกษา|bureaucracy=ระบบราชการ|sovereignty=อำนาจอธิปไตย|jurisdiction=เขตอำนาจศาล|fiscal=เกี่ยวกับการคลัง|inflation=ภาวะเงินเฟ้อ|recession=ภาวะเศรษฐกิจถดถอย|depreciation=ค่าเสื่อมราคา|revenue=รายได้|liability=หนี้สิน|asset=สินทรัพย์|innovation=นวัตกรรม|catalyst=ตัวเร่งปฏิกิริยา|biodiversity=ความหลากหลายทางชีวภาพ|contemplate=ไตร่ตรอง|anonymous=ไม่ระบุชื่อ|arbitrary=ตามอำเภอใจ|coherent=สอดคล้องเป็นเหตุเป็นผล|concise=กระชับ|explicit=ชัดแจ้ง|implicit=โดยนัย|feasible=เป็นไปได้|obsolete=ล้าสมัย|redundant=ซ้ำซ้อน|tentative=ยังไม่แน่นอน|unprecedented=ไม่เคยมีมาก่อน|deficit=การขาดดุล|incentive=สิ่งจูงใจ|stakeholder=ผู้มีส่วนได้ส่วนเสีย|autonomy=ความเป็นอิสระในการปกครองตนเอง"
+].map(l => l.split('|').map(x => x.split('=')));
+const CATS = [{ name: 'คณิตคิดเร็ว', icon: '🔢', levels: DIFFS }, { name: 'ศัพท์อังกฤษ', icon: '🔤', levels: VLEVELS }];
+const LV = (cat, diff) => CATS[cat | 0].levels[diff | 0];
 const BOT_NAMES = ['บอทจิ๋ว', 'บอทซิ่ง', 'บอทเลขเทพ', 'บอทงง', 'บอทไว', 'บอทชิล', 'บอทเก่ง'];
 
 const $ = s => document.querySelector(s);
@@ -643,13 +662,21 @@ let client = null, isHost = false, myId = null, roomCode = '';
 let S = null, clockOffset = 0, myLook = +(localStorage.hrLook || 0), myAnswer = null, lastQid = null, qRecv = 0;
 const hostNow = () => Date.now() + clockOffset;
 
-const H = { diff: 1, qTime: DIFFS[1].time, players: new Map(), conns: new Map(), state: 'lobby', round: 0, q: null, answers: new Map(), results: null, endsAt: 0, timers: [], dirty: false, final: null };
+const H = { cat: 0, diff: 1, used: new Set(), qTime: DIFFS[1].time, players: new Map(), conns: new Map(), state: 'lobby', round: 0, q: null, answers: new Map(), results: null, endsAt: 0, timers: [], dirty: false, final: null };
 const later = (fn, ms) => H.timers.push(setTimeout(fn, ms));
 const clearTimers = () => { H.timers.forEach(clearTimeout); H.timers = []; };
 
 function freeLane() {
   const used = new Set([...H.players.values()].map(p => p.lane));
   return [3, 4, 2, 5, 1, 6, 0, 7].find(l => !used.has(l)) ?? 0;
+}
+function genVocab(diff) {
+  const list = VOCAB[diff];
+  let pool = list.filter(([w]) => !H.used.has(w)); if (pool.length < 1) { H.used.clear(); pool = list; }
+  const [word, meaning] = pool[(Math.random() * pool.length) | 0]; H.used.add(word);
+  const set = new Set([meaning]);
+  while (set.size < 4) set.add(list[(Math.random() * list.length) | 0][1]);
+  return { id: Math.random().toString(36).slice(2, 9), kind: 'vocab', text: word, choices: [...set].sort(() => Math.random() - .5), answer: meaning };
 }
 function genQ(diff) {
   const r = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -687,8 +714,8 @@ function genQ(diff) {
 function snapshot() {
   const reveal = H.state !== 'question';
   return {
-    state: H.state, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
-    q: H.q ? { id: H.q.id, text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
+    state: H.state, cat: H.cat, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
+    q: H.q ? { id: H.q.id, kind: H.q.kind || 'math', text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, lane: p.lane, points: p.points, gain: p.gain,
       correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready })),
@@ -702,11 +729,11 @@ function broadcast() {
 setInterval(() => { if (isHost && H.dirty) broadcast(); }, 100);
 
 function nextQuestion() {
-  H.round++; H.q = genQ(H.diff); H.qTime = DIFFS[H.diff].time; H.answers.clear(); H.results = null;
+  H.round++; H.q = H.cat === 1 ? genVocab(H.diff) : genQ(H.diff); H.qTime = LV(H.cat, H.diff).time; H.answers.clear(); H.results = null;
   H.state = 'question'; H.endsAt = Date.now() + H.qTime;
   later(endQuestion, H.qTime + 250);
   for (const [id, p] of H.players) if (p.bot) {
-    const delay = H.qTime * (0.15 + Math.random() * 0.65), ok = Math.random() < DIFFS[H.diff].acc, qid = H.q.id;
+    const delay = H.qTime * (0.15 + Math.random() * 0.65), ok = Math.random() < LV(H.cat, H.diff).acc, qid = H.q.id;
     const wrong = H.q.choices.filter(c => c !== H.q.answer);
     later(() => handleAction({ id, type: 'answer', qid, choice: ok ? H.q.answer : wrong[(Math.random() * wrong.length) | 0], time: delay }), delay);
   }
@@ -756,7 +783,10 @@ function handleAction(a) {
     }
     case 'setDiff':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      H.diff = Math.max(0, Math.min(3, a.diff | 0)); H.qTime = DIFFS[H.diff].time; break;
+      H.diff = Math.max(0, Math.min(3, a.diff | 0)); H.qTime = LV(H.cat, H.diff).time; break;
+    case 'setCat':
+      if (a.id !== 'host' || H.state !== 'lobby') return;
+      H.cat = a.cat ? 1 : 0; H.qTime = LV(H.cat, H.diff).time; break;
     case 'removeBot': {
       if (a.id !== 'host' || H.state !== 'lobby') return;
       const bots = [...H.players.entries()].filter(([, x]) => x.bot); if (!bots.length) return;
@@ -770,13 +800,13 @@ function handleAction(a) {
       if ([...H.players.values()].some(x => !x.ready)) return;
       clearTimers();
       for (const q of H.players.values()) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0 });
-      H.round = 0; H.q = null; H.results = null; H.answers.clear();
+      H.round = 0; H.q = null; H.results = null; H.answers.clear(); H.used.clear();
       H.state = 'countdown'; H.endsAt = Date.now() + 3200;
       later(nextQuestion, 3200);
       break;
     case 'answer': {
       if (!p || H.state !== 'question' || !H.q || a.qid !== H.q.id || H.answers.has(a.id)) return;
-      H.answers.set(a.id, { choice: +a.choice, time: Math.max(0, Math.min(H.qTime, +a.time || H.qTime)) });
+      H.answers.set(a.id, { choice: H.q.choices.includes(a.choice) ? a.choice : null, time: Math.max(0, Math.min(H.qTime, +a.time || H.qTime)) });
       if (H.answers.size >= H.players.size) { clearTimers(); later(endQuestion, 500); }
       break;
     }
@@ -852,7 +882,7 @@ async function createRoom() {
     seen.set(a.id, Date.now());
     if (a.type === 'leave') return removePlayer(a.id);
     if (a.type === 'ping') { if (!H.players.has(a.id)) return; H.dirty = true; return; }
-    if (['addBot', 'removeBot', 'setDiff', 'start', 'lobby'].includes(a.type)) return;
+    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'start', 'lobby'].includes(a.type)) return;
     handleAction(a);
   });
   // ลบคนที่หายไปนาน (ปิดเว็บไปแล้ว)
@@ -938,6 +968,7 @@ $('#startBtn').onclick = () => send('start');
 $('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === myId); if (me) send('ready', { ready: !me.ready }); };
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
+$('#cats').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setCat', { cat: +b.dataset.c }); };
 $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setDiff', { diff: +b.dataset.d }); };
 let camMode = 0; const CAM_NAMES = ['🎥 มุมกว้าง', '🎥 มุมใกล้', '🎥 มุมสูง'];
 $('#camBtn').onclick = () => { camMode = (camMode + 1) % 3; $('#camBtn').textContent = CAM_NAMES[camMode]; };
@@ -1002,14 +1033,15 @@ function render() {
     $('#readyBtn').textContent = me && me.ready ? '✅ พร้อมแล้ว · กดเพื่อยกเลิก' : '✋ กดพร้อม';
     show('#botRow', isHost); show('#roomNet', isHost);
     if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
-    $('#diffs').innerHTML = DIFFS.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
-    $('#diffDesc').textContent = `${DIFFS[S.diff].desc} · ${DIFFS[S.diff].time / 1000} วิ/ข้อ`;
+    $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.icon} ${c.name}</button>`).join('');
+    $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
+    $('#diffDesc').textContent = `${LV(S.cat, S.diff).desc} · ${LV(S.cat, S.diff).time / 1000} วิ/ข้อ`;
     $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
   }
   if (st === 'countdown' || st === 'question' || st === 'reveal') {
     const sorted = standings(), myRank = sorted.findIndex(p => p.id === myId) + 1;
     $('#rank').innerHTML = ord(myRank);
-    $('#roundInfo').textContent = (st === 'countdown' ? 'เตรียมตัว!' : `ข้อที่ ${S.round}`) + ` · ${DIFFS[S.diff].icon} ${DIFFS[S.diff].name}`;
+    $('#roundInfo').textContent = (st === 'countdown' ? 'เตรียมตัว!' : `ข้อที่ ${S.round}`) + ` · ${CATS[S.cat].icon} ${LV(S.cat, S.diff).icon} ${LV(S.cat, S.diff).name}`;
     $('#board').innerHTML = sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}">${ava(p.look)}${esc(p.name)}${st === 'question' && p.answered ? ' <span class="ok">✓</span>' : ''}<span class="pts">${Math.min(p.points, GOAL)}</span></li>`).join('');
     $('#dots').innerHTML = S.players.map(p => `<div data-id="${p.id}" class="${p.id === myId ? 'me' : ''}" style="background:${LOOKS[p.look].shirt}"></div>`).join('');
   }
@@ -1025,7 +1057,7 @@ function render() {
     $('#waitHost').textContent = isHost ? '' : '⏳ รอเจ้าของห้องเริ่มรอบใหม่…';
   }
   if (st === 'finished' && S.final) {
-    $('#finalDiff').textContent = `${DIFFS[S.diff].icon} ${DIFFS[S.diff].name}`;
+    $('#finalDiff').textContent = `${CATS[S.cat].icon} ${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#podium').innerHTML = S.final.map((p, i) => `<div class="r ${p.id === myId ? 'me' : ''}"><span class="m">${medal(i)}</span>${ava(p.look)}
       <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · 🏁 ถึงเส้นชัย' : ''}</div></div>
       <span class="p">${p.points} คะแนน</span></div>`).join('');
@@ -1033,13 +1065,25 @@ function render() {
 }
 
 let renderedQid = null;
+function speak(word) {
+  try { if (!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(word); u.lang = 'en-US'; u.rate = 0.85; speechSynthesis.speak(u); } catch {}
+}
+$('#qtext').addEventListener('click', e => { if (e.target.closest('.say') && S && S.q) speak(S.q.text); });
 function renderQuestion() {
   const q = S.q; if (!q) return;
   if (renderedQid !== q.id) {
     renderedQid = q.id;
-    $('#qtext').textContent = `${q.text} = ?`;
-    $('#qtext').style.fontSize = q.text.length > 11 ? 'clamp(28px, 7.5vw, 44px)' : '';
-    $('#choices').innerHTML = q.choices.map((c, i) => `<button class="ch ch${i}" data-i="${i}"><small>${i + 1}</small>${c}</button>`).join('');
+    const vocab = q.kind === 'vocab';
+    if (vocab) {
+      $('#qtext').innerHTML = `<span class="word">${esc(q.text)}</span> <button class="say" title="ฟังเสียง">🔊</button><div class="qsub">แปลว่าอะไร?</div>`;
+      $('#qtext').style.fontSize = q.text.length > 11 ? 'clamp(30px, 8vw, 46px)' : '';
+      if (S.state === 'question') speak(q.text);
+    } else {
+      $('#qtext').textContent = `${q.text} = ?`;
+      $('#qtext').style.fontSize = q.text.length > 11 ? 'clamp(28px, 7.5vw, 44px)' : '';
+    }
+    $('#choices').classList.toggle('vocab', vocab);
+    $('#choices').innerHTML = q.choices.map((c, i) => `<button class="ch ch${i}" data-i="${i}"><small>${i + 1}</small>${esc(c)}</button>`).join('');
   }
   const btns = [...document.querySelectorAll('.ch')];
   const me = S.players.find(p => p.id === myId);
