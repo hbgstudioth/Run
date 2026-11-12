@@ -181,6 +181,7 @@
     <div class="panel">
       <div class="small">รหัสห้อง</div>
       <div id="roomCode" class="code"></div>
+      <div id="roomNet" class="small" style="font-weight:800;margin:-4px 0 8px"></div>
       <button id="copyBtn" class="btn ghost">📋 คัดลอกลิงก์เชิญเพื่อน</button>
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
@@ -804,13 +805,26 @@ const status = t => { $('#status').textContent = t; };
 const lockBtns = on => { $('#createBtn').disabled = $('#joinBtn').disabled = on; };
 const myName = () => { const n = $('#nameInput').value.trim() || 'นักวิ่ง'; localStorage.hrName = n; return n; };
 
+let reconnTimer = null;
+function setNet(ok) {
+  $('#netWarn').classList.toggle('hidden', ok);
+  const el = $('#roomNet'); if (!el) return;
+  el.textContent = ok ? '🟢 ห้องออนไลน์ เพื่อนใส่รหัสเข้าได้เลย' : '🔴 ห้องหลุดชั่วคราว กำลังเชื่อมใหม่… (ตอนนี้เพื่อนจะยังหาห้องไม่เจอ)';
+  el.style.color = ok ? '#15803d' : '#dc2626';
+}
+function hostReconnect(delay = 2500) {
+  if (reconnTimer || !peer || peer.destroyed) return;
+  reconnTimer = setTimeout(() => { reconnTimer = null; try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, delay);
+}
 function createRoom(tries = 0) {
   if (typeof Peer === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
-  lockBtns(true); status('');
+  lockBtns(true); status('กำลังสร้างห้อง…');
   roomCode = Array.from({ length: 5 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[(Math.random() * 31) | 0]).join('');
   peer = new Peer(PREFIX + roomCode);
   peer.on('open', () => {
-    isHost = true; myId = 'host';
+    setNet(true);
+    if (isHost) return; // เชื่อมใหม่สำเร็จ ห้องเดิม รหัสเดิม
+    isHost = true; myId = 'host'; status('');
     handleAction({ id: myId, type: 'join', name: myName(), look: myLook });
     history.replaceState(null, '', '?room=' + roomCode); broadcast();
   });
@@ -820,41 +834,37 @@ function createRoom(tries = 0) {
     conn.on('close', () => removePlayer(conn.peer));
     conn.on('error', () => removePlayer(conn.peer));
   });
-  peer.on('disconnected', () => {
-    if (!isHost || peer.destroyed) return;
-    $('#netWarn').classList.remove('hidden');
-    setTimeout(() => { try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, 800);
-  });
-  peer.on('open', () => $('#netWarn').classList.add('hidden'));
+  peer.on('disconnected', () => { if (!isHost) return; setNet(false); hostReconnect(1000); });
   peer.on('error', e => {
-    if (isHost && (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error' || e.type === 'socket-closed')) {
-      $('#netWarn').classList.remove('hidden');
-      setTimeout(() => { try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, 2000);
-      return;
+    if (isHost) {
+      // ห้องเปิดแล้ว: ห้ามสร้างห้องใหม่ (รหัสจะเปลี่ยน) ให้พยายามต่อรหัสเดิมจนกว่าจะได้
+      if (e.type === 'peer-unavailable') return;
+      setNet(false); hostReconnect(e.type === 'unavailable-id' ? 5000 : 2500); return;
     }
     if (e.type === 'unavailable-id' && tries < 3) { peer.destroy(); return createRoom(tries + 1); }
-    if (!isHost) { lockBtns(false); status('สร้างห้องไม่สำเร็จ (' + e.type + ')'); }
+    lockBtns(false); status('สร้างห้องไม่สำเร็จ (' + e.type + ') ลองใหม่อีกครั้ง');
   });
 }
 function joinRoom() {
   if (typeof Peer === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
-  const code = $('#codeInput').value.trim().toUpperCase();
+  const code = $('#codeInput').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  $('#codeInput').value = code;
   if (code.length !== 5) return status('ใส่รหัสห้อง 5 ตัว');
   if (peer) { try { peer.destroy(); } catch {} peer = null; }
   lockBtns(true); status('กำลังเข้าห้อง ' + code + ' ...'); roomCode = code; joinTries = 0;
   peer = new Peer();
   peer.on('open', id => { myId = id; connectHost(code); });
   peer.on('error', e => {
-    if (e.type === 'peer-unavailable' && joinTries < 4 && !S) {
-      joinTries++; status(`กำลังค้นหาห้อง ${code} … (ครั้งที่ ${joinTries + 1})`);
-      setTimeout(() => { if (!S && peer && !peer.destroyed) connectHost(code); }, 2500); return;
+    if (e.type === 'peer-unavailable' && joinTries < 12 && !S) {
+      joinTries++; status(`กำลังค้นหาห้อง ${code} … ครั้งที่ ${joinTries + 1}/13 (ให้เจ้าของห้องเปิดหน้าเกมค้างไว้)`);
+      setTimeout(() => { if (!S && peer && !peer.destroyed) connectHost(code); }, 3000); return;
     }
     if (S) return;
     lockBtns(false);
-    status(e.type === 'peer-unavailable' ? `ไม่พบห้อง ${code} (เจ้าของห้องอาจปิดหน้าเว็บไปแล้ว)` : 'เชื่อมต่อไม่ได้ (' + e.type + ')');
+    status(e.type === 'peer-unavailable' ? `ไม่พบห้อง ${code} · เช็กรหัสอีกครั้ง หรือให้เจ้าของห้องกลับมาที่หน้าเกมแล้วกดเข้าห้องใหม่` : 'เชื่อมต่อไม่ได้ (' + e.type + ')');
   });
   peer.on('disconnected', () => { try { if (!peer.destroyed) peer.reconnect(); } catch {} });
-  setTimeout(() => { if (!S && !isHost && $('#status').textContent.startsWith('กำลัง')) { lockBtns(false); status('เชื่อมต่อนานเกินไป ลองใหม่ หรือเปลี่ยนเครือข่าย'); } }, 25000);
+  setTimeout(() => { if (!S && !isHost && $('#status').textContent.startsWith('กำลัง')) { lockBtns(false); status('เชื่อมต่อนานเกินไป ลองใหม่ หรือเปลี่ยนเครือข่าย'); } }, 50000);
 }
 let joinTries = 0;
 function connectHost(code) {
@@ -900,7 +910,7 @@ $('#copyBtn').onclick = async () => {
   setTimeout(() => $('#copyBtn').textContent = '📋 คัดลอกลิงก์เชิญเพื่อน', 1800);
 };
 // กลับมาที่หน้าเว็บ (เช่น หลังสลับไปส่งลิงก์ใน LINE) → ต่อห้องกับระบบใหม่ทันที
-const wake = () => { if (isHost && peer && peer.disconnected && !peer.destroyed) { $('#netWarn').classList.remove('hidden'); try { peer.reconnect(); } catch {} } };
+const wake = () => { if (isHost && peer && peer.disconnected && !peer.destroyed) { setNet(false); hostReconnect(0); } };
 document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
 addEventListener('focus', wake); addEventListener('online', wake);
 setInterval(wake, 5000);
@@ -950,7 +960,8 @@ function render() {
     $('#startBtn').textContent = notReady > 0 ? `รออีก ${notReady} คนกดพร้อม…` : (S.players.length > 1 ? '🏁 เริ่มแข่ง!' : '🏁 เริ่มแข่ง (คนเดียว)');
     $('#readyBtn').classList.toggle('on', !!(me && me.ready));
     $('#readyBtn').textContent = me && me.ready ? '✅ พร้อมแล้ว · กดเพื่อยกเลิก' : '✋ กดพร้อม';
-    show('#botRow', isHost);
+    show('#botRow', isHost); show('#roomNet', isHost);
+    if (isHost && !$('#roomNet').textContent) setNet(!peer.disconnected);
     $('#diffs').innerHTML = DIFFS.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
     $('#diffDesc').textContent = `${DIFFS[S.diff].desc} · ${DIFFS[S.diff].time / 1000} วิ/ข้อ`;
     $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
