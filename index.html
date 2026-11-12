@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,600;0,800;1,800;1,900&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -229,7 +229,6 @@ import * as THREE from 'three';
 /* ======================================================================
    ค่าตั้งต้นของเกม
    ====================================================================== */
-const PREFIX = 'h-runner-th-v1-';
 const GOAL = 100;            // คะแนนที่ต้องสะสมถึงเส้นชัย (= 1 รอบสนาม)
 const REVEAL_TIME = 4500;    // เวลาโชว์ผล + วิ่ง (ms)
 const MAX_ROUNDS = 15;
@@ -640,7 +639,7 @@ function poseRunner(r, lane, dt, t, celebrate) {
 /* ======================================================================
    สถานะเกม (ฝั่งโฮสต์)
    ====================================================================== */
-let peer = null, isHost = false, hostConn = null, myId = null, roomCode = '';
+let client = null, isHost = false, myId = null, roomCode = '';
 let S = null, clockOffset = 0, myLook = +(localStorage.hrLook || 0), myAnswer = null, lastQid = null, qRecv = 0;
 const hostNow = () => Date.now() + clockOffset;
 
@@ -697,10 +696,10 @@ function snapshot() {
 }
 function broadcast() {
   const snap = snapshot();
-  for (const c of H.conns.values()) if (c.open) { try { c.send(snap); } catch {} }
+  pub('down', snap, true);
   applyState(snap); H.dirty = false;
 }
-setInterval(() => { if (isHost && H.dirty) broadcast(); }, 50);
+setInterval(() => { if (isHost && H.dirty) broadcast(); }, 100);
 
 function nextQuestion() {
   H.round++; H.q = genQ(H.diff); H.qTime = DIFFS[H.diff].time; H.answers.clear(); H.results = null;
@@ -744,7 +743,7 @@ function handleAction(a) {
       const name = String(a.name || 'นักวิ่ง').trim().slice(0, 12) || 'นักวิ่ง', look = Math.abs(+a.look || 0) % LOOKS.length;
       if (p) { p.name = name; p.look = look; }
       else {
-        if (H.players.size >= MAX_PLAYERS) { const c = H.conns.get(a.id); if (c) { try { c.send({ error: 'full' }); } catch {} } return; }
+        if (H.players.size >= MAX_PLAYERS) { pub('down', { error: 'full', to: a.id }); return; }
         H.players.set(a.id, { name, look, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0, ready: a.id === 'host' });
       }
       break;
@@ -792,7 +791,7 @@ function handleAction(a) {
   H.dirty = true;
 }
 function removePlayer(id) {
-  H.conns.delete(id); if (!H.players.delete(id)) return;
+  seen.delete(id); if (!H.players.delete(id)) return;
   H.answers.delete(id);
   if (H.state === 'question' && H.players.size && H.answers.size >= H.players.size) { clearTimers(); later(endQuestion, 300); }
   H.dirty = true;
@@ -805,78 +804,118 @@ const status = t => { $('#status').textContent = t; };
 const lockBtns = on => { $('#createBtn').disabled = $('#joinBtn').disabled = on; };
 const myName = () => { const n = $('#nameInput').value.trim() || 'นักวิ่ง'; localStorage.hrName = n; return n; };
 
-let reconnTimer = null;
-function setNet(ok) {
+// ระบบเชื่อมต่อ: ส่งข้อความผ่านเซิร์ฟเวอร์ MQTT สาธารณะ (ไม่ต้องต่อตรงระหว่างเครื่อง ใช้ได้ทุกเครือข่าย)
+// ตัวอักษรสุดท้ายของรหัสห้องบอกว่าใช้เซิร์ฟเวอร์ตัวไหน
+const BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
+const CODE_SETS = ['ABCDEFGHJKLMN', 'PQRSTUVWXYZ23'];
+const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const TOPIC = 'h-runner-th-v2/';
+const seen = new Map();
+const pick = str => str[(Math.random() * str.length) | 0];
+const pub = (dir, obj, retain = false) => { if (client && client.connected && roomCode) client.publish(TOPIC + roomCode + '/' + dir, JSON.stringify(obj), { qos: 0, retain }); };
+
+function setNet(ok, msg) {
+  $('#netWarn').textContent = msg || '📡 การเชื่อมต่อหลุด กำลังเชื่อมใหม่…';
   $('#netWarn').classList.toggle('hidden', ok);
-  const el = $('#roomNet'); if (!el) return;
-  el.textContent = ok ? '🟢 ห้องออนไลน์ เพื่อนใส่รหัสเข้าได้เลย' : '🔴 ห้องหลุดชั่วคราว กำลังเชื่อมใหม่… (ตอนนี้เพื่อนจะยังหาห้องไม่เจอ)';
+  const el = $('#roomNet'); if (!el || !isHost) return;
+  el.textContent = ok ? '🟢 ห้องออนไลน์ เพื่อนใส่รหัสเข้าได้เลย' : '🔴 เน็ตหลุดชั่วคราว กำลังเชื่อมใหม่…';
   el.style.color = ok ? '#15803d' : '#dc2626';
 }
-function hostReconnect(delay = 2500) {
-  if (reconnTimer || !peer || peer.destroyed) return;
-  reconnTimer = setTimeout(() => { reconnTimer = null; try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, delay);
+function connectBroker(idx, extra = {}) {
+  return new Promise((resolve, reject) => {
+    if (typeof mqtt === 'undefined') return reject('nolib');
+    const c = mqtt.connect(BROKERS[idx], { clientId: 'hr_' + Math.random().toString(36).slice(2, 12), clean: true, keepalive: 20, connectTimeout: 7000, reconnectPeriod: 2000, ...extra });
+    const t = setTimeout(() => { c.end(true); reject('timeout'); }, 8000);
+    c.once('connect', () => { clearTimeout(t); resolve(c); });
+  });
 }
-function createRoom(tries = 0) {
-  if (typeof Peer === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
+
+async function createRoom() {
+  if (typeof mqtt === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
   lockBtns(true); status('กำลังสร้างห้อง…');
-  roomCode = Array.from({ length: 5 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[(Math.random() * 31) | 0]).join('');
-  peer = new Peer(PREFIX + roomCode);
-  peer.on('open', () => {
-    setNet(true);
-    if (isHost) return; // เชื่อมใหม่สำเร็จ ห้องเดิม รหัสเดิม
-    isHost = true; myId = 'host'; status('');
-    handleAction({ id: myId, type: 'join', name: myName(), look: myLook });
-    history.replaceState(null, '', '?room=' + roomCode); broadcast();
+  for (let i = 0; i < BROKERS.length && !client; i++) {
+    const code = pick(ALPHA) + pick(ALPHA) + pick(ALPHA) + pick(ALPHA) + pick(CODE_SETS[i]);
+    try {
+      client = await connectBroker(i, { will: { topic: TOPIC + code + '/down', payload: JSON.stringify({ hostAway: true }), qos: 0, retain: false } });
+      roomCode = code;
+    } catch {}
+  }
+  if (!client) { lockBtns(false); return status('เชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'); }
+  isHost = true; myId = 'host'; status('');
+  const up = TOPIC + roomCode + '/up';
+  client.subscribe(up);
+  client.on('connect', () => { client.subscribe(up); setNet(true); H.dirty = true; });
+  client.on('offline', () => setNet(false)); client.on('close', () => setNet(false));
+  client.on('message', (topic, buf) => {
+    let a; try { a = JSON.parse(buf.toString()); } catch { return; }
+    if (!a || typeof a !== 'object' || typeof a.id !== 'string' || a.id === 'host' || a.id.startsWith('bot-')) return;
+    seen.set(a.id, Date.now());
+    if (a.type === 'leave') return removePlayer(a.id);
+    if (a.type === 'ping') { if (!H.players.has(a.id)) return; H.dirty = true; return; }
+    if (['addBot', 'removeBot', 'setDiff', 'start', 'lobby'].includes(a.type)) return;
+    handleAction(a);
   });
-  peer.on('connection', conn => {
-    conn.on('open', () => { H.conns.set(conn.peer, conn); conn.send(snapshot()); });
-    conn.on('data', a => { if (a && typeof a === 'object' && !['addBot', 'removeBot', 'setDiff', 'start', 'lobby'].includes(a.type)) { a.id = conn.peer; handleAction(a); } });
-    conn.on('close', () => removePlayer(conn.peer));
-    conn.on('error', () => removePlayer(conn.peer));
-  });
-  peer.on('disconnected', () => { if (!isHost) return; setNet(false); hostReconnect(1000); });
-  peer.on('error', e => {
-    if (isHost) {
-      // ห้องเปิดแล้ว: ห้ามสร้างห้องใหม่ (รหัสจะเปลี่ยน) ให้พยายามต่อรหัสเดิมจนกว่าจะได้
-      if (e.type === 'peer-unavailable') return;
-      setNet(false); hostReconnect(e.type === 'unavailable-id' ? 5000 : 2500); return;
-    }
-    if (e.type === 'unavailable-id' && tries < 3) { peer.destroy(); return createRoom(tries + 1); }
-    lockBtns(false); status('สร้างห้องไม่สำเร็จ (' + e.type + ') ลองใหม่อีกครั้ง');
-  });
+  // ลบคนที่หายไปนาน (ปิดเว็บไปแล้ว)
+  setInterval(() => {
+    const limit = H.state === 'lobby' ? 30000 : 90000, now = Date.now();
+    for (const [id, p] of H.players) if (id !== 'host' && !p.bot && now - (seen.get(id) || now) > limit) removePlayer(id);
+  }, 5000);
+  handleAction({ id: myId, type: 'join', name: myName(), look: myLook });
+  history.replaceState(null, '', '?room=' + roomCode);
+  setNet(true); broadcast();
 }
-function joinRoom() {
-  if (typeof Peer === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
+
+let joinTimer = null;
+async function joinRoom() {
+  if (typeof mqtt === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
   const code = $('#codeInput').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   $('#codeInput').value = code;
   if (code.length !== 5) return status('ใส่รหัสห้อง 5 ตัว');
-  if (peer) { try { peer.destroy(); } catch {} peer = null; }
-  lockBtns(true); status('กำลังเข้าห้อง ' + code + ' ...'); roomCode = code; joinTries = 0;
-  peer = new Peer();
-  peer.on('open', id => { myId = id; connectHost(code); });
-  peer.on('error', e => {
-    if (e.type === 'peer-unavailable' && joinTries < 12 && !S) {
-      joinTries++; status(`กำลังค้นหาห้อง ${code} … ครั้งที่ ${joinTries + 1}/13 (ให้เจ้าของห้องเปิดหน้าเกมค้างไว้)`);
-      setTimeout(() => { if (!S && peer && !peer.destroyed) connectHost(code); }, 3000); return;
+  if (client) { try { client.end(true); } catch {} client = null; }
+  lockBtns(true); status('กำลังเชื่อมต่อ…');
+  myId = myId || ('p' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4));
+  const idx = CODE_SETS[1].includes(code[4]) ? 1 : 0;
+  try { client = await connectBroker(idx); } catch { lockBtns(false); return status('เชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'); }
+  roomCode = code;
+  const down = TOPIC + code + '/down';
+  client.subscribe(down);
+  client.on('connect', () => { client.subscribe(down); setNet(true); });
+  client.on('offline', () => setNet(false)); client.on('close', () => setNet(false));
+  let found = false, hostAway = 0;
+  const started = Date.now();
+  status(`กำลังค้นหาห้อง ${code} …`);
+  client.on('message', (topic, buf) => {
+    let d; try { d = JSON.parse(buf.toString()); } catch { return; }
+    if (!d || typeof d !== 'object') return;
+    if (d.closed) {
+      if (!S) { stopJoin(); lockBtns(false); return status(`ห้อง ${code} ปิดไปแล้ว ให้เจ้าของห้องสร้างห้องใหม่`); }
+      hostAway = Date.now() - 100000; return setNet(false, '⏳ เจ้าของห้องออกจากหน้าเกม รอสักครู่…');
     }
-    if (S) return;
-    lockBtns(false);
-    status(e.type === 'peer-unavailable' ? `ไม่พบห้อง ${code} · เช็กรหัสอีกครั้ง หรือให้เจ้าของห้องกลับมาที่หน้าเกมแล้วกดเข้าห้องใหม่` : 'เชื่อมต่อไม่ได้ (' + e.type + ')');
+    if (d.hostAway) { hostAway = Date.now(); return setNet(false, '⏳ เจ้าของห้องหลุดชั่วคราว รอสักครู่…'); }
+    if (d.error === 'full') { if (d.to === myId) { stopJoin(); lockBtns(false); status('ห้องเต็มแล้ว (สูงสุด 8 คน)'); } return; }
+    if (!d.players) return;
+    if (!S && Date.now() - d.now > 15 * 60000) return; // ห้องเก่าที่ค้างอยู่
+    hostAway = 0; setNet(true);
+    if (!found) { found = true; status(`พบห้อง ${code} แล้ว กำลังเข้าร่วม…`); }
+    if (d.players.some(p => p.id === myId) || S) { status(''); applyState(d); }
   });
-  peer.on('disconnected', () => { try { if (!peer.destroyed) peer.reconnect(); } catch {} });
-  setTimeout(() => { if (!S && !isHost && $('#status').textContent.startsWith('กำลัง')) { lockBtns(false); status('เชื่อมต่อนานเกินไป ลองใหม่ หรือเปลี่ยนเครือข่าย'); } }, 50000);
+  const tick = () => {
+    if (!client) return;
+    const inRoom = S && S.players.some(p => p.id === myId);
+    if (!inRoom) pub('up', { id: myId, type: 'join', name: myName(), look: myLook });
+    else pub('up', { id: myId, type: 'ping' });
+    if (!S && Date.now() - started > 45000) {
+      stopJoin(); lockBtns(false);
+      status(found ? 'เจ้าของห้องไม่ตอบ ลองให้เจ้าของห้องกลับมาที่หน้าเกม แล้วกดเข้าห้องใหม่' : `ไม่พบห้อง ${code} · เช็กรหัสอีกครั้ง หรือให้เจ้าของห้องเปิดหน้าเกมค้างไว้`);
+    }
+    if (S && hostAway && Date.now() - hostAway > 120000) { stopJoin(); S = null; render(); lockBtns(false); status('เจ้าของห้องหลุดนานเกินไป ห้องถูกปิด'); }
+  };
+  tick(); joinTimer = setInterval(tick, 2500);
 }
-let joinTries = 0;
-function connectHost(code) {
-  const conn = peer.connect(PREFIX + code, { reliable: true });
-  hostConn = conn;
-  conn.on('open', () => conn.send({ type: 'join', name: myName(), look: myLook }));
-  conn.on('data', d => { if (d && d.error === 'full') { lockBtns(false); status('ห้องเต็มแล้ว (สูงสุด 8 คน)'); } else if (d && d.players) { status(''); applyState(d); } });
-  conn.on('close', () => { if (conn !== hostConn || !S) return; S = null; render(); lockBtns(false); status('เจ้าของห้องออกไปแล้ว ห้องถูกปิด'); });
-}
+function stopJoin() { clearInterval(joinTimer); joinTimer = null; if (client) { try { client.end(true); } catch {} client = null; } setNet(true); }
 function send(type, extra = {}) {
   if (isHost) handleAction({ id: myId, type, ...extra });
-  else if (hostConn && hostConn.open) hostConn.send({ type, ...extra });
+  else pub('up', { id: myId, type, ...extra });
 }
 
 /* ======================================================================
@@ -903,18 +942,19 @@ $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHos
 let camMode = 0; const CAM_NAMES = ['🎥 มุมกว้าง', '🎥 มุมใกล้', '🎥 มุมสูง'];
 $('#camBtn').onclick = () => { camMode = (camMode + 1) % 3; $('#camBtn').textContent = CAM_NAMES[camMode]; };
 $('#againBtn').onclick = () => send('lobby');
-$('#leaveBtn').onclick = () => { location.href = location.pathname; };
+$('#leaveBtn').onclick = () => { if (isHost) pub('down', { closed: true }, true); else if (myId) pub('up', { id: myId, type: 'leave' }); setTimeout(() => location.href = location.pathname, 300); };
 $('#copyBtn').onclick = async () => {
   const link = location.origin + location.pathname + '?room=' + roomCode;
   try { await navigator.clipboard.writeText(link); $('#copyBtn').textContent = '✅ คัดลอกแล้ว ส่งให้เพื่อนได้เลย!'; } catch { prompt('คัดลอกลิงก์นี้:', link); }
   setTimeout(() => $('#copyBtn').textContent = '📋 คัดลอกลิงก์เชิญเพื่อน', 1800);
 };
 // กลับมาที่หน้าเว็บ (เช่น หลังสลับไปส่งลิงก์ใน LINE) → ต่อห้องกับระบบใหม่ทันที
-const wake = () => { if (isHost && peer && peer.disconnected && !peer.destroyed) { setNet(false); hostReconnect(0); } };
+const wake = () => { if (client && !client.connected && !client.disconnecting) { try { client.reconnect(); } catch {} } };
 document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
 addEventListener('focus', wake); addEventListener('online', wake);
 setInterval(wake, 5000);
-addEventListener('beforeunload', e => { if (isHost && H.conns.size) { e.preventDefault(); e.returnValue = ''; } });
+addEventListener('beforeunload', e => { if (isHost && H.players.size > 1) { e.preventDefault(); e.returnValue = ''; } });
+addEventListener('pagehide', () => { if (isHost) pub('down', { closed: true }, true); else if (myId) pub('up', { id: myId, type: 'leave' }); });
 
 function choose(i) {
   if (!S || S.state !== 'question' || !S.q || myAnswer) return;
@@ -961,7 +1001,7 @@ function render() {
     $('#readyBtn').classList.toggle('on', !!(me && me.ready));
     $('#readyBtn').textContent = me && me.ready ? '✅ พร้อมแล้ว · กดเพื่อยกเลิก' : '✋ กดพร้อม';
     show('#botRow', isHost); show('#roomNet', isHost);
-    if (isHost && !$('#roomNet').textContent) setNet(!peer.disconnected);
+    if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
     $('#diffs').innerHTML = DIFFS.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
     $('#diffDesc').textContent = `${DIFFS[S.diff].desc} · ${DIFFS[S.diff].time / 1000} วิ/ข้อ`;
     $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
@@ -1133,7 +1173,7 @@ addEventListener('resize', resize);
 // เริ่ม (รอฟอนต์ไม่เกิน 1.5 วิ เพื่อให้ป้ายในสนามใช้ฟอนต์สวย)
 await Promise.race([document.fonts.load('italic 900 40px Kanit'), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 resize(); buildWorld(); buildPodium(); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
-if (typeof Peer === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
+if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
 </html>
