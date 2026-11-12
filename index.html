@@ -77,6 +77,11 @@
   #lobbyList { list-style: none; padding: 0; margin: 0 0 12px; max-height: 34vh; overflow-y: auto; }
   #lobbyList li { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: #f1f5f9; border-radius: 12px; margin-bottom: 6px; font-weight: 600; }
   #lobbyList .ava { width: 30px; height: 30px; margin: 0; border-width: 2px; }
+  #lobbyList .st { margin-left: auto; font-size: 13px; font-weight: 800; padding: 2px 10px; border-radius: 99px; }
+  #lobbyList .st.y { background: #dcfce7; color: #15803d; } #lobbyList .st.n { background: #fef3c7; color: #b45309; }
+  #readyBtn.on { background: linear-gradient(#94a3b8, #64748b); box-shadow: 0 5px 0 #475569; }
+  #netWarn { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-weight: 800; font-size: 14px;
+             padding: 6px 14px; border-radius: 99px; z-index: 5; pointer-events: none; }
 
   /* ---------- HUD ---------- */
   #rankBox { position: absolute; left: 14px; top: 8px; pointer-events: none; }
@@ -183,6 +188,7 @@
       <div id="diffs" class="diffs"></div>
       <div id="botRow" class="row"><button id="addBot" class="btn ghost">🤖 เพิ่มบอท</button><button id="removeBot" class="btn ghost">➖ ลบบอท</button></div>
       <button id="startBtn" class="btn green big">เริ่มแข่ง!</button>
+      <button id="readyBtn" class="btn green big">✋ กดพร้อม</button>
       <div id="lobbyHint" class="small" style="margin-top:10px"></div>
     </div>
   </section>
@@ -202,6 +208,7 @@
   </div>
   <div id="roundResult" class="hidden"></div>
   <div id="big"></div>
+  <div id="netWarn" class="hidden">📡 การเชื่อมต่อของห้องหลุด กำลังเชื่อมใหม่…</div>
 
   <!-- ผลสุดท้าย -->
   <section id="final" class="screen hidden">
@@ -209,6 +216,7 @@
     <div class="panel">
       <h2>ผลการแข่งขัน · <span id="finalDiff"></span></h2>
       <div id="podium"></div>
+      <div id="waitHost" class="small" style="margin-bottom:8px"></div>
       <div class="row" style="margin:0"><button id="againBtn" class="btn green">🔁 เล่นอีกครั้ง</button><button id="leaveBtn" class="btn ghost">ออกจากห้อง</button></div>
     </div>
   </section>
@@ -683,7 +691,7 @@ function snapshot() {
     q: H.q ? { id: H.q.id, text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, lane: p.lane, points: p.points, gain: p.gain,
-      correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot })),
+      correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready })),
   };
 }
 function broadcast() {
@@ -736,14 +744,14 @@ function handleAction(a) {
       if (p) { p.name = name; p.look = look; }
       else {
         if (H.players.size >= MAX_PLAYERS) { const c = H.conns.get(a.id); if (c) { try { c.send({ error: 'full' }); } catch {} } return; }
-        H.players.set(a.id, { name, look, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0 });
+        H.players.set(a.id, { name, look, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0, ready: a.id === 'host' });
       }
       break;
     }
     case 'addBot': {
       if (a.id !== 'host' || H.state !== 'lobby' || H.players.size >= MAX_PLAYERS) return;
       const n = [...H.players.values()].filter(x => x.bot).length;
-      H.players.set('bot-' + Math.random().toString(36).slice(2, 7), { name: BOT_NAMES[n % BOT_NAMES.length], look: (n + 1 + myLook) % LOOKS.length, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0, bot: true });
+      H.players.set('bot-' + Math.random().toString(36).slice(2, 7), { name: BOT_NAMES[n % BOT_NAMES.length], look: (n + 1 + myLook) % LOOKS.length, lane: freeLane(), points: 0, gain: 0, correct: 0, ctime: 0, bot: true, ready: true });
       break;
     }
     case 'setDiff':
@@ -754,8 +762,12 @@ function handleAction(a) {
       const bots = [...H.players.entries()].filter(([, x]) => x.bot); if (!bots.length) return;
       H.players.delete(bots[bots.length - 1][0]); break;
     }
+    case 'ready':
+      if (!p || H.state !== 'lobby' || a.id === 'host') return;
+      p.ready = !!a.ready; break;
     case 'start':
-      if (!p || !(H.state === 'lobby' || H.state === 'finished')) return;
+      if (a.id !== 'host' || H.state !== 'lobby') return;
+      if ([...H.players.values()].some(x => !x.ready)) return;
       clearTimers();
       for (const q of H.players.values()) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0 });
       H.round = 0; H.q = null; H.results = null; H.answers.clear();
@@ -769,9 +781,9 @@ function handleAction(a) {
       break;
     }
     case 'lobby':
-      if (H.state !== 'finished') return;
+      if (a.id !== 'host' || H.state !== 'finished') return;
       clearTimers();
-      for (const q of H.players.values()) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0 });
+      for (const [qid, q] of H.players) Object.assign(q, { points: 0, gain: 0, correct: 0, ctime: 0, ready: qid === 'host' || !!q.bot });
       H.state = 'lobby'; H.round = 0; H.q = null; H.final = null;
       break;
     default: return;
@@ -804,11 +816,22 @@ function createRoom(tries = 0) {
   });
   peer.on('connection', conn => {
     conn.on('open', () => { H.conns.set(conn.peer, conn); conn.send(snapshot()); });
-    conn.on('data', a => { if (a && typeof a === 'object' && a.type !== 'addBot' && a.type !== 'removeBot' && a.type !== 'setDiff') { a.id = conn.peer; handleAction(a); } });
+    conn.on('data', a => { if (a && typeof a === 'object' && !['addBot', 'removeBot', 'setDiff', 'start', 'lobby'].includes(a.type)) { a.id = conn.peer; handleAction(a); } });
     conn.on('close', () => removePlayer(conn.peer));
     conn.on('error', () => removePlayer(conn.peer));
   });
+  peer.on('disconnected', () => {
+    if (!isHost || peer.destroyed) return;
+    $('#netWarn').classList.remove('hidden');
+    setTimeout(() => { try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, 800);
+  });
+  peer.on('open', () => $('#netWarn').classList.add('hidden'));
   peer.on('error', e => {
+    if (isHost && (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error' || e.type === 'socket-closed')) {
+      $('#netWarn').classList.remove('hidden');
+      setTimeout(() => { try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch {} }, 2000);
+      return;
+    }
     if (e.type === 'unavailable-id' && tries < 3) { peer.destroy(); return createRoom(tries + 1); }
     if (!isHost) { lockBtns(false); status('สร้างห้องไม่สำเร็จ (' + e.type + ')'); }
   });
@@ -817,20 +840,29 @@ function joinRoom() {
   if (typeof Peer === 'undefined') return status('โหลดระบบเชื่อมต่อไม่ได้ ลองรีเฟรช');
   const code = $('#codeInput').value.trim().toUpperCase();
   if (code.length !== 5) return status('ใส่รหัสห้อง 5 ตัว');
-  lockBtns(true); status('กำลังเข้าห้อง ' + code + ' ...'); roomCode = code;
+  if (peer) { try { peer.destroy(); } catch {} peer = null; }
+  lockBtns(true); status('กำลังเข้าห้อง ' + code + ' ...'); roomCode = code; joinTries = 0;
   peer = new Peer();
-  peer.on('open', id => {
-    myId = id;
-    hostConn = peer.connect(PREFIX + code, { reliable: true });
-    hostConn.on('open', () => hostConn.send({ type: 'join', name: myName(), look: myLook }));
-    hostConn.on('data', d => { if (d && d.error === 'full') { lockBtns(false); status('ห้องเต็มแล้ว (สูงสุด 8 คน)'); } else if (d && d.players) { status(''); applyState(d); } });
-    hostConn.on('close', () => { S = null; render(); lockBtns(false); status('เจ้าของห้องออกไปแล้ว ห้องถูกปิด'); });
-  });
+  peer.on('open', id => { myId = id; connectHost(code); });
   peer.on('error', e => {
+    if (e.type === 'peer-unavailable' && joinTries < 4 && !S) {
+      joinTries++; status(`กำลังค้นหาห้อง ${code} … (ครั้งที่ ${joinTries + 1})`);
+      setTimeout(() => { if (!S && peer && !peer.destroyed) connectHost(code); }, 2500); return;
+    }
+    if (S) return;
     lockBtns(false);
     status(e.type === 'peer-unavailable' ? `ไม่พบห้อง ${code} (เจ้าของห้องอาจปิดหน้าเว็บไปแล้ว)` : 'เชื่อมต่อไม่ได้ (' + e.type + ')');
   });
-  setTimeout(() => { if (!S && !isHost && $('#status').textContent.startsWith('กำลัง')) { lockBtns(false); status('เชื่อมต่อนานเกินไป ลองใหม่ หรือเปลี่ยนเครือข่าย'); } }, 15000);
+  peer.on('disconnected', () => { try { if (!peer.destroyed) peer.reconnect(); } catch {} });
+  setTimeout(() => { if (!S && !isHost && $('#status').textContent.startsWith('กำลัง')) { lockBtns(false); status('เชื่อมต่อนานเกินไป ลองใหม่ หรือเปลี่ยนเครือข่าย'); } }, 25000);
+}
+let joinTries = 0;
+function connectHost(code) {
+  const conn = peer.connect(PREFIX + code, { reliable: true });
+  hostConn = conn;
+  conn.on('open', () => conn.send({ type: 'join', name: myName(), look: myLook }));
+  conn.on('data', d => { if (d && d.error === 'full') { lockBtns(false); status('ห้องเต็มแล้ว (สูงสุด 8 คน)'); } else if (d && d.players) { status(''); applyState(d); } });
+  conn.on('close', () => { if (conn !== hostConn || !S) return; S = null; render(); lockBtns(false); status('เจ้าของห้องออกไปแล้ว ห้องถูกปิด'); });
 }
 function send(type, extra = {}) {
   if (isHost) handleAction({ id: myId, type, ...extra });
@@ -854,6 +886,7 @@ $('#createBtn').onclick = () => createRoom();
 $('#joinBtn').onclick = joinRoom;
 $('#codeInput').onkeydown = e => { if (e.key === 'Enter') joinRoom(); };
 $('#startBtn').onclick = () => send('start');
+$('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === myId); if (me) send('ready', { ready: !me.ready }); };
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
 $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setDiff', { diff: +b.dataset.d }); };
@@ -866,6 +899,11 @@ $('#copyBtn').onclick = async () => {
   try { await navigator.clipboard.writeText(link); $('#copyBtn').textContent = '✅ คัดลอกแล้ว ส่งให้เพื่อนได้เลย!'; } catch { prompt('คัดลอกลิงก์นี้:', link); }
   setTimeout(() => $('#copyBtn').textContent = '📋 คัดลอกลิงก์เชิญเพื่อน', 1800);
 };
+// กลับมาที่หน้าเว็บ (เช่น หลังสลับไปส่งลิงก์ใน LINE) → ต่อห้องกับระบบใหม่ทันที
+const wake = () => { if (isHost && peer && peer.disconnected && !peer.destroyed) { $('#netWarn').classList.remove('hidden'); try { peer.reconnect(); } catch {} } };
+document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+addEventListener('focus', wake); addEventListener('online', wake);
+setInterval(wake, 5000);
 addEventListener('beforeunload', e => { if (isHost && H.conns.size) { e.preventDefault(); e.returnValue = ''; } });
 
 function choose(i) {
@@ -904,11 +942,18 @@ function render() {
   if (st === 'lobby') {
     $('#roomCode').textContent = roomCode;
     $('#count').textContent = `${S.players.length}/${MAX_PLAYERS} คน`;
-    $('#lobbyList').innerHTML = S.players.map(p => `<li>${ava(p.look)}${esc(p.name)}${p.id === myId ? ' <span class="small">(คุณ)</span>' : ''}${p.id === 'host' ? ' 👑' : ''}${p.bot ? ' 🤖' : ''}</li>`).join('');
+    $('#lobbyList').innerHTML = S.players.map(p => `<li>${ava(p.look)}${esc(p.name)}${p.id === myId ? ' <span class="small">(คุณ)</span>' : ''}${p.id === 'host' ? ' 👑' : ''}${p.bot ? ' 🤖' : ''}
+      <span class="st ${p.ready ? 'y' : 'n'}">${p.id === 'host' ? 'เจ้าของห้อง' : p.ready ? '✅ พร้อม' : '⏳ ยังไม่พร้อม'}</span></li>`).join('');
+    const notReady = S.players.filter(p => !p.ready).length, me = S.players.find(p => p.id === myId);
+    show('#startBtn', isHost); show('#readyBtn', !isHost);
+    $('#startBtn').disabled = notReady > 0;
+    $('#startBtn').textContent = notReady > 0 ? `รออีก ${notReady} คนกดพร้อม…` : (S.players.length > 1 ? '🏁 เริ่มแข่ง!' : '🏁 เริ่มแข่ง (คนเดียว)');
+    $('#readyBtn').classList.toggle('on', !!(me && me.ready));
+    $('#readyBtn').textContent = me && me.ready ? '✅ พร้อมแล้ว · กดเพื่อยกเลิก' : '✋ กดพร้อม';
     show('#botRow', isHost);
     $('#diffs').innerHTML = DIFFS.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.icon} ${d.name}</button>`).join('');
     $('#diffDesc').textContent = `${DIFFS[S.diff].desc} · ${DIFFS[S.diff].time / 1000} วิ/ข้อ`;
-    $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ห้ามปิดหน้านี้ระหว่างเล่น · อยู่คนเดียวก็เพิ่มบอทมาแข่งได้' : 'รอทุกคนพร้อม แล้วใครกดเริ่มก็ได้!';
+    $('#lobbyHint').textContent = isHost ? '👑 คุณเป็นเจ้าของห้อง ปิดหน้านี้แล้วห้องจะหาย · ถ้าสลับไปแอปอื่น กลับมาที่หน้านี้ ห้องจะเชื่อมใหม่เอง' : 'กด "พร้อม" แล้วรอเจ้าของห้องกดเริ่ม';
   }
   if (st === 'countdown' || st === 'question' || st === 'reveal') {
     const sorted = standings(), myRank = sorted.findIndex(p => p.id === myId) + 1;
@@ -923,6 +968,10 @@ function render() {
       const p = S.players.find(q => q.id === x.id); if (!p) return '';
       return `<div><span>${x.correct ? medal(x.rank - 1) : (x.choice == null ? '⌛' : '❌')}</span><span>${esc(p.name)}</span><span>${x.correct ? (x.time / 1000).toFixed(2) + 'วิ' : ''}</span><span>+${x.gain}</span></div>`;
     }).join('');
+  }
+  if (st === 'finished') {
+    show('#againBtn', isHost);
+    $('#waitHost').textContent = isHost ? '' : '⏳ รอเจ้าของห้องเริ่มรอบใหม่…';
   }
   if (st === 'finished' && S.final) {
     $('#finalDiff').textContent = `${DIFFS[S.diff].icon} ${DIFFS[S.diff].name}`;
