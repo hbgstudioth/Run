@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>แข่งวิ่งออนไลน์ 🏃</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; font-family: system-ui, "Sarabun", sans-serif; background: #0f172a; color: #f1f5f9;
+         min-height: 100vh; display: flex; flex-direction: column; align-items: center; user-select: none; }
+  h1 { margin: 18px 0 6px; font-size: 28px; }
+  .sub { color: #94a3b8; margin-bottom: 14px; font-size: 14px; text-align: center; padding: 0 12px; }
+  .card { background: #1e293b; border-radius: 16px; padding: 20px; width: min(94vw, 720px); margin-bottom: 14px; }
+  input { font-size: 18px; padding: 12px; border-radius: 10px; border: 2px solid #334155; background: #0f172a;
+          color: #fff; width: 100%; margin-bottom: 12px; }
+  #codeInput { text-transform: uppercase; letter-spacing: 4px; text-align: center; }
+  button { font-size: 18px; font-weight: 700; padding: 14px 20px; border: 0; border-radius: 12px; cursor: pointer;
+           background: #22c55e; color: #052e16; width: 100%; }
+  button.alt { background: #3b82f6; color: #fff; }
+  button.ghost { background: #334155; color: #e2e8f0; font-size: 15px; padding: 10px; }
+  button:active { transform: scale(.97); }
+  button:disabled { background: #475569; color: #94a3b8; }
+  .hidden { display: none !important; }
+  .or { text-align: center; color: #64748b; margin: 14px 0; }
+  .code { font-size: 40px; font-weight: 900; letter-spacing: 8px; text-align: center; color: #fde047; margin: 4px 0 10px; }
+  .row { display: flex; gap: 8px; margin-bottom: 14px; }
+
+  .lane { position: relative; height: 54px; border-bottom: 2px dashed #334155; background: #172033; }
+  .lane.me { background: #1d2b45; }
+  .lane .name { position: absolute; left: 8px; top: 4px; font-size: 12px; font-weight: 700; z-index: 2; text-shadow: 0 1px 2px #000; }
+  .runner { position: absolute; top: 12px; font-size: 32px; line-height: 1; transition: left .12s linear; transform: scaleX(-1); }
+  .finish { position: absolute; right: 30px; top: 0; bottom: 0; width: 8px;
+            background: repeating-linear-gradient(0deg,#fff 0 8px,#000 8px 16px); z-index: 1; }
+  .place { position: absolute; right: 44px; top: 14px; font-size: 20px; font-weight: 800; }
+
+  #overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+             font-size: 140px; font-weight: 900; pointer-events: none; text-shadow: 0 6px 20px #000; }
+  #pads { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: min(94vw, 720px); }
+  .pad { height: 150px; font-size: 26px; background: #3b82f6; color: #fff; touch-action: manipulation; }
+  .pad.next { background: #f59e0b; color: #1c1917; box-shadow: 0 0 0 4px #fde68a; }
+  #lobbyList { list-style: none; padding: 0; margin: 10px 0 14px; }
+  #lobbyList li { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; background: #0f172a; display: flex; gap: 8px; align-items: center; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  td { padding: 8px; border-bottom: 1px solid #334155; }
+  #status { font-size: 14px; color: #fca5a5; margin-top: 10px; min-height: 1em; text-align: center; }
+</style>
+</head>
+<body>
+<h1>🏃 แข่งวิ่งออนไลน์</h1>
+<div class="sub">กดปุ่ม ซ้าย / ขวา สลับกันให้เร็วที่สุด (คีย์บอร์ด: ← → หรือ A D)</div>
+
+<!-- หน้าแรก -->
+<div id="joinView" class="card">
+  <input id="nameInput" maxlength="16" placeholder="ชื่อของคุณ">
+  <button id="createBtn">➕ สร้างห้องใหม่</button>
+  <div class="or">— หรือ —</div>
+  <input id="codeInput" maxlength="5" placeholder="รหัสห้อง">
+  <button id="joinBtn" class="alt">เข้าห้อง</button>
+  <div id="status"></div>
+</div>
+
+<!-- ล็อบบี้ -->
+<div id="lobbyView" class="card hidden">
+  <div class="sub" style="margin:0">รหัสห้อง</div>
+  <div class="code" id="roomCode"></div>
+  <div class="row">
+    <button class="ghost" id="copyBtn">📋 คัดลอกลิงก์เชิญ</button>
+  </div>
+  <b>ผู้เล่นในห้อง</b> <span id="count"></span>
+  <ul id="lobbyList"></ul>
+  <button id="startBtn">เริ่มแข่ง!</button>
+  <div class="sub" style="margin-top:10px" id="lobbyHint"></div>
+</div>
+
+<!-- สนาม -->
+<div id="raceView" class="card hidden" style="padding:10px"><div id="track"></div></div>
+<div id="pads" class="hidden">
+  <button class="pad" id="leftPad">⬅ ซ้าย</button>
+  <button class="pad" id="rightPad">ขวา ➡</button>
+</div>
+
+<!-- ผลการแข่ง -->
+<div id="resultView" class="card hidden">
+  <h2 style="margin-top:0">🏆 ผลการแข่ง</h2>
+  <table id="resultTable"></table>
+  <button id="againBtn">กลับห้องรอ / แข่งใหม่</button>
+</div>
+
+<div id="overlay"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const GOAL = 100, MAX_TAPS_PER_SEC = 16, PREFIX = 'run-race-th-v1-';
+const COLORS = ['#ef4444','#3b82f6','#22c55e','#eab308','#a855f7','#ec4899','#14b8a6','#f97316','#64748b','#84cc16'];
+
+let peer = null, isHost = false, hostConn = null, myId = null, roomCode = '', S = null, clockOffset = 0, nextSide = null;
+
+$('#nameInput').value = localStorage.raceName || '';
+const urlRoom = new URLSearchParams(location.search).get('room');
+if (urlRoom) { $('#codeInput').value = urlRoom.toUpperCase(); $('#createBtn').classList.add('ghost'); }
+
+const status = (t) => { $('#status').textContent = t; };
+const myName = () => { const n = $('#nameInput').value.trim() || 'ผู้เล่น'; localStorage.raceName = n; return n; };
+const lock = (on) => { $('#createBtn').disabled = $('#joinBtn').disabled = on; };
+
+if (typeof Peer === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
+
+/* ===================== โฮสต์ (เครื่องคนสร้างห้อง) ===================== */
+const players = new Map();  // id -> {name,color,progress,finishTime,taps}
+const conns = new Map();    // peerId -> DataConnection
+let game = { state: 'lobby', startAt: 0, ranking: [] }, dirty = false;
+
+function snapshot() {
+  return { goal: GOAL, state: game.state, startAt: game.startAt, now: Date.now(), ranking: game.ranking,
+    players: [...players.entries()].map(([id, p]) => ({ id, name: p.name, color: p.color, progress: p.progress, finishTime: p.finishTime })) };
+}
+function broadcast() {
+  const snap = snapshot();
+  for (const c of conns.values()) if (c.open) c.send(snap);
+  applyState(snap);
+  dirty = false;
+}
+const nextColor = () => { const used = new Set([...players.values()].map(p => p.color)); return COLORS.find(c => !used.has(c)) || COLORS[players.size % COLORS.length]; };
+function checkEnd() {
+  if (game.state === 'racing' && players.size && [...players.values()].every(p => p.finishTime != null)) game.state = 'finished';
+}
+function removePlayer(id) {
+  conns.delete(id); players.delete(id);
+  game.ranking = game.ranking.filter(r => r !== id);
+  checkEnd(); dirty = true;
+}
+function handleAction(a) {
+  const p = players.get(a.id);
+  switch (a.type) {
+    case 'join': {
+      const name = String(a.name || 'ผู้เล่น').trim().slice(0, 16) || 'ผู้เล่น';
+      if (p) p.name = name; else players.set(a.id, { name, color: nextColor(), progress: 0, finishTime: null, taps: [] });
+      break;
+    }
+    case 'start':
+      if (!p || game.state === 'countdown' || game.state === 'racing') return;
+      for (const q of players.values()) { q.progress = 0; q.finishTime = null; q.taps = []; }
+      game = { state: 'countdown', startAt: Date.now() + 3000, ranking: [] };
+      setTimeout(() => { if (game.state === 'countdown') { game.state = 'racing'; dirty = true; } }, 3000);
+      break;
+    case 'tap': {
+      if (!p || game.state !== 'racing' || p.finishTime != null) return;
+      const now = Date.now();
+      p.taps = p.taps.filter(t => now - t < 1000);
+      if (p.taps.length >= MAX_TAPS_PER_SEC) return;
+      p.taps.push(now);
+      p.progress = Math.min(GOAL, p.progress + 1);
+      if (p.progress >= GOAL) { p.finishTime = now - game.startAt; game.ranking.push(a.id); checkEnd(); }
+      break;
+    }
+    case 'lobby':
+      if (game.state !== 'finished') return;
+      for (const q of players.values()) { q.progress = 0; q.finishTime = null; }
+      game = { state: 'lobby', startAt: 0, ranking: [] };
+      break;
+    default: return;
+  }
+  dirty = true;
+}
+setInterval(() => { if (isHost && dirty) broadcast(); }, 50);
+
+function createRoom(tries = 0) {
+  if (typeof Peer === 'undefined') return;
+  lock(true); status('กำลังสร้างห้อง...');
+  roomCode = Array.from({ length: 5 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random() * 31 | 0]).join('');
+  peer = new Peer(PREFIX + roomCode);
+  peer.on('open', () => {
+    isHost = true; myId = 'host';
+    handleAction({ id: myId, type: 'join', name: myName() });
+    history.replaceState(null, '', '?room=' + roomCode);
+    status(''); broadcast();
+  });
+  peer.on('connection', conn => {
+    conn.on('open', () => { conns.set(conn.peer, conn); conn.send(snapshot()); });
+    conn.on('data', a => { if (a && typeof a === 'object') { a.id = conn.peer; handleAction(a); } });
+    conn.on('close', () => removePlayer(conn.peer));
+    conn.on('error', () => removePlayer(conn.peer));
+  });
+  peer.on('error', e => {
+    if (e.type === 'unavailable-id' && tries < 3) { peer.destroy(); return createRoom(tries + 1); }
+    if (!isHost) { lock(false); status('สร้างห้องไม่สำเร็จ: ' + e.type); }
+  });
+}
+
+/* ===================== ผู้เล่นที่เข้าห้อง ===================== */
+function joinRoom() {
+  if (typeof Peer === 'undefined') return;
+  const code = $('#codeInput').value.trim().toUpperCase();
+  if (code.length !== 5) return status('ใส่รหัสห้อง 5 ตัว');
+  lock(true); status('กำลังเข้าห้อง ' + code + '...');
+  roomCode = code;
+  peer = new Peer();
+  peer.on('open', id => {
+    myId = id;
+    hostConn = peer.connect(PREFIX + code, { reliable: true });
+    hostConn.on('open', () => { status(''); hostConn.send({ type: 'join', name: myName() }); });
+    hostConn.on('data', snap => applyState(snap));
+    hostConn.on('close', hostGone);
+  });
+  peer.on('error', e => {
+    lock(false);
+    if (e.type === 'peer-unavailable') status('ไม่พบห้อง ' + code + ' (เจ้าของห้องอาจปิดหน้าเว็บไปแล้ว)');
+    else status('เชื่อมต่อไม่ได้: ' + e.type);
+  });
+  setTimeout(() => { if (!S) { lock(false); if (!$('#status').textContent.startsWith('ไม่พบ')) status('เชื่อมต่อนานเกินไป ลองอีกครั้ง หรือเปลี่ยนเครือข่าย'); } }, 15000);
+}
+function hostGone() {
+  S = null; render();
+  lock(false); status('เจ้าของห้องออกไปแล้ว ห้องถูกปิด');
+}
+
+function send(type, extra = {}) {
+  if (isHost) handleAction({ id: myId, type, ...extra });
+  else if (hostConn && hostConn.open) hostConn.send({ type, ...extra });
+}
+
+/* ===================== ปุ่ม / ควบคุม ===================== */
+$('#createBtn').onclick = () => createRoom();
+$('#joinBtn').onclick = joinRoom;
+$('#codeInput').onkeydown = e => { if (e.key === 'Enter') joinRoom(); };
+$('#startBtn').onclick = () => send('start');
+$('#againBtn').onclick = () => send('lobby');
+$('#copyBtn').onclick = async () => {
+  const link = location.origin + location.pathname + '?room=' + roomCode;
+  try { await navigator.clipboard.writeText(link); $('#copyBtn').textContent = '✅ คัดลอกแล้ว!'; }
+  catch { prompt('คัดลอกลิงก์นี้:', link); }
+  setTimeout(() => $('#copyBtn').textContent = '📋 คัดลอกลิงก์เชิญ', 1500);
+};
+
+function step(side) {
+  if (!S || S.state !== 'racing') return;
+  const me = S.players.find(p => p.id === myId);
+  if (!me || me.finishTime != null) return;
+  if (nextSide && side !== nextSide) return;
+  nextSide = side === 'L' ? 'R' : 'L';
+  send('tap'); updatePads();
+}
+$('#leftPad').addEventListener('pointerdown', e => { e.preventDefault(); step('L'); });
+$('#rightPad').addEventListener('pointerdown', e => { e.preventDefault(); step('R'); });
+addEventListener('keydown', e => {
+  if (e.repeat || document.activeElement.tagName === 'INPUT') return;
+  if (['ArrowLeft', 'a', 'A', 'ฟ'].includes(e.key)) step('L');
+  if (['ArrowRight', 'd', 'D', 'ก'].includes(e.key)) step('R');
+});
+function updatePads() {
+  $('#leftPad').classList.toggle('next', nextSide !== 'R');
+  $('#rightPad').classList.toggle('next', nextSide !== 'L');
+}
+addEventListener('beforeunload', e => { if (isHost && conns.size) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ===================== แสดงผล ===================== */
+const show = (id, on) => $(id).classList.toggle('hidden', !on);
+const fmt = ms => (ms / 1000).toFixed(2) + ' วิ';
+const medal = i => ['🥇', '🥈', '🥉'][i] || (i + 1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function applyState(snap) { S = snap; clockOffset = snap.now - Date.now(); render(); }
+
+let countdownTimer = null;
+function render() {
+  const inRoom = !!(S && S.players.some(p => p.id === myId));
+  show('#joinView', !inRoom);
+  show('#lobbyView', inRoom && S.state === 'lobby');
+  show('#raceView', inRoom && S.state !== 'lobby');
+  show('#pads', inRoom && (S.state === 'racing' || S.state === 'countdown'));
+  show('#resultView', inRoom && S.state === 'finished');
+  clearInterval(countdownTimer);
+  const ov = $('#overlay');
+  if (!inRoom) { ov.textContent = ''; $('#track').innerHTML = ''; return; }
+
+  $('#roomCode').textContent = roomCode;
+  $('#count').textContent = `(${S.players.length} คน)`;
+  $('#lobbyHint').textContent = isHost
+    ? '⚠️ คุณเป็นเจ้าของห้อง อย่าปิดหรือสลับออกจากหน้านี้นาน ไม่งั้นห้องจะหลุด'
+    : 'ใครกดเริ่มก็ได้ ทุกคนจะออกตัวพร้อมกัน';
+  $('#lobbyList').innerHTML = S.players.map(p =>
+    `<li><span class="dot" style="background:${p.color}"></span>${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}${p.id === 'host' ? ' 👑' : ''}</li>`).join('');
+
+  const track = $('#track');
+  const ids = new Set(S.players.map(p => p.id));
+  [...track.children].forEach(l => { if (!ids.has(l.dataset.id)) l.remove(); });
+  for (const p of S.players) {
+    let lane = [...track.children].find(l => l.dataset.id === p.id);
+    if (!lane) {
+      lane = document.createElement('div');
+      lane.className = 'lane' + (p.id === myId ? ' me' : '');
+      lane.dataset.id = p.id;
+      lane.innerHTML = '<span class="name"></span><div class="finish"></div><span class="place"></span><span class="runner">🏃</span>';
+      track.appendChild(lane);
+    }
+    const nm = lane.querySelector('.name');
+    nm.textContent = p.name + (p.id === myId ? ' (คุณ)' : ''); nm.style.color = p.color;
+    lane.querySelector('.runner').style.left = (8 + (lane.clientWidth - 70) * p.progress / S.goal) + 'px';
+    const rank = S.ranking.indexOf(p.id);
+    lane.querySelector('.place').textContent = rank >= 0 ? medal(rank) : '';
+  }
+
+  if (S.state === 'countdown') {
+    nextSide = null; updatePads();
+    const tick = () => { const left = Math.ceil((S.startAt - (Date.now() + clockOffset)) / 1000); ov.textContent = left > 0 ? left : 'GO!'; };
+    tick(); countdownTimer = setInterval(tick, 100);
+  } else if (S.state === 'racing' && Date.now() + clockOffset - S.startAt < 800) {
+    ov.textContent = 'GO!';
+    setTimeout(() => { if (S && S.state === 'racing') ov.textContent = ''; }, 800);
+  } else {
+    const me = S.players.find(p => p.id === myId);
+    ov.textContent = (S.state === 'racing' && me && me.finishTime != null) ? '🏁' : '';
+  }
+
+  if (S.state === 'finished') {
+    $('#resultTable').innerHTML = S.ranking.map((id, i) => {
+      const p = S.players.find(x => x.id === id);
+      return p ? `<tr><td>${medal(i)}</td><td style="color:${p.color}"><b>${esc(p.name)}</b></td><td>${fmt(p.finishTime)}</td></tr>` : '';
+    }).join('');
+  }
+}
+addEventListener('resize', () => S && render());
+</script>
+</body>
+</html>
