@@ -1195,7 +1195,7 @@ function updateAura(r, dt) {
 function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.parent.remove(p.m); p.m.material.dispose(); }); if (r.scoreSp) r.root.remove(r.scoreSp); scene.remove(r.root); r.root.traverse(o => { if (o.material && o.material.map && o.isSprite) { o.material.map.dispose(); o.material.dispose(); } }); }
 
 /* ---------- ตึกโครงคอนกรีต (ยังสร้างไม่เสร็จ) เดินขึ้นได้ถึงดาดฟ้า ---------- */
-const FH = 6.3;
+const FH = 4.4;
 const BLD = [
   [{ x: -22, z: 11, f: 2, w: 10, d: 12 }, { x: 22, z: -13, f: 3, w: 12, d: 13 }],
   [{ x: -21, z: -13, f: 2, w: 10, d: 12 }, { x: 22, z: -12, f: 3, w: 12, d: 13 }],
@@ -1231,7 +1231,7 @@ function buildBuildings() {
         for (let k = 0; k < nb; k++) {
           const s0 = cols[k] + cw / 2, s1 = cols[k + 1] - cw / 2;
           if (door && k === 1) continue;
-          if ((k + seed) % 4 === 0) put(s0, s1, yb, yb + 2.6, brick);
+          if ((k + seed) % 4 === 0) put(s0, s1, yb, yb + 2.0, brick);
           else put(s0, s1, yb, yb + 1.0, cm);
         }
       };
@@ -1244,7 +1244,7 @@ function buildBuildings() {
           frame('z', x0 + T / 2, z0 + T, z1 - T, yb, yt, false, i + 2);
           frame('z', x1 - T / 2, z0 + T, z1 - T, yb, yt, false, i + 3);
           // บันไดขึ้นชั้นถัดไป/ดาดฟ้า (สลับซ้าย-ขวา)
-          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 1.5, sx1 = sx0 + 1.5, zs = z0 + T + 1.4, n = 16, dz = 0.42, rise = FH / n;
+          const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 2.4, sx1 = sx0 + 2.4, zs = z0 + T + 1.4, n = 11, dz = 0.42, rise = FH / n;
           for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, sm);
           const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.3;
           box(x0, hx0, ys, yt, z0, z1, cm); box(hx1, x1, ys, yt, z0, z1, cm); box(hx0, hx1, ys, yt, z0, hz0, cm); box(hx0, hx1, ys, yt, hz1, z1, cm);
@@ -1744,7 +1744,7 @@ function applyHit(sid, tid, dmg, w, hs) {
   H.dirty = true;
 }
 function losClear(a, b) {
-  const o = new THREE.Vector3(a.x, 1.9, a.z), d = new THREE.Vector3(b.x - a.x, 0, b.z - a.z); const len = d.length(); if (!len) return true; d.divideScalar(len);
+  const o = new THREE.Vector3(a.x, (a.y || 0) + 1.9, a.z), d = new THREE.Vector3(b.x - a.x, (b.y || 0) + 1.5 - o.y, b.z - a.z); const len = d.length(); if (!len) return true; d.divideScalar(len);
   const h = rayCast(o, d, len, null, 0, true); return h.t >= len - 0.6;
 }
 function botTick(now) {
@@ -2563,9 +2563,11 @@ function fireShot() {
   if (h.kind === 'player') { const tp = remotes.get(h.id); if (tp) { const ph = tp.cr ? 1.85 : 2.65; hs = end.y >= (tp.ry || 0) + ph - 0.55; } }
   const fx = Math.sin(me.yaw), fz = Math.cos(me.yaw), rx = -Math.cos(me.yaw), rz = Math.sin(me.yaw), gl = [0.95, 1.4, 1.75][me.w];
   const muzzle = new THREE.Vector3(me.x + fx * gl + rx * 0.36, me.y + (me.cr ? 1.4 : 1.95), me.z + fz * gl + rz * 0.36);
-  const md = end.clone().sub(muzzle), ml = md.length(); md.normalize();
-  const hb = rayCast(muzzle, md, ml, myId, 0.05, true);
-  if (hb.t < ml - 0.15) { end = muzzle.clone().addScaledVector(md, hb.t); h = { kind: 'wall' }; }
+  // ตรวจว่ามีสิ่งกีดขวางจาก "ระดับสายตา" ไปถึงจุดเล็งหรือไม่ (ยืนหลังกล่องยิงข้ามได้ แต่ยิงทะลุพื้น/ผนังไม่ได้)
+  const eye = new THREE.Vector3(me.x + rx * 0.3, me.y + (me.cr ? 1.7 : 2.45), me.z + rz * 0.3);
+  const ed = end.clone().sub(eye), el = ed.length(); ed.normalize();
+  const hb = rayCast(eye, ed, el, myId, 0.05, true);
+  if (hb.t < el - 0.25) { end = eye.clone().addScaledVector(ed, hb.t); h = { kind: 'wall' }; hs = false; }
   if (h.kind === 'player') {
     const tp = remotes.get(h.id), dist = tp ? Math.hypot(tp.rx - me.x, tp.rz - me.z) : 99, dmg = dmgAt(me.w, dist) * (hs ? 2 : 1);
     if (dmg > 0) { send('hit', { target: h.id, dmg, w: me.w, hs }); me.hitFlash = 1; $('#hitMark').classList.toggle('hs', hs); Music.sfx(hs ? 'hshit' : 'hit'); }
