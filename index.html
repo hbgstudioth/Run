@@ -13,9 +13,9 @@
   :root { --panel: rgba(13,15,19,.84); --line: rgba(255,255,255,.11); --txt: #e8e5df; --mut: #8d929a; --acc: #d9a441; --acc2: #b4432e; --ok: #6aa96b; --bad: #c0503a; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0b0d; font-family: "Oswald", "Kanit", system-ui, sans-serif; color: var(--txt); user-select: none; }
-  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; filter: saturate(.74) contrast(1.1) brightness(.97); }
-  #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0,0,0,.62) 100%); }
-  #grain { position: fixed; inset: -60px; pointer-events: none; opacity: .075; mix-blend-mode: overlay; animation: grain .6s steps(5) infinite; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; filter: saturate(.95) contrast(1.04); }
+  #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,.38) 100%); }
+  #grain { position: fixed; inset: -60px; pointer-events: none; opacity: .045; mix-blend-mode: overlay; animation: grain .6s steps(5) infinite; }
   @keyframes grain { 0% { transform: translate(0,0); } 20% { transform: translate(-22px,14px); } 40% { transform: translate(18px,-26px); } 60% { transform: translate(-12px,30px); } 80% { transform: translate(26px,8px); } }
   #ui { position: fixed; inset: 0; pointer-events: none; }
   #ui > * { pointer-events: auto; }
@@ -191,7 +191,9 @@
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
       <div class="lobbyHead"><b>ฉากแข่งขัน</b></div>
-      <div id="maps" class="diffs" style="grid-template-columns:1fr 1fr"></div>
+      <div id="maps" class="diffs" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div class="lobbyHead"><b>ช่วงเวลา</b></div>
+      <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>หมวดคำถาม</b></div>
       <div id="cats" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ระดับความยาก</b><span id="diffDesc" class="small"></span></div>
@@ -332,7 +334,6 @@ sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 160 });
 sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
-const SUN_OFF = new THREE.Vector3(55, 38, 30);
 
 /* ---------- สนามวงรี ---------- */
 const L = 70, RIN = 26, LW = 1.7, LANES = 8, ROUT = RIN + LANES * LW;
@@ -492,9 +493,19 @@ function buildWorld() {
     fl.geometry.translate(1, 0, 0); fl.position.set(p[0], 6.3, p[1]); stad.add(fl); world.flags.push(fl);
   }
 
+  // เสาไฟสนาม
+  const flood = new THREE.MeshStandardMaterial({ color: '#f2f2ea', emissive: '#ffffff', emissiveIntensity: 0 }); world.nightMats.push({ m: flood, on: 4 });
+  for (const [x, z] of [[-L / 2 - 30, ROUT + 22], [L / 2 + 30, ROUT + 22], [-L / 2 - 30, -ROUT - 22], [L / 2 + 30, -ROUT - 22]]) {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 30, 8), toon('#6b6f75')); pole.position.set(x, 15, z); stad.add(pole);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.6), flood); head.position.set(x, 31, z); head.lookAt(0, 0, 0); stad.add(head);
+  }
+  // ดวงดาว
+  { const pts = []; for (let i = 0; i < 900; i++) { const th = Math.random() * Math.PI * 2, ph = Math.random() * 1.3; pts.push(Math.cos(th) * Math.sin(ph) * 520, Math.cos(ph) * 520, Math.sin(th) * Math.sin(ph) * 520); }
+    const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    world.stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: '#dfe6ff', size: 1.6, sizeAttenuation: false, fog: false, transparent: true, opacity: .85 })); world.stars.visible = false; scene.add(world.stars); }
   // เมฆ
   world.clouds = [];
-  const cg = new THREE.IcosahedronGeometry(1, 2), cm = new THREE.MeshLambertMaterial({ color: '#9aa0a8', emissive: '#3a3f47', emissiveIntensity: .4, fog: false, transparent: true, opacity: .85 });
+  const cg = new THREE.IcosahedronGeometry(1, 2), cm = new THREE.MeshLambertMaterial({ color: '#f4f6f8', emissive: '#555a60', emissiveIntensity: .5, fog: false, transparent: true, opacity: .9 }); world.cloudMat = cm;
   for (let i = 0; i < 16; i++) {
     const c = new THREE.Group(); const a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 200;
     c.position.set(Math.cos(a) * r, 55 + Math.random() * 45, Math.sin(a) * r);
@@ -502,7 +513,7 @@ function buildWorld() {
     scene.add(c); world.clouds.push(c);
   }
 }
-const world = {};
+const world = { nightMats: [] };
 /* ---------- ฉากถนนกรุงเทพ ---------- */
 function buildBangkok() {
   const g = new THREE.Group(); g.visible = false; scene.add(g); world.bkk = g;
@@ -568,7 +579,8 @@ function buildBangkok() {
       x.fillStyle = 'rgba(80,60,40,.55)'; for (let k = 0; k < 8; k++) x.fillRect(22, gy + 52 + k * 6, w - 44, 3);
       x.fillStyle = '#7c2d12'; for (let k = 0; k < 4; k++) x.fillRect(40 + k * 50, gy + fh - 30, 24, 20);
     });
-    return { mat: new THREE.MeshLambertMaterial({ map: tex }), floors, wall };
+    const mat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.85 }); world.nightMats.push({ m: mat, on: 0.38 });
+    return { mat, floors, wall };
   });
   const roofMat = toon('#9ca3af');
   const AWN = ['#dc2626', '#2563eb', '#16a34a', '#f59e0b', '#db2777', '#0d9488'];
@@ -595,7 +607,7 @@ function buildBangkok() {
     const a = (i / 46) * Math.PI * 2 + Math.random() * 0.1, dist = ROUT + 48 + Math.random() * 90;
     const x = Math.cos(a) * (dist + L / 2 * Math.abs(Math.cos(a))), z = Math.sin(a) * dist;
     const w = 10 + Math.random() * 9, h = 28 + Math.random() * (i % 7 === 0 ? 90 : 55);
-    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, w * (0.8 + Math.random() * .4)), new THREE.MeshLambertMaterial({ map: glass, color: towerTints[i % 5] }));
+    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, w * (0.8 + Math.random() * .4)), (() => { const mt = new THREE.MeshStandardMaterial({ map: glass, emissiveMap: glass, emissive: '#ffe2a0', emissiveIntensity: 0, color: towerTints[i % 5], roughness: 0.35, metalness: 0.4 }); world.nightMats.push({ m: mt, on: 0.55 }); return mt; })());
     t.position.set(x, h / 2, z); t.rotation.y = Math.random() * Math.PI; g.add(t);
     if (i % 3 === 0) { const top = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, h * 0.18, w * 0.6), t.material); top.position.set(x, h + h * 0.09, z); top.rotation.y = t.rotation.y; g.add(top); }
     if (i % 4 === 1) cyl(0.15, 0.25, 9, '#e5e7eb', x, h + 4.5, z);
@@ -673,7 +685,7 @@ function buildBangkok() {
   for (let i = 0; i < 22; i++) {
     const [x, z] = posAt(i / 22 + 0.045, ROUT + 5.4), [x2, z2] = posAt(i / 22 + 0.046, ROUT + 5.4);
     const lp = new THREE.Group(); lp.position.set(x, 0, z); lp.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; g.add(lp);
-    cyl(0.1, 0.14, 7, '#475569', 0, 3.5, 0, lp, 6); box(0.12, 0.12, 1.8, '#475569', 0, 7, 0.85, lp); box(0.5, 0.2, 0.7, '#fef3c7', 0, 6.9, 1.7, lp);
+    cyl(0.1, 0.14, 7, '#475569', 0, 3.5, 0, lp, 6); box(0.12, 0.12, 1.8, '#475569', 0, 7, 0.85, lp); box(0.5, 0.2, 0.7, world.lampMat || (world.lampMat = (() => { const mt = new THREE.MeshStandardMaterial({ color: '#fff3d6', emissive: '#ffd59a', emissiveIntensity: 0 }); world.nightMats.push({ m: mt, on: 3 }); return mt; })()), 0, 6.9, 1.7, lp);
   }
   // รถเข็นขายอาหารริมทาง
   const UMB = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#ec4899'];
@@ -732,20 +744,241 @@ function buildBangkok() {
 }
 
 const MAPS = [
-  { name: 'สนามกีฬา', icon: '🏟️', track: '#7a3b2e', top: '#1d2733', bot: '#b7896a', fog: 0x6f6a66, fogNear: 90, fogFar: 300, ground: 0x2a2a28, sky: 0xaab4c0, hemi: 0.55, sun: 0xffc48a, sunI: 2.6, exp: 1.0 },
-  { name: 'ถนนกรุงเทพ', icon: '🛺', track: '#2c3036', top: '#141b26', bot: '#c9784a', fog: 0x7a5d4d, fogNear: 110, fogFar: 380, ground: 0x2b2622, sky: 0xb0a39a, hemi: 0.5, sun: 0xffad6b, sunI: 2.4, exp: 1.05 },
-]
-let curMap = -1;
-function applyMap(m) {
-  m = m | 0; if (m === curMap || !world.bkk) return; curMap = m;
-  const c = MAPS[m];
-  world.stad.visible = m === 0; world.bkk.visible = m === 1;
-  world.trackMat.color.set(c.track);
-  skyMat.uniforms.top.value.set(c.top); skyMat.uniforms.bot.value.set(c.bot);
-  scene.fog.color.set(c.fog); scene.fog.near = c.fogNear; scene.fog.far = c.fogFar;
-  hemi.groundColor.set(c.ground); hemi.color.set(c.sky); hemi.intensity = c.hemi; sun.color.set(c.sun); sun.intensity = c.sunI;
-  renderer.toneMappingExposure = c.exp;
-  (world.bannerMats || []).forEach(mt => { mt.map = m ? world.bkkBanner : world.bannerTex; mt.needsUpdate = true; });
+  { name: 'สนามกีฬา', track: '#8a3e2f' },
+  { name: 'ถนนกรุงเทพ', track: '#35393f' },
+  { name: 'เมืองซอมบี้', track: '#34373a' },
+];
+const TODS = ['กลางวัน', 'กลางคืน'];
+// ค่าแสง/ท้องฟ้า แยกตามฉาก × เวลา
+const ENV = [
+  [{ top: '#3d84d6', bot: '#d8e8f4', fog: 0xcfdde8, fn: 160, ff: 520, sky: 0xe8f0f8, gnd: 0x5a5c4c, hemi: 1.25, sun: 0xfff5e4, sunI: 3.1, exp: 1.0, sp: [40, 90, 30], cloud: '#f4f6f8' },
+   { top: '#03060c', bot: '#16223a', fog: 0x0e1626, fn: 90, ff: 360, sky: 0x8aa0c8, gnd: 0x101010, hemi: 0.85, sun: 0xd6e2ff, sunI: 2.2, exp: 1.15, sp: [-30, 75, 35], cloud: '#20283a' }],
+  [{ top: '#4a8bd8', bot: '#e8e2d0', fog: 0xdcd6c6, fn: 170, ff: 520, sky: 0xf0ece2, gnd: 0x5c564c, hemi: 1.2, sun: 0xfff1dc, sunI: 3.0, exp: 1.0, sp: [45, 85, 25], cloud: '#f6f4f0' },
+   { top: '#05070e', bot: '#2a1f30', fog: 0x1a1522, fn: 100, ff: 380, sky: 0x7a7aa8, gnd: 0x0d0c0c, hemi: 0.6, sun: 0xa8b8e8, sunI: 1.2, exp: 1.2, sp: [-35, 70, 30], cloud: '#241f2c' }],
+  [{ top: '#5e6763', bot: '#a8ad9b', fog: 0x8f9483, fn: 45, ff: 240, sky: 0xb7bcad, gnd: 0x34342c, hemi: 1.0, sun: 0xece9da, sunI: 1.6, exp: 1.0, sp: [30, 80, 40], cloud: '#80857a' },
+   { top: '#020403', bot: '#15221b', fog: 0x101a14, fn: 28, ff: 170, sky: 0x58806a, gnd: 0x060606, hemi: 0.5, sun: 0xa8d8b8, sunI: 0.8, exp: 1.25, sp: [-30, 70, 30], cloud: '#121a15' }],
+];
+const sunOff = new THREE.Vector3(40, 90, 30);
+let curEnv = '';
+function applyMap(m, tod = 0) {
+  m = Math.max(0, Math.min(2, m | 0)); tod = tod ? 1 : 0;
+  const key = m + '-' + tod; if (key === curEnv || !world.bkk) return; curEnv = key;
+  const e = ENV[m][tod];
+  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2;
+  world.trackMat.color.set(MAPS[m].track);
+  skyMat.uniforms.top.value.set(e.top); skyMat.uniforms.bot.value.set(e.bot);
+  scene.fog.color.set(e.fog); scene.fog.near = e.fn; scene.fog.far = e.ff;
+  hemi.color.set(e.sky); hemi.groundColor.set(e.gnd); hemi.intensity = e.hemi;
+  sun.color.set(e.sun); sun.intensity = e.sunI; sunOff.set(...e.sp);
+  renderer.toneMappingExposure = e.exp;
+  if (world.cloudMat) { world.cloudMat.color.set(e.cloud); world.cloudMat.emissive.set(tod ? '#000000' : '#555a60'); }
+  if (world.stars) world.stars.visible = tod === 1 && m !== 2;
+  world.nightMats.forEach(({ m: mt, on }) => { mt.emissiveIntensity = tod ? on : 0; });
+  (world.fireLights || []).forEach(l => { l.userData.base = m === 2 ? (tod ? 30 : 6) : 0; l.intensity = l.userData.base; });
+  if (world.beamMat) world.beamMat.opacity = tod ? 0.12 : 0;
+  (world.bannerMats || []).forEach(mt => { mt.map = m === 1 ? world.bkkBanner : m === 2 ? world.zomBanner : world.bannerTex; mt.needsUpdate = true; });
+}
+/* ---------- ฉากเมืองซอมบี้ ---------- */
+function buildZombie() {
+  const g = new THREE.Group(); g.visible = false; scene.add(g); world.zom = g;
+  const box = (w, h, d, mat, x, y, z, parent = g) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
+  const cyl = (rt, rb, h, mat, x, y, z, parent = g, seg = 10) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const nightMat = (c, on, extra = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0, roughness: 0.6, ...extra }); world.nightMats.push({ m, on }); return m; };
+
+  // พื้นยางมะตอยแตกร้าว
+  const crack = canvasTex(256, 256, (x) => {
+    x.fillStyle = '#4a4a46'; x.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${Math.random() < .5 ? 0 : 255},${Math.random() < .5 ? 0 : 255},0,${Math.random() * 0.04})`; x.fillRect(Math.random() * 256, Math.random() * 256, 3, 3); }
+    x.strokeStyle = 'rgba(15,15,14,.7)'; x.lineWidth = 2;
+    for (let k = 0; k < 7; k++) { x.beginPath(); let px = Math.random() * 256, py = Math.random() * 256; x.moveTo(px, py); for (let j = 0; j < 8; j++) { px += rnd(-30, 30); py += rnd(-30, 30); x.lineTo(px, py); } x.stroke(); }
+    x.fillStyle = 'rgba(60,70,40,.35)'; for (let k = 0; k < 6; k++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, rnd(6, 20), 0, 7); x.fill(); }
+  });
+  crack.wrapS = crack.wrapT = THREE.RepeatWrapping; crack.repeat.set(70, 70);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ map: crack, roughness: 0.95 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
+  const shape = new THREE.Shape(); const n = 40;
+  for (let i = 0; i < 4 * n; i++) { const p = segPt(i / n, RIN - 0.7); i ? shape.lineTo(p[0], -p[1]) : shape.moveTo(p[0], -p[1]); }
+  const dirt = canvasTex(128, 128, (x) => { x.fillStyle = '#4d4a3a'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 500; i++) { x.fillStyle = `rgba(${rnd(40, 90) | 0},${rnd(50, 80) | 0},${rnd(30, 50) | 0},.5)`; x.fillRect(Math.random() * 128, Math.random() * 128, 4, 4); } });
+  dirt.wrapS = dirt.wrapT = THREE.RepeatWrapping; dirt.repeat.set(1 / 8, 1 / 8);
+  const inf = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ map: dirt, roughness: 1 }));
+  inf.geometry.rotateX(-Math.PI / 2); inf.position.y = 0.02; inf.receiveShadow = true; g.add(inf);
+
+  // ตึกร้าง
+  const winTex = (seed, lit) => canvasTex(128, 256, (x, w, h) => {
+    x.fillStyle = ['#5d5a52', '#4f5552', '#6a6158', '#545049'][seed % 4]; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 300; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .12})`; x.fillRect(Math.random() * w, Math.random() * h, rnd(2, 10), rnd(2, 14)); }
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 3; c++) {
+      const px = 12 + c * 40, py = 12 + r * 31, k = Math.random();
+      x.fillStyle = lit ? (k < 0.12 ? '#ffb85c' : '#000') : (k < 0.3 ? '#0c0d0e' : k < 0.45 ? '#7a5a3a' : '#2b3236');
+      x.fillRect(px, py, 26, 20);
+      if (!lit && k >= 0.3 && k < 0.45) { x.fillStyle = '#5a4128'; for (let p = 0; p < 3; p++) x.fillRect(px - 2, py + 3 + p * 6, 30, 3); }
+    }
+    if (!lit && seed % 3 === 0) { x.fillStyle = 'rgba(0,0,0,.55)'; x.beginPath(); x.moveTo(0, 0); x.lineTo(w * 0.6, 0); x.lineTo(w * 0.2, h * 0.3); x.fill(); }
+  });
+  const ruinMats = [0, 1, 2, 3, 4, 5].map(i => { const t = winTex(i, false), e = winTex(i, true); const m = new THREE.MeshStandardMaterial({ map: t, emissiveMap: e, emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.92 }); world.nightMats.push({ m, on: 0.8 }); return m; });
+  const graffiti = ['SURVIVORS →', 'HELP', 'เขตกักกัน', 'NO ENTRY', 'RUN!', 'อย่าเข้าไป'];
+  function ruin(x, z, w, h, tx, tz, i) {
+    const grp = new THREE.Group(); grp.position.set(x, 0, z); g.add(grp);
+    const m = ruinMats[i % ruinMats.length];
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 9), m); b.position.y = h / 2; grp.add(b);
+    if (i % 3 === 0) { const c = box(w * 0.55, 2.5, 7, m, w * 0.2, h + 0.4, 0, grp); c.rotation.z = 0.35; }
+    if (i % 4 === 1) for (let k = 0; k < 3; k++) box(rnd(1, 2.5), rnd(0.6, 1.4), rnd(1, 2), '#5a5750', rnd(-w / 2, w / 2), 0.5, 5.5 + rnd(0, 1.5), grp).rotation.set(rnd(0, 1), rnd(0, 3), rnd(0, 1));
+    if (i % 5 === 2) {
+      const gt = canvasTex(256, 64, (c, cw, ch) => { c.clearRect(0, 0, cw, ch); c.font = '700 42px Oswald, Kanit, sans-serif'; c.fillStyle = ['#c0392b', '#e5e7eb', '#d4ac0d'][i % 3]; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(graffiti[i % graffiti.length], cw / 2, ch / 2); });
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.8, w * 0.2), new THREE.MeshStandardMaterial({ map: gt, transparent: true, roughness: 1 })); p.position.set(0, 2.2, 4.52); grp.add(p);
+    }
+    grp.lookAt(tx, 0, tz); grp.rotation.z += rnd(-0.03, 0.03);
+  }
+  let bi = 0;
+  for (const sd of [1, -1]) for (let x = -L / 2; x < L / 2 - 2;) { const w = rnd(7, 11); ruin(x + w / 2, sd * (ROUT + 20), w - 0.3, rnd(9, 22), x + w / 2, 0, bi++); x += w; }
+  for (const [k, cx] of [[1, L / 2], [3, -L / 2]]) { const R2 = ROUT + 20, cnt = Math.round(Math.PI * R2 / 8.5); for (let i = 1; i < cnt; i++) { const [x, z] = segPt(k + i / cnt, R2); ruin(x, z, 8, rnd(9, 24), cx, 0, bi++); } }
+  for (let i = 0; i < 30; i++) {
+    const a = i / 30 * Math.PI * 2, d = ROUT + rnd(45, 110), x = Math.cos(a) * (d + L / 2 * Math.abs(Math.cos(a))), z = Math.sin(a) * d, w = rnd(10, 18), h = rnd(25, 70);
+    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), ruinMats[i % 6]); t.position.set(x, h / 2, z); t.rotation.set(0, rnd(0, 3), i % 6 === 0 ? 0.08 : 0); g.add(t);
+    if (i % 4 === 0) { const top = box(w * 0.7, h * 0.15, w * 0.6, ruinMats[(i + 1) % 6], x, h + h * 0.04, z); top.rotation.set(0.25, rnd(0, 3), 0.15); }
+  }
+
+  // รถพังทิ้งไว้
+  const rust = ['#6b3b26', '#4f5a5e', '#5d4a3a', '#3e4448', '#7a6a4a', '#2f3a33'];
+  function wreck(x, z, ry, flip, c) {
+    const t = new THREE.Group(); t.position.set(x, 0, z); t.rotation.y = ry; g.add(t);
+    box(1.9, 0.75, 4.2, c, 0, 0.7, 0, t); box(1.7, 0.6, 2.1, c, 0, 1.35, -0.2, t);
+    box(1.72, 0.45, 2.0, '#111315', 0, 1.35, -0.2, t).scale.set(1.01, 0.85, 0.92);
+    for (const wx of [-0.9, 0.9]) for (const wz of [-1.35, 1.35]) { const w = cyl(0.34, 0.34, 0.24, '#151515', wx, 0.34, wz, t, 10); w.rotation.z = Math.PI / 2; }
+    if (flip) { t.rotation.z = Math.PI; t.position.y = 1.75; }
+    t.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  }
+  for (let i = 0; i < 18; i++) { const [x, z] = posAt(i / 18 + rnd(0, 0.03), ROUT + rnd(7, 12)); wreck(x, z, rnd(0, 6.3), i % 5 === 0, rust[i % 6]); }
+  for (const [x, z, r] of [[-22, 14, 0.4], [20, -16, 2.2], [-28, -12, 1.2], [26, 12, 3.6]]) wreck(x, z, r, false, rust[(x | 0) & 3]);
+  // รถบัสไหม้
+  const bus = new THREE.Group(); bus.position.set(-10, 0, -ROUT - 9); bus.rotation.y = 0.25; g.add(bus);
+  box(2.6, 2.8, 11, '#6e5a2c', 0, 1.8, 0, bus); box(2.62, 0.9, 10.6, '#121212', 0, 2.4, 0, bus);
+  for (const wz of [-3.8, 3.8]) for (const wx of [-1.2, 1.2]) { const w = cyl(0.5, 0.5, 0.3, '#151515', wx, 0.5, wz, bus, 12); w.rotation.z = Math.PI / 2; }
+
+  // แบริเออร์ กระสอบทราย รั้ว
+  const jShape = new THREE.Shape([new THREE.Vector2(-0.4, 0), new THREE.Vector2(0.4, 0), new THREE.Vector2(0.18, 0.35), new THREE.Vector2(0.14, 0.9), new THREE.Vector2(-0.14, 0.9), new THREE.Vector2(-0.18, 0.35)]);
+  const jGeo = new THREE.ExtrudeGeometry(jShape, { depth: 2.4, bevelEnabled: false }); jGeo.translate(0, 0, -1.2);
+  const jMat = toon('#8d8a82');
+  for (let i = 0; i < 40; i++) {
+    const r = i % 2 ? ROUT + 2.6 : RIN - 2.8, [x, z] = posAt(i / 40 + rnd(-0.004, 0.004), r), [x2, z2] = posAt(i / 40 + 0.002, r);
+    const j = new THREE.Mesh(jGeo, jMat); j.position.set(x, 0, z); j.rotation.y = Math.atan2(x2 - x, z2 - z) + rnd(-0.15, 0.15); j.castShadow = true; g.add(j);
+  }
+  const sandG = new THREE.CapsuleGeometry(0.28, 0.5, 4, 8); sandG.rotateZ(Math.PI / 2);
+  for (const [cx, cz] of [[-14, -6], [14, 6], [-6, 15], [8, -16]]) for (let row = 0; row < 3; row++) for (let k = 0; k < 5 - row; k++) { const s = new THREE.Mesh(sandG, toon('#8a7b5a')); s.position.set(cx + (k - 2 + row / 2) * 1.05, 0.25 + row * 0.45, cz); s.scale.set(1, 0.75, 1); s.castShadow = true; g.add(s); }
+  const fenceTex = canvasTex(64, 64, (x) => { x.clearRect(0, 0, 64, 64); x.strokeStyle = '#9aa0a6'; x.lineWidth = 2; for (let k = -64; k < 128; k += 12) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 64, 64); x.stroke(); x.beginPath(); x.moveTo(k + 64, 0); x.lineTo(k, 64); x.stroke(); } });
+  fenceTex.wrapS = fenceTex.wrapT = THREE.RepeatWrapping; fenceTex.repeat.set(6, 2);
+  const fenceMat = new THREE.MeshStandardMaterial({ map: fenceTex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.3, metalness: 0.6, roughness: 0.5 });
+  for (let i = 0; i < 16; i++) {
+    const r = ROUT + 14.5, [x, z] = posAt(i / 16, r), [x2, z2] = posAt(i / 16 + 0.04, r);
+    const len = Math.hypot(x2 - x, z2 - z), f = new THREE.Mesh(new THREE.PlaneGeometry(len, 3), fenceMat);
+    f.position.set((x + x2) / 2, 1.5, (z + z2) / 2); f.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; f.rotation.z = rnd(-0.06, 0.06); g.add(f);
+    cyl(0.06, 0.06, 3.2, '#6b6f75', x, 1.6, z, g, 6);
+  }
+  // เทปกั้น
+  const tape = canvasTex(256, 32, (x, w, h) => { x.fillStyle = '#f2c230'; x.fillRect(0, 0, w, h); x.fillStyle = '#111'; x.font = '700 22px Oswald, sans-serif'; x.textBaseline = 'middle'; for (let k = 0; k < 2; k++) x.fillText('DO NOT CROSS', 8 + k * 128, h / 2 + 1); });
+  tape.wrapS = THREE.RepeatWrapping;
+  for (let i = 0; i < 10; i++) {
+    const r = RIN - 1.6, [x, z] = posAt(i / 10 + 0.02, r), [x2, z2] = posAt(i / 10 + 0.06, r), len = Math.hypot(x2 - x, z2 - z);
+    const tm = new THREE.MeshBasicMaterial({ map: tape.clone(), side: THREE.DoubleSide }); tm.map.repeat.set(len / 6, 1); tm.map.needsUpdate = true;
+    const tp = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.18), tm); tp.position.set((x + x2) / 2, 1.0, (z + z2) / 2); tp.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; g.add(tp);
+    cyl(0.04, 0.04, 1.1, '#2b2b2b', x, 0.55, z, g, 6);
+  }
+  // ถังไฟ
+  world.fires = [];
+  const fireMat = new THREE.MeshBasicMaterial({ color: '#ff8a2a', transparent: true, opacity: 0.9, depthWrite: false });
+  const fireMat2 = new THREE.MeshBasicMaterial({ color: '#ffd36b', transparent: true, opacity: 0.85, depthWrite: false });
+  for (const [x, z] of [[ -18, 18 ], [ 18, -19 ], [ -36, -6 ], [ 36, 8 ], [ 0, 19 ], [ -8, -19 ], [ 45, 30 ], [ -45, -30 ]]) {
+    cyl(0.42, 0.38, 1.1, '#5a3a22', x, 0.55, z, g, 12).castShadow = true;
+    const f1 = new THREE.Mesh(new THREE.ConeGeometry(0.38, 1.2, 8), fireMat); f1.position.set(x, 1.6, z); g.add(f1);
+    const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.8, 8), fireMat2); f2.position.set(x, 1.45, z); g.add(f2);
+    world.fires.push({ f1, f2, ph: Math.random() * 6 });
+  }
+  world.fireLights = [];
+  for (const [x, z] of [[-18, 18], [18, -19], [0, 19]]) { const pl = new THREE.PointLight(0xff8a3a, 0, 22, 1.6); pl.position.set(x, 2.2, z); g.add(pl); world.fireLights.push(pl); }
+  // ป้ายเขตกักกัน
+  const signT = (t1, t2) => canvasTex(512, 256, (x, w, h) => {
+    x.fillStyle = '#e8e4d8'; x.fillRect(0, 0, w, h);
+    for (let k = -h; k < w; k += 40) { x.fillStyle = '#d9a12b'; x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 20, 0); x.lineTo(k + 20 + h * 0.18, h * 0.18); x.lineTo(k + h * 0.18, h * 0.18); x.fill(); }
+    x.fillStyle = '#111'; x.fillRect(0, h * 0.18, w, 4);
+    x.fillStyle = '#9b1c1c'; x.font = '700 70px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.fillText(t1, w / 2, h * 0.55);
+    x.fillStyle = '#1b1b1b'; x.font = '500 40px Kanit, sans-serif'; x.fillText(t2, w / 2, h * 0.82);
+    for (let i = 0; i < 400; i++) { x.fillStyle = `rgba(80,60,40,${Math.random() * .15})`; x.fillRect(Math.random() * w, Math.random() * h, 4, 4); }
+  });
+  for (const [x, z, ry, a, b] of [[-20, ROUT + 4.5, Math.PI, 'QUARANTINE', 'เขตกักกัน ห้ามเข้า'], [22, -ROUT - 4.5, 0, 'DANGER', 'พบผู้ติดเชื้อในพื้นที่'], [L / 2 + 12, 0, -Math.PI / 2, 'EVACUATE', 'อพยพทันที']]) {
+    const sg = new THREE.Group(); sg.position.set(x, 0, z); sg.rotation.y = ry; g.add(sg);
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), new THREE.MeshStandardMaterial({ map: signT(a, b), roughness: 0.9 })); p.position.y = 4.2; sg.add(p);
+    for (const sx of [-2.6, 2.6]) cyl(0.08, 0.08, 4.2, '#4b4f55', sx, 2.1, -0.05, sg, 6);
+  }
+  // หอสังเกตการณ์ + ไฟส่อง
+  const tower = new THREE.Group(); tower.position.set(-L / 2 - 12, 0, 0); g.add(tower);
+  for (const [sx, sz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) cyl(0.15, 0.2, 12, '#3d4146', sx, 6, sz, tower, 6);
+  box(4.4, 0.3, 4.4, '#3d4146', 0, 12, 0, tower); box(4.4, 2.2, 0.1, '#4b4a3c', 0, 13.2, 2.2, tower); box(4.4, 2.2, 0.1, '#4b4a3c', 0, 13.2, -2.2, tower);
+  const beamMat = new THREE.MeshBasicMaterial({ color: '#f7f3d0', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const beam = new THREE.Mesh(new THREE.ConeGeometry(5, 45, 24, 1, true).translate(0, -22.5, 0), beamMat);
+  const piv = new THREE.Group(); piv.position.set(0, 13.5, 0); tower.add(piv); beam.rotation.x = -1.25; piv.add(beam);
+  world.searchlight = piv; world.beamMat = beamMat;
+  // ต้นไม้แห้ง
+  for (let i = 0; i < 22; i++) {
+    const a = rnd(0, 6.3), d = i < 8 ? rnd(8, 18) : ROUT + rnd(30, 40), x = Math.cos(a) * (d + (i < 8 ? 6 : L / 2 * Math.abs(Math.cos(a)))), z = Math.sin(a) * d * (i < 8 ? 0.8 : 1);
+    if (Math.hypot(x, z) < 8) continue;
+    const tr = new THREE.Group(); tr.position.set(x, 0, z); g.add(tr);
+    cyl(0.18, 0.3, 5, '#2f2a24', 0, 2.5, 0, tr, 6).castShadow = true;
+    for (let k = 0; k < 5; k++) { const br = cyl(0.04, 0.1, rnd(1.5, 2.6), '#2f2a24', 0, 3 + k * 0.4, 0, tr, 5); br.rotation.set(rnd(-1, 1), rnd(0, 6), rnd(0.6, 1.1)); br.geometry.translate(0, 0.9, 0); br.castShadow = true; }
+  }
+  // ขยะ ยาง ถุง
+  const tireG = new THREE.TorusGeometry(0.34, 0.14, 8, 14), bagG = new THREE.SphereGeometry(0.4, 10, 8);
+  for (let i = 0; i < 60; i++) {
+    const [x, z] = posAt(Math.random(), Math.random() < .5 ? ROUT + rnd(3, 6) : RIN - rnd(3, 8));
+    const k = i % 3, m = new THREE.Mesh(k === 0 ? tireG : k === 1 ? bagG : new THREE.BoxGeometry(rnd(0.4, 1.2), rnd(0.2, 0.6), rnd(0.4, 1.2)), toon(k === 0 ? '#151515' : k === 1 ? '#1d2024' : '#6a5f50'));
+    m.position.set(x, k === 0 ? 0.12 : 0.2, z); m.rotation.set(k === 0 ? Math.PI / 2 : rnd(0, 1), rnd(0, 6), 0); if (k === 1) m.scale.set(1, 0.7, 1); m.castShadow = true; g.add(m);
+  }
+
+  // ซอมบี้เดินเตร่
+  world.zombies = [];
+  const ZC = [['#7d8f6a', '#4a4f3e', '#3b3a36'], ['#8a957a', '#5b4636', '#2e3036'], ['#6f8269', '#3f4b5a', '#3a3328'], ['#8b9883', '#6b5a48', '#262626']];
+  const zG = { leg: new THREE.CapsuleGeometry(0.13, 0.62, 4, 8), arm: new THREE.CapsuleGeometry(0.1, 0.5, 4, 8), torso: new THREE.CapsuleGeometry(0.28, 0.45, 4, 10), head: new THREE.SphereGeometry(0.27, 14, 12), eye: new THREE.SphereGeometry(0.035, 6, 6) };
+  const eyeMat = new THREE.MeshStandardMaterial({ color: '#d8e05a', emissive: '#d8e05a', emissiveIntensity: 0 }); world.nightMats.push({ m: eyeMat, on: 2.5 });
+  for (let i = 0; i < 22; i++) {
+    const [skin, shirt, pants] = ZC[i % 4];
+    const z = new THREE.Group(), body = new THREE.Group(); z.add(body);
+    const add = (p, geo, c, x, y, zz) => { const m = new THREE.Mesh(geo, typeof c === 'string' ? toon(c) : c); m.position.set(x, y, zz); m.castShadow = true; p.add(m); return m; };
+    const legs = [], arms = [];
+    for (const sd of [-1, 1]) {
+      const hip = new THREE.Group(); hip.position.set(sd * 0.15, 1.15, 0); body.add(hip); add(hip, zG.leg, pants, 0, -0.5, 0); legs.push(hip);
+      const sh = new THREE.Group(); sh.position.set(sd * 0.38, 1.95, 0); body.add(sh); add(sh, zG.arm, i % 3 ? skin : shirt, 0, -0.34, 0); arms.push(sh);
+    }
+    const t = add(body, zG.torso, shirt, 0, 1.65, 0); t.scale.set(1.08, 1, 0.75);
+    const head = new THREE.Group(); head.position.set(0, 2.32, 0.05); body.add(head);
+    add(head, zG.head, skin, 0, 0, 0).scale.set(0.95, 1.1, 1);
+    for (const sd of [-1, 1]) add(head, zG.eye, eyeMat, sd * 0.09, 0.03, 0.24);
+    head.rotation.z = rnd(-0.4, 0.4); head.rotation.x = 0.25;
+    body.rotation.x = 0.18;
+    const zr = rnd(0, 1) < 0.65 ? ROUT + rnd(3, 13) : RIN - rnd(4, 10);
+    const zz = { g: z, legs, arms, body, u: Math.random(), r: zr, dir: Math.random() < .5 ? 1 : -1, v: rnd(0.4, 0.9), ph: Math.random() * 6, wob: rnd(0.5, 1.5) };
+    z.scale.setScalar(rnd(0.9, 1.05)); g.add(z); world.zombies.push(zz);
+  }
+
+  world.zomBanner = canvasTex(1024, 160, (x, w, h) => {
+    x.fillStyle = '#1b1b18'; x.fillRect(0, 0, w, h);
+    for (let k = -h; k < w; k += 60) { x.fillStyle = '#d9a12b'; x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 30, 0); x.lineTo(k + 30 + 24, 24); x.lineTo(k + 24, 24); x.fill(); x.beginPath(); x.moveTo(k, h - 24); x.lineTo(k + 30, h - 24); x.lineTo(k + 54, h); x.lineTo(k + 24, h); x.fill(); }
+    x.font = '700 76px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#e8e2d2'; x.fillText('QUARANTINE ZONE · H-RUNNER', w / 2, h / 2 + 3);
+  });
+}
+function updateZombie(dt, t) {
+  if (!world.zom || !world.zom.visible) return;
+  for (const z of world.zombies) {
+    const P = 2 * L + 2 * Math.PI * z.r; z.u += z.dir * z.v * dt / P; z.ph += dt * z.v * 3.2;
+    const [x, y] = posAt(z.u, z.r), [x2, y2] = posAt(z.u + z.dir * 0.002, z.r);
+    z.g.position.set(x + Math.sin(z.ph * 0.3) * z.wob, 0.02, y); z.g.rotation.y = Math.atan2(x2 - x, y2 - y) + Math.sin(z.ph * 0.5) * 0.25;
+    const s = Math.sin(z.ph);
+    z.legs[0].rotation.x = s * 0.35; z.legs[1].rotation.x = -s * 0.35;
+    z.arms[0].rotation.x = -1.35 + Math.sin(z.ph * 0.7) * 0.15; z.arms[1].rotation.x = -1.2 + Math.cos(z.ph * 0.6) * 0.2;
+    z.body.position.y = Math.abs(Math.cos(z.ph)) * 0.05; z.body.rotation.z = Math.sin(z.ph) * 0.08;
+  }
+  for (const f of world.fires) { const k = 0.85 + Math.sin(t * 13 + f.ph) * 0.1 + Math.sin(t * 7.3 + f.ph * 2) * 0.08; f.f1.scale.set(1, k, 1); f.f2.scale.set(1, 2 - k, 1); f.f1.rotation.y = t * 2; }
+  if (world.searchlight) world.searchlight.rotation.y = Math.sin(t * 0.35) * 1.6;
+  world.fireLights.forEach((l, i) => { if (l.intensity > 0) l.intensity = l.userData.base * (0.8 + Math.sin(t * 11 + i) * 0.2); });
 }
 
 
@@ -978,6 +1211,7 @@ const Music = (() => {
     lobby: { bpm: 76, chords: [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [40, 47, 52, 56]], scale: [57, 60, 62, 64, 67, 69, 72], mel: melody(311, 64, 0.12, 7), lead: 'sine', drums: 1, pad: true, vol: 0.85 },
     // แข่ง: จังหวะหนัก เบสกระแทก แบบหนังแอ็กชัน
     race: { bpm: 128, chords: [[45, 52, 57], [41, 48, 53], [38, 45, 50], [40, 47, 52]], scale: [57, 60, 62, 64, 65, 67, 69, 72], mel: melody(97, 64, 0.35, 8), lead: 'triangle', drums: 2, pad: false, vol: 0.85 },
+    zombie: { bpm: 104, chords: [[40, 47, 52, 55], [41, 48, 53, 56], [40, 47, 52, 55], [39, 46, 51, 54]], scale: [52, 55, 56, 59, 60, 63, 64, 67], mel: melody(666, 64, 0.22, 8), lead: 'sine', drums: 4, pad: true, vol: 0.9 },
     bkk: { bpm: 122, chords: [[38, 45, 50], [36, 43, 48], [33, 40, 45], [35, 42, 47]], scale: [62, 64, 67, 69, 71, 74, 76, 79], mel: melody(1234, 64, 0.45, 8), lead: 'ranat', drums: 3, pad: false, vol: 0.8 },
   };
   function init() {
@@ -1008,13 +1242,15 @@ const Music = (() => {
   function schedule(i, t) {
     const S = song, s16 = i % 16, bar = Math.floor(i / 16) % 4, ch = S.chords[bar], beat = 60 / S.bpm, st = beat / 4, v = S.vol;
     // เบส
-    if (S.drums >= 2) { if (s16 % 2 === 0) tone(t, midi(ch[0] - 12), st * 1.5, 'sawtooth', (s16 % 4 === 0 ? 0.16 : 0.1) * v, musicBus); if (s16 === 0) tone(t, midi(ch[0] - 24), beat * 3.5, 'sine', 0.22 * v, musicBus, 0.02); }
+    if (S.drums === 4) { if (s16 % 4 === 0) tone(t, midi(ch[0] - 12), beat * 0.9, 'sawtooth', 0.07 * v, musicBus, 0.05); }
+    else if (S.drums >= 2) { if (s16 % 2 === 0) tone(t, midi(ch[0] - 12), st * 1.5, 'sawtooth', (s16 % 4 === 0 ? 0.16 : 0.1) * v, musicBus); if (s16 === 0) tone(t, midi(ch[0] - 24), beat * 3.5, 'sine', 0.22 * v, musicBus, 0.02); }
     else if (s16 % 8 === 0) tone(t, midi(ch[0] - 12), beat * 1.8, 'triangle', 0.22 * v, musicBus);
     // คอร์ด
     if (S.pad && s16 === 0) ch.forEach(n => { tone(t, midi(n), beat * 4.2, 'sine', 0.055 * v, musicBus, 0.6); tone(t, midi(n) * 1.004, beat * 4.2, 'triangle', 0.02 * v, musicBus, 0.6); });
     if (!S.pad && s16 === 0) ch.forEach(n => tone(t, midi(n + 12), beat * 3.6, 'sawtooth', 0.012 * v, musicBus, 0.3));
     // กลอง
-    if (S.drums === 1) { if (s16 === 0) kick(t, 0.4 * v); if (s16 === 8) tone(t, 80, 0.5, 'sine', 0.18 * v, musicBus, 0.002, 40); if (s16 % 4 === 2) noise(t, 0.03, 0.025 * v, 9000); }
+    if (S.drums === 4) { if (s16 === 0 || s16 === 3) tone(t, 62, 0.3, 'sine', 0.45 * v, musicBus, 0.003, 38); if (s16 % 4 === 2) noise(t, 0.05, 0.03 * v, 6000); if (s16 === 8 && bar % 2) noise(t, 1.2, 0.05 * v, 300, 'lowpass'); }
+    else if (S.drums === 1) { if (s16 === 0) kick(t, 0.4 * v); if (s16 === 8) tone(t, 80, 0.5, 'sine', 0.18 * v, musicBus, 0.002, 40); if (s16 % 4 === 2) noise(t, 0.03, 0.025 * v, 9000); }
     else {
       if (s16 % 4 === 0) kick(t, 0.6 * v);
       if (s16 === 4 || s16 === 12) { noise(t, 0.22, 0.26 * v, 1400, 'bandpass'); tone(t, 180, 0.12, 'triangle', 0.1 * v, musicBus, 0.002, 90); }
@@ -1059,7 +1295,7 @@ let client = null, isHost = false, myId = null, roomCode = '';
 let S = null, clockOffset = 0, myLook = +(localStorage.hrLook || 0), myAnswer = null, lastQid = null, qRecv = 0;
 const hostNow = () => Date.now() + clockOffset;
 
-const H = { map: 0, cat: 0, diff: 1, used: new Set(), qTime: DIFFS[1].time, players: new Map(), conns: new Map(), state: 'lobby', round: 0, q: null, answers: new Map(), results: null, endsAt: 0, timers: [], dirty: false, final: null };
+const H = { tod: 0, map: 0, cat: 0, diff: 1, used: new Set(), qTime: DIFFS[1].time, players: new Map(), conns: new Map(), state: 'lobby', round: 0, q: null, answers: new Map(), results: null, endsAt: 0, timers: [], dirty: false, final: null };
 const later = (fn, ms) => H.timers.push(setTimeout(fn, ms));
 const clearTimers = () => { H.timers.forEach(clearTimeout); H.timers = []; };
 
@@ -1111,7 +1347,7 @@ function genQ(diff) {
 function snapshot() {
   const reveal = H.state !== 'question';
   return {
-    state: H.state, map: H.map, cat: H.cat, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
+    state: H.state, map: H.map, tod: H.tod, cat: H.cat, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
     q: H.q ? { id: H.q.id, kind: H.q.kind || 'math', text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, lane: p.lane, points: p.points, gain: p.gain,
@@ -1183,7 +1419,10 @@ function handleAction(a) {
       H.diff = Math.max(0, Math.min(3, a.diff | 0)); H.qTime = LV(H.cat, H.diff).time; break;
     case 'setMap':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      H.map = a.map ? 1 : 0; break;
+      H.map = Math.max(0, Math.min(2, a.map | 0)); break;
+    case 'setTod':
+      if (a.id !== 'host' || H.state !== 'lobby') return;
+      H.tod = a.tod ? 1 : 0; break;
     case 'setCat':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       H.cat = a.cat ? 1 : 0; H.qTime = LV(H.cat, H.diff).time; break;
@@ -1282,7 +1521,7 @@ async function createRoom() {
     seen.set(a.id, Date.now());
     if (a.type === 'leave') return removePlayer(a.id);
     if (a.type === 'ping') { if (!H.players.has(a.id)) return; H.dirty = true; return; }
-    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'start', 'lobby'].includes(a.type)) return;
+    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'setTod', 'start', 'lobby'].includes(a.type)) return;
     handleAction(a);
   });
   // ลบคนที่หายไปนาน (ปิดเว็บไปแล้ว)
@@ -1368,6 +1607,7 @@ $('#startBtn').onclick = () => send('start');
 $('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === myId); if (me) send('ready', { ready: !me.ready }); };
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
+$('#tods').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setTod', { tod: +b.dataset.t }); };
 $('#maps').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setMap', { map: +b.dataset.m }); };
 $('#cats').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setCat', { cat: +b.dataset.c }); };
 $('#diffs').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setDiff', { diff: +b.dataset.d }); };
@@ -1423,7 +1663,7 @@ function render() {
   show('#qpanel', st === 'question' || st === 'reveal');
   show('#roundResult', st === 'reveal');
   show('#final', st === 'finished');
-  applyMap(inRoom ? S.map : 0);
+  applyMap(inRoom ? S.map : 0, inRoom ? S.tod : 0);
   if (!inRoom) { Music.play('lobby'); syncRunners([]); return; }
   syncRunners(S.players);
 
@@ -1441,6 +1681,7 @@ function render() {
     show('#botRow', isHost); show('#roomNet', isHost);
     if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
     $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${m.name}</button>`).join('');
+    $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
     $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.name}</button>`).join('');
     $('#diffDesc').textContent = `${LV(S.cat, S.diff).desc} · ${LV(S.cat, S.diff).time / 1000} วิ/ข้อ`;
@@ -1459,7 +1700,7 @@ function render() {
   }
   if (st === 'finished' && !sfxFinished) { sfxFinished = true; Music.sfx('win'); }
   if (st !== 'finished') sfxFinished = false;
-  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' ? (S.map ? 'bkk' : 'race') : 'lobby');
+  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' ? (S.map === 2 ? 'zombie' : S.map === 1 ? 'bkk' : 'race') : 'lobby');
   if (st === 'reveal' && S.results) {
     $('#roundResult').innerHTML = `<h4>ผลข้อที่ ${S.round} · ตอบ ${S.q.answer}</h4>` + S.results.map(x => {
       const p = S.players.find(q => q.id === x.id); if (!p) return '';
@@ -1594,7 +1835,7 @@ function frame() {
   const k = 1 - Math.exp(-dt * (inRoom ? 4 : 1.5));
   camPos.lerp(tmpV, k); camLook.lerp(tmpL, k);
   camera.position.copy(camPos); camera.lookAt(camLook);
-  sun.target.position.copy(camLook); sun.position.copy(camLook).add(SUN_OFF);
+  sun.target.position.copy(camLook); sun.position.copy(camLook).add(sunOff);
 
   // ของประดับเคลื่อนไหว
   if (world.crowd) {
@@ -1602,6 +1843,7 @@ function frame() {
     world.seats.forEach(([x, y, z, ph], i) => { m.makeTranslation(x, y + Math.max(0, Math.sin(t * 5 + ph)) * 0.35, z); world.crowd.setMatrixAt(i, m); });
     world.crowd.instanceMatrix.needsUpdate = true;
     world.flags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2 + i) * 0.4; });
+    updateZombie(dt, t);
     if (world.bkk && world.bkk.visible) {
       world.bkkFlags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2.2 + i) * 0.45; });
       world.train.position.x = ((t * 12) % 160) - 95;
@@ -1642,7 +1884,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); buildWorld(); buildBangkok(); applyMap(0); buildPodium(); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
+resize(); buildWorld(); buildBangkok(); buildZombie(); applyMap(0, 0); buildPodium(); buildThumbs(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
