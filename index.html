@@ -2544,12 +2544,32 @@ function poseBuffs(r, pl, alive) {
     bub.position.y = 1.35; r.root.add(bub);
     const inf = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.05, 8, 32), new THREE.MeshBasicMaterial({ color: '#ff6a1f', transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false }));
     inf.rotation.x = Math.PI / 2; inf.position.y = 1.0; r.root.add(inf);
-    r.buffFx = { bub, inf };
+    const cv = document.createElement('canvas'); cv.width = 192; cv.height = 56;
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true }));
+    sp.scale.set(1.25, 0.36, 1); sp.position.y = 3.62; sp.renderOrder = 9; sp.visible = false; r.root.add(sp);
+    r.buffFx = { bub, inf, sp, cv, tex, key: '' };
   }
   const now = hostNow(), t = performance.now() / 1000, god = alive && (pl.godU || 0) > now, inf = alive && (pl.infU || 0) > now;
   r.buffFx.bub.visible = god; r.buffFx.inf.visible = inf;
   if (god) { r.buffFx.bub.material.opacity = 0.12 + 0.08 * Math.sin(t * 6); r.buffFx.bub.scale.setScalar(1 + 0.03 * Math.sin(t * 5)); }
   if (inf) { r.buffFx.inf.position.y = 0.4 + ((t * 1.6) % 2.2); r.buffFx.inf.rotation.z = t * 3; }
+  // นับถอยหลังบนหัว
+  const parts = [];
+  if (god) parts.push(['★ ' + Math.ceil(((pl.godU || 0) - now) / 1000), '#ffd23c']);
+  if (inf) parts.push(['∞ ' + Math.ceil(((pl.infU || 0) - now) / 1000), '#ff7a33']);
+  const key = parts.map(p => p[0]).join('|'), b = r.buffFx;
+  b.sp.visible = parts.length > 0;
+  if (b.key !== key && parts.length) {
+    b.key = key; const x = b.cv.getContext('2d'), w = b.cv.width, h = b.cv.height; x.clearRect(0, 0, w, h);
+    const pw = parts.length === 1 ? 96 : 88, gap = 8, total = parts.length * pw + (parts.length - 1) * gap; let px = (w - total) / 2;
+    x.font = '700 30px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    for (const [txt, c] of parts) {
+      x.fillStyle = 'rgba(10,12,15,.82)'; x.beginPath(); x.roundRect ? x.roundRect(px, 6, pw, 44, 8) : x.rect(px, 6, pw, 44); x.fill();
+      x.strokeStyle = c; x.lineWidth = 3; x.stroke(); x.fillStyle = c; x.fillText(txt, px + pw / 2, 29); px += pw + gap;
+    }
+    b.tex.needsUpdate = true;
+  }
 }
 function poseArmor(r, armor, alive) {
   const tier = alive ? armorTier(armor) : 0;
@@ -2593,7 +2613,7 @@ function updateHpBar(r, hp, armor, alive) {
 }
 function unposeShooter(r) {
   if (r.hpBar) r.hpBar.sp.visible = false;
-  if (r.buffFx) { r.buffFx.bub.visible = false; r.buffFx.inf.visible = false; }
+  if (r.buffFx) { r.buffFx.bub.visible = false; r.buffFx.inf.visible = false; r.buffFx.sp.visible = false; }
   if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0);
