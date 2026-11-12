@@ -2484,7 +2484,30 @@ function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   r.arms[0].rotation.set(aim, 0, -0.04); r.arms[1].rotation.set(aim + 0.2, 0, -0.6);
   r.head.rotation.x = -pitch * 0.5;
 }
+// หลอดเลือดบนหัว
+function updateHpBar(r, hp, armor, alive) {
+  if (!r.hpBar) {
+    const cv = document.createElement('canvas'); cv.width = 160; cv.height = 34;
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true }));
+    sp.scale.set(1.7, 0.36, 1); sp.position.y = 3.42; sp.renderOrder = 9; r.root.add(sp);
+    r.hpBar = { sp, cv, tex, key: '' };
+  }
+  const b = r.hpBar, key = alive ? hp + '|' + armor : 'dead';
+  b.sp.visible = alive;
+  if (b.key === key) return; b.key = key;
+  const x = b.cv.getContext('2d'), w = b.cv.width;
+  x.clearRect(0, 0, w, 34);
+  x.fillStyle = 'rgba(8,10,12,.85)'; x.fillRect(0, 0, w, 34);
+  x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(4, 4, w - 8, 16);
+  x.fillStyle = hp > 50 ? '#6fc070' : hp > 25 ? '#e0a83e' : '#d9472f'; x.fillRect(4, 4, (w - 8) * Math.max(0, hp) / HP_MAX, 16);
+  x.fillStyle = 'rgba(0,0,0,.35)'; for (let k = 1; k < 4; k++) x.fillRect(4 + (w - 8) * k / 4 - 1, 4, 2, 16);
+  x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(4, 23, w - 8, 7);
+  if (armor > 0) { x.fillStyle = '#5b9bd5'; x.fillRect(4, 23, (w - 8) * armor / ARMOR_MAX, 7); }
+  b.tex.needsUpdate = true;
+}
 function unposeShooter(r) {
+  if (r.hpBar) r.hpBar.sp.visible = false;
   if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0);
@@ -2631,6 +2654,7 @@ function shooterFrame(dt, t) {
     }
     const yy = id === myId ? me.y : src.ry || 0, air = id === myId ? !me.grounded : (src.ry || 0) > 0.05 && Math.abs((src.y || 0) - (src.ry || 0)) > 0.02;
     r.root.position.set(src.rx, 0.07 + yy, src.rz); r.root.rotation.y = id === myId ? me.yaw : src.ryaw;
+    updateHpBar(r, pl.hp ?? HP_MAX, pl.armor || 0, pl.alive !== false && !(id === myId && scoped));
     poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0);
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
   }
