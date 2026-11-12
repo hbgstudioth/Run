@@ -179,10 +179,10 @@
   #killFeed div.hs { border-left: 3px solid #ff2d20; } #killFeed div.hs span { color: #ff6b5a; }
   #bTimer { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); font-family: "Oswald", sans-serif; font-size: 26px; font-weight: 600; letter-spacing: .08em;
             background: rgba(10,12,15,.7); border: 1px solid var(--line); padding: 2px 16px; border-radius: 3px; pointer-events: none; }
-  #bScore { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 6px; background: rgba(10,12,15,.68); border: 1px solid var(--line); border-radius: 4px; pointer-events: none; font-size: 13px; min-width: 190px; }
-  #bScore li { display: grid; grid-template-columns: 26px 1fr 24px 24px; align-items: center; gap: 6px; padding: 2px 4px; }
+  #bScore { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 6px; background: rgba(10,12,15,.68); border: 1px solid var(--line); border-radius: 4px; pointer-events: none; font-size: 13px; min-width: 220px; }
+  #bScore li { display: grid; grid-template-columns: 26px 1fr 24px 28px 24px; align-items: center; gap: 6px; padding: 2px 4px; }
   #bScore li.hd { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #bScore li.me { background: rgba(217,164,65,.18); } #bScore li.dead { opacity: .45; }
-  #bScore .ava { width: 22px; height: 22px; } #bScore li span:nth-child(3) { color: var(--acc); text-align: right; } #bScore li span:nth-child(4) { color: var(--mut); text-align: right; }
+  #bScore .ava { width: 22px; height: 22px; } #bScore li span:nth-child(3) { color: var(--acc); text-align: right; } #bScore li span:nth-child(4) { color: #ff6b5a; text-align: right; } #bScore li span:nth-child(5) { color: var(--mut); text-align: right; } #bScore li.hd span { color: var(--mut) !important; }
   #killFeed { position: absolute; right: 60px; top: 12px; text-align: right; pointer-events: none; font-size: 13px; }
   #killFeed div { background: rgba(10,12,15,.7); padding: 3px 10px; margin-bottom: 3px; border-radius: 2px; animation: slide .3s both; }
   #killFeed b { color: var(--acc); font-weight: 500; } #killFeed span { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #killFeed i { font-style: normal; color: #e0866f; }
@@ -1319,18 +1319,18 @@ function buildPodium() {
   cf.visible = false; scene.add(cf); world.confMesh = cf;
 }
 function scoreSprite(text, gold) {
-  const tex = canvasTex(320, 96, (x, w) => {
+  const tex = canvasTex(420, 96, (x, w) => {
     x.fillStyle = gold ? '#d9a441' : 'rgba(14,17,22,.85)'; x.beginPath(); x.roundRect ? x.roundRect(20, 12, w - 40, 70, 35) : x.rect(20, 12, w - 40, 70); x.fill();
     x.font = '600 44px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = gold ? '#15120c' : '#f4f1ea'; x.fillText(text, w / 2, 49);
   });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
-  sp.scale.set(2.6, 0.78, 1); sp.position.y = 4.5; sp.renderOrder = 11; return sp;
+  sp.scale.set(3.4, 0.78, 1); sp.position.y = 4.5; sp.renderOrder = 11; return sp;
 }
-function posePodium(r, slot, dt, t, pts) {
+function posePodium(r, slot, dt, t, pts, hs) {
   let x, y, z = 0;
   if (slot < 3) { [x, y] = PODIUM[slot]; } else { const k = slot - 3; x = (k - 2) * 1.9 + (k % 2 ? 0.4 : 0); y = 0; z = 3.4 + (k > 4 ? 1.8 : 0); }
   r.u = 0; r.root.position.set(x, y + 0.02, z); r.root.rotation.y = 0; flutter(r, dt, 2); r.speed = 0; updateAura(r, dt);
-  const label = `${pts} ${S && S.mode === 'shoot' ? 'KILLS' : 'คะแนน'}`;
+  const label = S && S.mode === 'shoot' ? `${pts} KILLS · ${hs || 0} HS` : `${pts} คะแนน`;
   if (!r.scoreSp || r.scoreLabel !== label) { if (r.scoreSp) r.root.remove(r.scoreSp); r.scoreSp = scoreSprite(label, slot === 0); r.scoreLabel = label; r.root.add(r.scoreSp); }
   r.phase += dt * (slot === 0 ? 7 : 5);
   if (slot < 3) {
@@ -2057,7 +2057,7 @@ function render() {
     $('#finalDiff').textContent = shootMode ? `ยิงกันเอง · ${MAPS[S.map | 0].name}` : `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#podium').innerHTML = S.final.map((p, i) => `<div class="r ${p.id === myId ? 'me' : ''}"><span class="m">${medal(i)}</span>${ava(p.look)}
       <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">${shootMode ? `ยิงได้ ${p.points} · ยิงหัว ${p.hs || 0} · ถูกยิง ${p.deaths || 0}` : `ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}`}</div></div>
-      <span class="p">${p.points} ${shootMode ? 'KILLS' : 'คะแนน'}</span></div>`).join('');
+      <span class="p">${p.points} ${shootMode ? `KILLS<small style="display:block;font-size:12px;color:#ff6b5a">${p.hs || 0} HEADSHOT</small>` : 'คะแนน'}</span></div>`).join('');
   }
 }
 
@@ -2296,10 +2296,10 @@ function frame() {
       d.u += d.v * dt; d.speed = d.v * P; poseRunner(d, d.lane, dt, t, false);
     }
   } else {
-    const finalSlots = st === 'finished' && S.final ? new Map(S.final.map((p, i) => [p.id, [i, p.points]])) : null;
+    const finalSlots = st === 'finished' && S.final ? new Map(S.final.map((p, i) => [p.id, [i, p.points, p.hs]])) : null;
     if (world.confMesh) world.confMesh.visible = !!finalSlots;
     for (const [id, r] of runners) {
-      if (finalSlots && finalSlots.has(id)) { const [slot, pts] = finalSlots.get(id); posePodium(r, slot, dt, t, pts); continue; }
+      if (finalSlots && finalSlots.has(id)) { const [slot, pts, hsN] = finalSlots.get(id); posePodium(r, slot, dt, t, pts, hsN); continue; }
       if (r.scoreSp) clearScore(r);
       const P = 2 * L + 2 * Math.PI * laneR(r.lane), gap = r.target - r.u;
       const vel = gap > 0.0005 ? Math.min(0.07, Math.max(0.012, gap * 1.4)) : 0;
@@ -2691,7 +2691,7 @@ function renderBattleHud() {
     if (f.vid === myId) hsDeath = !!f.hs;
   }
   const sorted = [...S.players].sort((a, b) => (b.kills - a.kills) || (a.deaths - b.deaths));
-  $('#bScore').innerHTML = `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>D</span></li>` + sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span>${p.deaths}</span></li>`).join('');
+  $('#bScore').innerHTML = `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>HS</span><span>D</span></li>` + sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span class="hsc">${p.hs || 0}</span><span>${p.deaths}</span></li>`).join('');
   const now = hostNow();
   $('#killFeed').innerHTML = (S.feed || []).filter(f => now - f.t < 7000).map(f => `<div class="${f.hs ? 'hs' : ''}"><b>${esc(f.k)}</b> <span>${WEAPONS[f.w] ? WEAPONS[f.w].name : ''}${f.hs ? ' · ⌖ HEADSHOT' : ''}</span> <i>${esc(f.v)}</i></div>`).join('');
   syncPickups(S.pickups);
