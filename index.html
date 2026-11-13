@@ -1513,9 +1513,10 @@ function attachGirl(r, lookIdx, outfit, SK) {
   r.body.traverse(o => { if (o.isMesh) o.visible = false; });
   // ย้ายข้อต่อให้ตรงกับสรีระของโมเดล
   const gA = r.arms.map((a, i) => { const s = i ? 1 : -1, g = new THREE.Group(); a.position.set(s * 0.27, 1.9, -0.01); g.rotation.z = s * 0.2; a.add(g); g.add(r.elbows[i]); r.elbows[i].position.set(0, -0.354, 0); return g; });
-  r.legs.forEach((l, i) => { const s = i ? 1 : -1; l.position.set(s * 0.19, 1.16, 0); r.knees[i].position.set(-s * 0.06, -0.53, 0.07); });
+  const KN = [[0.083, -0.551, -0.0095], [-0.0997, -0.548, 0.026]]; // ตำแหน่งเข่าจริงของโมเดล (เทียบสะโพก)
+  r.legs.forEach((l, i) => { const s = i ? 1 : -1; l.position.set(s * 0.19, 1.16, 0); r.knees[i].position.set(...KN[i]); });
   const bone = p => { const b = new THREE.Bone(); p.add(b); return b; };
-  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1])];
+  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1]), bone(r.knees[0]), bone(r.knees[1])];
   r.root.updateMatrixWorld(true);
   const skel = new THREE.Skeleton(bones), meshes = [];
   const skinned = (geo, mat) => { const m = new THREE.SkinnedMesh(geo, mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); meshes.push(m); return m; };
@@ -1541,20 +1542,18 @@ function attachGirl(r, lookIdx, outfit, SK) {
     skinned(girlShell(K, 'skirt', tw(0.98, 1.3), y => 0.03 + (1.3 - y) * 0.16), plate('#8d939b'));
     skinned(girlShell(K, 'skirtHem', tw(0.98, 1.01), 0.083), nm);
   } else { // ชุดว่ายน้ำ: ใช้ลายเดิม + สายนีออนต้นขา
-    skinned(girlShell(K, 'thighBand', tw(0.9, 0.93), 0.012), nm);
+    // (ใช้สายข้อเท้าแทน)
   }
-  // ขาท่อนล่าง + รองเท้าตามชุด
-  const skinC = new THREE.Color('#f2c9b0').multiply(new THREE.Color(GL.skin || '#fff'));
-  const legTop = 0.08, legLen = 0.56;
-  const shinGeo = new THREE.CylinderGeometry(0.128, 0.062, legLen, 16, 3); shinGeo.translate(0, legTop - legLen / 2, 0);
-  const bootTall = v === 'mil' || v === 'war', sockTall = v === 'sport';
+  // ขาท่อนล่าง: น่องเป็นเนื้อเดียวกับโมเดลแล้ว → ใส่บู๊ต/ถุงเท้าเป็นเปลือกแนบน่อง + รองเท้า
+  const lw = (lo, hi) => (x, y, z, hr, sk, aw) => y > lo && y < hi && aw < 0.3;
+  const bootTall = v === 'mil' || v === 'war';
+  if (v === 'mil') { skinned(girlShell(K, 'boot', lw(-1, 0.585), 0.014), cloth(GL.boot)); skinned(girlShell(K, 'bootCuff', lw(0.515, 0.585), 0.022), cloth('#121410')); skinned(girlShell(K, 'bootLine', lw(0.515, 0.535), 0.026), nm); }
+  if (v === 'war') { skinned(girlShell(K, 'greave', lw(-1, 0.585), 0.02), plate('#8d939b')); skinned(girlShell(K, 'greaveCuff', lw(0.515, 0.585), 0.03), plate(GL.c1)); skinned(girlShell(K, 'greaveLine', lw(0.37, 0.47), 0.026), nm); }
+  if (v === 'sport') { skinned(girlShell(K, 'sock', lw(-1, 0.47), 0.008), cloth('#f4f4f0')); skinned(girlShell(K, 'sockBand', lw(0.37, 0.47), 0.013), nm); }
+  if (v === 'swim') skinned(girlShell(K, 'ankleBand', lw(0.16, 0.24), 0.01), nm);
   for (const kn of r.knees) {
-    const sk = new THREE.Mesh(shinGeo, stylize(new THREE.MeshStandardMaterial({ color: bootTall ? (v === 'war' ? '#8d939b' : GL.boot) : sockTall ? '#f4f4f0' : skinC, roughness: bootTall ? 0.4 : 0.6, metalness: v === 'war' ? 0.8 : 0 })));
-    sk.scale.set(1, 1, 1.05); sk.castShadow = true; kn.add(sk);
-    if (bootTall || sockTall) { const cf = new THREE.Mesh(new THREE.TorusGeometry(0.128, 0.014, 6, 20), nm); cf.rotation.x = Math.PI / 2; cf.position.y = legTop - (sockTall ? 0.08 : 0.0); kn.add(cf); }
-    if (v === 'swim') { const ab = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.012, 6, 16), nm); ab.rotation.x = Math.PI / 2; ab.position.y = -0.4; kn.add(ab); }
-    const shoe = new THREE.Mesh(HB.shoe, stylize(new THREE.MeshStandardMaterial({ color: bootTall ? '#17181b' : GL.boot, roughness: 0.55 }))); shoe.position.set(0, -0.5, 0.06); shoe.scale.set(0.8, 0.85, 0.82); shoe.castShadow = true; kn.add(shoe);
-    const sole = new THREE.Mesh(HB.sole, bootTall ? toon('#0d0e10') : nm); sole.position.set(0, -0.555, 0.06); sole.scale.set(0.8, 1, 0.82); kn.add(sole);
+    const shoe = new THREE.Mesh(HB.shoe, stylize(new THREE.MeshStandardMaterial({ color: bootTall ? '#17181b' : GL.boot, roughness: 0.55 }))); shoe.position.set(0, -0.5, 0.05); shoe.scale.set(0.72, 0.8, 0.78); shoe.castShadow = true; kn.add(shoe);
+    const sole = new THREE.Mesh(HB.sole, bootTall ? toon('#0d0e10') : nm); sole.position.set(0, -0.55, 0.05); sole.scale.set(0.72, 1, 0.78); kn.add(sole);
   }
   // อุปกรณ์บนหัว/ตัว (หน่วยเดียวกับโมเดล)
   const HA = new THREE.Group(); HA.scale.setScalar(2); HA.position.set(0, 0, 0); r.head.add(HA);
