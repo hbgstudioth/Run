@@ -526,6 +526,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 
 /* ======================================================================
    ค่าตั้งต้นของเกม
@@ -1356,6 +1358,139 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
+/* ---------- ตัวละครโมเดล 3D จริง (GLB มีโครงกระดูก + แอนิเมชัน) ---------- */
+const CHAR = { ready: false, kinds: {} };
+const CH_FILES = { soldier: 'models/Soldier.glb', xbot: 'models/Xbot.glb' };
+const FEMALE = new Set([1, 4, 5, 7]);
+const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
+const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
+function loadChars() {
+  const ld = new GLTFLoader(), got = {};
+  Promise.all(Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))).then(() => {
+    const base = got.xbot || got.soldier;
+    for (const [k, g] of Object.entries(got)) {
+      g.scene.updateMatrixWorld(true);
+      const bw = n => { for (const nn of BN(n)) { const b = g.scene.getObjectByName(nn); if (b) return b.getWorldPosition(new THREE.Vector3()).y; } return null; };
+      const top = bw('HeadTop_End') ?? bw('Head'), ft = Math.min(bw('LeftFoot') ?? 0, bw('RightFoot') ?? 0);
+      const h = top != null ? (top - ft) / 0.95 : 1.8;
+      const la = bw('LeftArm') != null ? g.scene.getObjectByName(BN('LeftArm').find(n => g.scene.getObjectByName(n))).getWorldPosition(new THREE.Vector3()).x : 1, ra = bw('RightArm') != null ? g.scene.getObjectByName(BN('RightArm').find(n => g.scene.getObjectByName(n))).getWorldPosition(new THREE.Vector3()).x : 0;
+      let clips = g.animations.filter(c => !/tpose/i.test(c.name));
+      if (k === 'michelle') clips = []; // โครงต่างจากแอนิเมชันที่มี → ขยับด้วยโค้ดแทน
+      const map = {}; for (const c of clips) map[c.name.toLowerCase()] = c;
+      let grayMap = null;
+      if (k === 'soldier') g.scene.traverse(o => { if (grayMap || !o.isMesh || /visor/i.test(o.material.name) || !o.material.map || !o.material.map.image) return;
+        try { const im = o.material.map.image, cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; const x = cv.getContext('2d'); x.drawImage(im, 0, 0);
+          const d = x.getImageData(0, 0, cv.width, cv.height), a = d.data; for (let i = 0; i < a.length; i += 4) { const l = Math.min(255, Math.max(0, ((a[i] * 0.3 + a[i + 1] * 0.59 + a[i + 2] * 0.11) - 128) * 1.3 + 150)); a[i] = a[i + 1] = a[i + 2] = l; } x.putImageData(d, 0, 0);
+          grayMap = new THREE.CanvasTexture(cv); grayMap.flipY = o.material.map.flipY; grayMap.colorSpace = THREE.SRGBColorSpace; grayMap.wrapS = o.material.map.wrapS; grayMap.wrapT = o.material.map.wrapT; } catch (e) { console.warn('gray', e); } });
+      CHAR.kinds[k] = { grayMap, scene: g.scene, scale: 2.62 / (h || 1.8), clips: map, yaw: la < ra ? Math.PI : 0, proc: k === 'michelle' };
+    }
+    CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
+  });
+}
+function charKind(lookIdx, outfit) { const need = outfit === 'sport' ? 'xbot' : FEMALE.has(lookIdx % LOOKS.length) ? 'michelle' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
+function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
+  const K = CHAR.kinds[kind], m = cloneSkinned(K.scene); m.scale.multiplyScalar(K.scale);
+  const neon = SK.neon, ski = SKINS.indexOf(SK);
+  m.traverse(o => {
+    if (!o.isMesh) return;
+    o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+    const mt = o.material.clone(); mt.userData = {}; o.material = mt;
+    if (kind === 'xbot') { if (/joint/i.test(mt.name)) { mt.color.set(lk.trim || '#222'); mt.emissive = new THREE.Color(lk.trim || '#000'); mt.emissiveIntensity = 0.25; } else mt.color.set(lk.top); mt.metalness = 0.35; mt.roughness = 0.38; }
+    else if (/visor/i.test(mt.name)) { mt.emissive = new THREE.Color(neon); mt.emissiveIntensity = 1.4; mt.color.set('#0b1a0b'); }
+    else if (kind === 'soldier') { if (K.grayMap) mt.map = K.grayMap; mt.color.set(SKIN_TINT[ski] || '#4b524e'); mt.metalness = Math.max(mt.metalness || 0, ski === 1 ? 0.55 : 0.3); mt.roughness = ski === 1 ? 0.4 : 0.6; }
+    stylize(mt);
+  });
+  r.body.traverse(o => { if (o.isMesh) o.visible = false; });
+  r.root.add(m);
+  const mixer = new THREE.AnimationMixer(m), act = {};
+  for (const [n, c] of Object.entries(K.clips)) act[n] = mixer.clipAction(c);
+  const bone = n => { for (const nn of BN(n)) { const b = m.getObjectByName(nn); if (b) return b; } return null; };
+  const B = {}; for (const n of ['Hips', 'Spine', 'Spine2', 'Head', 'RightArm', 'RightForeArm', 'RightHand', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightUpLeg', 'RightLeg', 'RightFoot', 'LeftUpLeg', 'LeftLeg', 'LeftFoot']) B[n] = bone(n);
+  r.glb = { m, mixer, act, B, cur: null, kind, yaw: K.yaw, proc: K.proc, ph: 0 }; m.rotation.y = K.yaw;
+  if (act.idle) { act.idle.play(); r.glb.cur = 'idle'; } mixer.update(0);
+  if (K.proc) { m.updateMatrixWorld(true); r.root.getWorldQuaternion(_gqr); procLoco(r.glb, 'idle', 0); }
+  r.root.updateMatrixWorld(true);
+  // จุดยึดอุปกรณ์ (ปืน เกราะ) ไว้กับกระดูก
+  const anchor = (b, mtx) => { const a = new THREE.Group(); if (!b) { r.body.add(a); return a; } b.add(a); const tg = r.root.matrixWorld.clone().multiply(mtx); const mm = b.matrixWorld.clone().invert().multiply(tg); mm.decompose(a.position, a.quaternion, a.scale); return a; };
+  const T = (x, y, z, sc = 1) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion(), new THREE.Vector3(sc, sc, sc));
+  const hp = new THREE.Vector3(); if (B.RightHand) { B.RightHand.getWorldPosition(hp); r.root.worldToLocal(hp); } else hp.set(-0.38, 1.28, 0);
+  r.att = { body: anchor(B.Spine, T(0, 0, 0)), head: anchor(B.Head, T(0, 2.43, 0.01, 0.5)), knees: [anchor(B.RightLeg, T(-0.135, 0.62, 0)), anchor(B.LeftLeg, T(0.135, 0.62, 0))],
+    elbows: [anchor(B.RightForeArm, T(-0.38, 1.65, 0)), anchor(B.LeftForeArm, T(0.38, 1.65, 0))], hand: anchor(B.RightHand, T(hp.x, hp.y, hp.z)) };
+  if (outfit !== 'sport' && kind === 'michelle') { // เกราะยุทธวิธีให้ตัวละครหญิง
+    const nm = neonMat(neon), am = toon(SK.armor), A = r.att.body, add = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.castShadow = true; A.add(o); return o; };
+    add(G.plate, am, 0, 1.72, 0.15).scale.set(0.66, 0.8, 0.7); add(G.plate, am, 0, 1.72, -0.15).scale.set(0.66, 0.8, 0.7);
+    for (const sd of [-1, 1]) add(HB.neonV, nm, sd * 0.1, 1.74, 0.195); add(HB.neonH, nm, 0, 1.92, 0.195).scale.set(0.8, 1, 1);
+    add(G.belt, am, 0, 1.32, 0).scale.set(0.75, 1, 0.62); add(HB.packT, am, 0, 1.72, -0.25).scale.set(0.8, 0.8, 0.8);
+    const H = r.att.head; const v = new THREE.Mesh(HB.ear2, toon('#121417')); v.position.set(0.38, 0, 0.02); H.add(v); const d = new THREE.Mesh(HB.dot, nm); d.position.set(0.45, 0.03, 0.06); H.add(d);
+  }
+}
+// ทิศแขน/ขา (พิกัดตัวละคร: +z หน้า, +y บน, +x ซ้ายของตัวละคร)
+const GDIR = {
+  aim: { RU: [-0.3, -0.55, 0.78], RF: [0.35, 0.1, 0.93], LU: [0.32, -0.45, 0.83], LF: [-0.28, 0.12, 0.95] },
+  scan: { RU: [-0.25, -0.8, 0.5], RF: [0.3, -0.3, 0.9], LU: [0.3, -0.75, 0.55], LF: [-0.25, -0.3, 0.9] },
+  idle2: { RU: [-0.55, -0.8, -0.1], RF: [0.75, -0.55, 0.3], LU: [0.55, -0.8, -0.1], LF: [-0.75, -0.55, 0.3] },
+  flex: { RU: [-1, 0.08, 0.05], RF: [-0.05, 1, 0.15], LU: [1, 0.08, 0.05], LF: [0.05, 1, 0.15] },
+  pump: { RU: [-0.2, 0.97, 0.15], RF: [-0.05, 1, 0.05], LU: [0.2, -0.95, 0.12], LF: [0.1, -0.9, 0.35] },
+  stretch: { RU: [-0.15, 0.98, 0], RF: [0.3, 0.95, 0], LU: [0.15, 0.98, 0], LF: [-0.3, 0.95, 0] },
+  cross: { RU: [-0.35, -0.75, 0.55], RF: [0.95, 0.05, 0.3], LU: [0.35, -0.75, 0.5], LF: [-0.95, 0.12, 0.25] },
+  salute: { RU: [-0.95, 0.15, 0.25], RF: [0.6, 0.75, 0.25], LU: [0.15, -0.98, 0], LF: [0.1, -0.98, 0.1] },
+  cheer: { RU: [-0.35, 0.93, 0.1], RF: [-0.1, 1, 0.1], LU: [0.35, 0.93, 0.1], LF: [0.1, 1, 0.1] },
+};
+const _gv1 = new THREE.Vector3(), _gv2 = new THREE.Vector3(), _gv3 = new THREE.Vector3(), _gq1 = new THREE.Quaternion(), _gq2 = new THREE.Quaternion(), _gq3 = new THREE.Quaternion(), _gqr = new THREE.Quaternion();
+function aimBone(b, child, dirW, w) {
+  if (!b || !child || w <= 0) return;
+  b.getWorldPosition(_gv1); child.getWorldPosition(_gv2); _gv2.sub(_gv1).normalize();
+  _gq1.setFromUnitVectors(_gv2, dirW); b.getWorldQuaternion(_gq2); _gq1.multiply(_gq2);
+  b.parent.getWorldQuaternion(_gq3).invert(); _gq3.multiply(_gq1); b.quaternion.slerp(_gq3, Math.min(1, w)); b.updateMatrixWorld(true);
+}
+function dirW(v, pitch = 0) {
+  let [x, y, z] = v; if (pitch) { const c = Math.cos(pitch), s2 = Math.sin(pitch); [y, z] = [y * c + z * s2, z * c - y * s2]; }
+  return _gv3.set(x, y, z).normalize().applyQuaternion(_gqr);
+}
+// เดิน/วิ่ง/ยืน ด้วยการกำหนดทิศแขนขา (ใช้ได้กับโครงกระดูกทุกแบบ)
+function procLoco(G2, anim, dt, ts = 1) {
+  const B = G2.B, run = anim === 'run', walk = anim === 'walk';
+  G2.ph += dt * (run ? 9.5 : walk ? 5.5 : 1.6) * (ts || 1);
+  const s = Math.sin(G2.ph), A = run ? 0.75 : walk ? 0.4 : 0, br = Math.sin(G2.ph) * 0.03;
+  for (const [sd, up, lo, ft] of [[-1, B.RightUpLeg, B.RightLeg, B.RightFoot], [1, B.LeftUpLeg, B.LeftLeg, B.LeftFoot]]) {
+    const ss = sd < 0 ? s : -s, a = A * ss, k = run ? 0.25 + Math.max(0, -ss) * 1.25 : walk ? 0.1 + Math.max(0, -ss) * 0.5 : 0.04;
+    aimBone(up, lo, dirW([sd * 0.04, -Math.cos(a), Math.sin(a)]), 1); aimBone(lo, ft, dirW([0, -Math.cos(a - k), Math.sin(a - k)]), 1);
+  }
+  for (const [sd, up, lo, hd] of [[-1, B.RightArm, B.RightForeArm, B.RightHand], [1, B.LeftArm, B.LeftForeArm, B.LeftHand]]) {
+    const ss = sd < 0 ? -s : s, b = (run ? 0.7 : walk ? 0.35 : 0.03) * ss + (A ? 0 : br), e = run ? 1.35 : walk ? 0.35 : 0.15;
+    aimBone(up, lo, dirW([sd * 0.16, -Math.cos(b), Math.sin(b)]), 1); aimBone(lo, hd, dirW([sd * 0.06, -Math.cos(b + e), Math.sin(b + e)]), 1);
+  }
+}
+// o: { speed, aim(pitch), crouch, dead, dirs, w, ts, y }
+function glbTick(r, dt, anim, o = {}) {
+  const G2 = r.glb; if (!G2) return;
+  const want = G2.act[anim] ? anim : 'idle';
+  if (G2.cur !== want && G2.act[want]) { const nx = G2.act[want]; nx.reset().play(); if (G2.cur && G2.act[G2.cur]) G2.act[G2.cur].crossFadeTo(nx, 0.25, false); G2.cur = want; }
+  const a = G2.act[G2.cur]; if (a) a.timeScale = o.ts || (want === 'run' ? clampN((o.speed || 7) / 7.5, 0.6, 1.7) : 1);
+  G2.mixer.update(dt);
+  const m = G2.m, B = G2.B;
+  m.rotation.set(0, G2.yaw, 0); if (o.dead) { m.rotation.x = -1.45; m.rotation.order = 'YXZ'; } m.position.set(0, o.dead ? 0.3 : (o.crouch ? -0.55 : 0) + (o.y || 0), o.dead ? -1.1 : 0);
+  m.updateMatrixWorld(true); r.root.getWorldQuaternion(_gqr);
+  if (G2.proc) procLoco(G2, anim, dt, anim === 'run' ? clampN((o.speed || 7) / 7.5, 0.6, 1.7) : (o.ts || 1));
+  const D = o.dirs || (o.aim != null && !o.dead ? GDIR.aim : null), w = o.w ?? 1, p = o.aim || 0;
+  if (D) {
+    aimBone(B.RightArm, B.RightForeArm, dirW(D.RU, p * 0.6), w); aimBone(B.RightForeArm, B.RightHand, dirW(D.RF, p), w);
+    aimBone(B.LeftArm, B.LeftForeArm, dirW(D.LU, p * 0.6), w); aimBone(B.LeftForeArm, B.LeftHand, dirW(D.LF, p), w);
+  }
+  if (o.crouch && !o.dead) {
+    aimBone(B.LeftUpLeg, B.LeftLeg, dirW([0.1, -0.2, 0.97]), 1); aimBone(B.LeftLeg, B.LeftFoot, dirW([0, -1, 0.05]), 1);
+    aimBone(B.RightUpLeg, B.RightLeg, dirW([-0.1, -0.95, -0.2]), 1); aimBone(B.RightLeg, B.RightFoot, dirW([0, -0.12, -1]), 1);
+  }
+  if (o.aim != null && B.Head && !o.dead) { B.Head.rotation.x -= p * 0.4; B.Head.updateMatrixWorld(true); }
+}
+function onCharsReady() {
+  try {
+    THUMBS.tac = []; THUMBS.sport = []; buildThumbs(); buildLookPicker(); lbChip();
+    demo.forEach(d => removeRunner(d)); buildDemo(); showcaseLook(myLook);
+    for (const [id, r] of runners) removeRunner(r); runners.clear(); if (S) syncRunners(S.players);
+    pvSetLook(myLook, false);
+  } catch (e) { console.warn('chars ready', e); }
+}
 function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac', skin = 0) {
   const base = LOOKS[lookIdx % LOOKS.length], sport = outfit === 'sport', SK = SKINS[(skin | 0) % SKINS.length];
   const lk = !sport ? { ...base, top: SK.top, pants: SK.pants, boots: SK.boots, vest: SK.armor, trim: SK.neon, knee: false, holster: true, helmet: SK.armor, cap: base.cap ? SK.armor : base.cap, mask: base.mask ? '#0b0c0e' : null, collar: false, tac: true } : sport ? { ...base, ...SPORT[lookIdx % SPORT.length], vest: false, pack: false, knee: false, collar: false, mask: null, phones: false, gear: SPORT[lookIdx % SPORT.length].band ? 'band' : null, sport: true } : base;
@@ -1454,7 +1589,9 @@ function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac', skin = 
   parent.add(root);
   const aura = [];
   if (name) for (let k = 0; k < 14; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
-  return { outfit, skin: skin | 0, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
+  const R0 = { outfit, skin: skin | 0, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
+  if (CHAR.ready) { const kd = charKind(lookIdx, outfit); if (kd) try { attachGLB(R0, kd, lookIdx, outfit, SK, lk); } catch (e) { console.warn('glb', e); } }
+  return R0;
 }
 function flutter() {}
 // งอเข่า/ศอกตามท่าขา (ให้ท่าวิ่งเหมือนคน)
@@ -2064,6 +2201,7 @@ function posePodium(r, slot, dt, t, pts, hs) {
     r.arms.forEach((a, i) => { a.rotation.x = -1.2 + Math.sin(r.phase * 2.5) * 0.25; a.rotation.z = (i ? -1 : 1) * 0.5; });
   }
   r.legs.forEach(l => l.rotation.x = 0); limbs(r, slot < 3 ? -0.15 : -1.0);
+  if (r.glb) glbTick(r, dt, 'idle', slot < 3 ? { dirs: slot === 0 ? GDIR.cheer : GDIR.pump, y: r.body.position.y } : { dirs: GDIR.cross, w: 0.9 });
 }
 function clearScore(r) { if (r.scoreSp) { r.root.remove(r.scoreSp); r.scoreSp = null; r.scoreLabel = null; r.arms.forEach((a, i) => a.rotation.z = (i ? 1 : -1) * 0.15); } }
 
@@ -2079,6 +2217,7 @@ function poseRunner(r, lane, dt, t, celebrate) {
     r.arms.forEach((a, i) => { a.rotation.x = Math.PI * 0.92 + Math.sin(r.phase * 2 + i) * 0.15; });
     r.legs.forEach((l, i) => { l.rotation.x = (i ? 1 : -1) * 0.2; });
     r.root.rotation.y += Math.PI / 2; limbs(r, -0.2);
+    if (r.glb) glbTick(r, dt, 'idle', { dirs: GDIR.cheer, y: Math.abs(Math.sin(r.phase)) * 0.5 });
     return;
   }
   const running = ws > 0.6, amp = running ? Math.min(1, 0.45 + ws / 25) : 0.28;
@@ -2090,6 +2229,7 @@ function poseRunner(r, lane, dt, t, celebrate) {
   r.body.rotation.x = running ? 0.18 * amp : 0.03;
   r.head.rotation.z = Math.sin(r.phase * 0.5) * 0.05;
   limbs(r, running ? -1.3 : -0.35);
+  if (r.glb) glbTick(r, dt, running ? 'run' : 'idle', { speed: ws });
 }
 
 /* ======================================================================
@@ -3106,7 +3246,7 @@ function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i
 /* ---------- พรีวิวตัวละครเต็มตัว + ท่าแอคติ้ง ---------- */
 const EMOTE_T = 3.4, BLEND_T = 0.5;
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0 }; }
+function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
 function pvPose(name, t) {
   const P = pvBase(), sd = [-1, 1], br = Math.sin(t * 2.1);
   P.by = br * 0.012; P.hx = -0.02;
@@ -3145,10 +3285,13 @@ function pvPose(name, t) {
       P.hx = -0.05; P.l = [0, 0]; P.k = [0.04, 0.04];
       P.a = [[-0.55, -1.15], [0, 0.06]]; P.e = [[0, -2.65], [-0.05, 0]]; P.ry = 0.15; break;
   }
+  const gd = GDIR[name === 'idle2' ? 'idle2' : name];
+  if (gd) { P.ow = 1; P.oRU = gd.RU; P.oRF = gd.RF; P.oLU = gd.LU; P.oLF = gd.LF; }
+  if (name === 'lunge') P.run = 1;
   return P;
 }
 function pvLerp(A, B, k) {
-  const m = (a, b) => typeof a === 'number' ? a + (b - a) * k : a.map((v, i) => m(v, b[i]));
+  const m = (a, b) => typeof a === 'number' ? a + (b - a) * k : Array.isArray(a) ? a.map((v, i) => m(v, b[i])) : b;
   const o = {}; for (const key in A) o[key] = m(A[key], B[key]); return o;
 }
 function pvApply(r, P) {
@@ -3157,6 +3300,7 @@ function pvApply(r, P) {
   r.legs.forEach((l, i) => l.rotation.set(P.l[i], 0, 0)); r.knees.forEach((k, i) => { k.rotation.x = P.k[i]; });
   r.arms.forEach((a, i) => a.rotation.set(P.a[i][0], 0, P.a[i][1])); r.elbows.forEach((e, i) => e.rotation.set(P.e[i][0], 0, P.e[i][1]));
   if (r.guns) { r.guns.g.visible = P.gun > 0.5; r.guns.models.forEach((m, j) => { m.visible = j === (PV.gunW ?? 1); }); }
+  if (r.glb) glbTick(r, PV.dt || 0.016, P.run > 0.5 ? 'run' : 'idle', { dirs: P.ow > 0.01 ? { RU: P.oRU, RF: P.oRF, LU: P.oLU, LF: P.oLF } : null, w: P.ow, y: P.by, ts: P.run > 0.5 ? 0.75 : 0 });
 }
 function pvInit() {
   const cv = $('#pvCanvas'); if (!cv || PV.ready) return;
@@ -3197,7 +3341,7 @@ function pvTick(dt) {
   const cv = PV.r.domElement, w = cv.clientWidth, h = cv.clientHeight;
   if (!w || !h) return;
   if (cv.width !== Math.round(w * PV.r.getPixelRatio()) || cv.height !== Math.round(h * PV.r.getPixelRatio())) { PV.r.setSize(w, h, false); PV.cam.aspect = w / h; PV.cam.updateProjectionMatrix(); }
-  PV.t += dt; PV.emT += dt;
+  PV.t += dt; PV.emT += dt; PV.dt = dt;
   const seq = PV.seq, cur = seq[PV.emote % seq.length];
   if (PV.emT > EMOTE_T) { PV.prevName = cur; PV.emote++; PV.emT = 0; }
   const name = seq[PV.emote % seq.length];
@@ -3478,11 +3622,11 @@ function buildGunIcons() {
 }
 function ensureGuns(r) {
   if (r.guns) return r.guns;
-  const g = new THREE.Group(); g.position.set(0, -0.72, 0.02); r.arms[0].add(g);
+  const g = new THREE.Group(); if (r.att) { g.position.set(0, -0.06, 0.03); r.att.hand.add(g); } else { g.position.set(0, -0.72, 0.02); r.arms[0].add(g); }
   const models = [0, 1, 2].map(w => { const m = makeGunModel(w); g.add(m); return m; });
   g.visible = false;
   // เสื้อเกราะ (แสดงเมื่อมีเกราะ)
-  const vest = new THREE.Group(); vest.visible = false; r.body.add(vest);
+  const vest = new THREE.Group(); vest.visible = false; (r.att ? r.att.body : r.body).add(vest);
   const vm = toon('#1f2a3a'), vs = toon('#3a6ea5');
   const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; vest.add(o); return o; };
   add(new THREE.BoxGeometry(0.64, 0.58, 0.12), vm, 0, 1.76, 0.2); add(new THREE.BoxGeometry(0.64, 0.58, 0.11), vm, 0, 1.76, -0.2);
@@ -3493,7 +3637,7 @@ function ensureGuns(r) {
 }
 function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   const gs = ensureGuns(r); gs.g.visible = alive; gs.models.forEach((m, i) => m.visible = i === w); poseArmor(r, armor, alive);
-  if (!alive) { r.body.rotation.x = -1.5; r.body.position.y = 0.32; r.legs.forEach(l => l.rotation.x = 0.1); r.arms.forEach(a => a.rotation.set(-0.3, 0, 0)); limbs(r, -0.2); gs.vest.visible = false; return; }
+  if (!alive) { r.body.rotation.x = -1.5; r.body.position.y = 0.32; r.legs.forEach(l => l.rotation.x = 0.1); r.arms.forEach(a => a.rotation.set(-0.3, 0, 0)); limbs(r, -0.2); gs.vest.visible = false; if (r.glb) glbTick(r, dt, 'idle', { dead: true }); return; }
   r.body.rotation.x = 0; r.phase += dt * (mv ? (cr ? 6 : 10) : 2);
   const s = Math.sin(r.phase), amp = mv ? (cr ? 0.35 : 0.75) : 0;
   if (cr) { r.legs[0].rotation.x = -1.3 + s * amp; r.legs[1].rotation.x = -0.4 - s * amp; r.body.position.y = -0.55; }
@@ -3503,11 +3647,13 @@ function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   r.arms[0].rotation.set(aim, 0, -0.04); r.arms[1].rotation.set(aim + 0.2, 0, -0.6);
   r.head.rotation.x = -pitch * 0.5;
   limbs(r, 0, cr ? [1.55 - s * amp * 0.5, 1.85] : air ? [1.3, 0.5] : null);
+  if (r.glb) glbTick(r, dt, mv ? (cr ? 'walk' : 'run') : 'idle', { aim: pitch, crouch: cr, ts: mv && cr ? 0.8 : 0 });
 }
 // ---------- เกราะหลายระดับ (ยิ่งเก็บเยอะ ยิ่งอลังการ) ----------
 const ARMOR_TIERS = ['เสื้อเกราะ', 'เกราะเหล็ก', 'เกราะอัศวิน', 'เกราะทองคำ', 'เกราะตำนาน'];
 const armorTier = a => a <= 0 ? 0 : Math.min(5, Math.ceil(a / 50));
 function buildArmorTiers(r) {
+  const AB = r.att ? r.att.body : r.body, AH = r.att ? r.att.head : r.head, AK = r.att ? r.att.knees : r.knees, AE = r.att ? r.att.elbows : r.elbows;
   const steel = toon('#8a96a3'), dark = toon('#2a3240'), gold = toon('#c9a227');
   const glowC = new THREE.MeshStandardMaterial({ color: '#7fe3ff', emissive: '#4fd6ff', emissiveIntensity: 2.2 });
   const glowO = new THREE.MeshStandardMaterial({ color: '#ffb35a', emissive: '#ff8a1f', emissiveIntensity: 2.4 });
@@ -3516,27 +3662,27 @@ function buildArmorTiers(r) {
   const attach = (tier, parent, geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) => { const g = new THREE.Group(); g.userData.tier = tier; const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; g.add(m); parent.add(g); (r.armorBits = r.armorBits || []).push(g); return m; };
   // ระดับ 2: บ่าเหล็ก สนับเข่า เข็มขัดกระเป๋า
   const half = new THREE.SphereGeometry(0.26, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55);
-  for (const sd of [-1, 1]) { const p = attach(2, r.body, half, steel, sd * 0.4, 2.06, 0, 1.0, 0.75, 1.0); p.rotation.z = -sd * 0.35; }
-  for (const l of r.knees) attach(2, l, new THREE.BoxGeometry(0.2, 0.2, 0.1), steel, 0, -0.02, 0.11);
-  for (const px of [-0.24, -0.08, 0.08, 0.24]) attach(2, r.body, new THREE.BoxGeometry(0.12, 0.14, 0.08), dark, px, 1.36, 0.25);
+  for (const sd of [-1, 1]) { const p = attach(2, AB, half, steel, sd * 0.4, 2.06, 0, 1.0, 0.75, 1.0); p.rotation.z = -sd * 0.35; }
+  for (const l of AK) attach(2, l, new THREE.BoxGeometry(0.2, 0.2, 0.1), steel, 0, -0.02, 0.11);
+  for (const px of [-0.24, -0.08, 0.08, 0.24]) attach(2, AB, new THREE.BoxGeometry(0.12, 0.14, 0.08), dark, px, 1.36, 0.25);
   // ระดับ 3: หมวกเหล็ก + แถบเลนส์เรืองแสง ปลอกแขน ขลิบทอง แกนพลังงานกลางอก
-  attach(3, r.head, new THREE.SphereGeometry(0.49, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), steel, 0, 0.05, -0.02).rotation.x = -0.1;
-  attach(3, r.head, new THREE.BoxGeometry(0.62, 0.09, 0.08), glowC, 0, 0.06, 0.42);
-  for (const a of r.elbows) attach(3, a, new THREE.CylinderGeometry(0.085, 0.075, 0.24, 10), steel, 0, -0.14, 0);
-  attach(3, r.body, new THREE.BoxGeometry(0.66, 0.05, 0.16), gold, 0, 2.0, 0.24); attach(3, r.body, new THREE.BoxGeometry(0.05, 0.56, 0.16), gold, 0, 1.76, 0.25);
-  attach(3, r.body, new THREE.OctahedronGeometry(0.08), glowC, 0, 1.82, 0.31);
+  attach(3, AH, new THREE.SphereGeometry(0.49, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), steel, 0, 0.05, -0.02).rotation.x = -0.1;
+  attach(3, AH, new THREE.BoxGeometry(0.62, 0.09, 0.08), glowC, 0, 0.06, 0.42);
+  for (const a of AE) attach(3, a, new THREE.CylinderGeometry(0.085, 0.075, 0.24, 10), steel, 0, -0.14, 0);
+  attach(3, AB, new THREE.BoxGeometry(0.66, 0.05, 0.16), gold, 0, 2.0, 0.24); attach(3, AB, new THREE.BoxGeometry(0.05, 0.56, 0.16), gold, 0, 1.76, 0.25);
+  attach(3, AB, new THREE.OctahedronGeometry(0.08), glowC, 0, 1.82, 0.31);
   // ระดับ 4: เกราะหลัง + ช่องไอพ่นเรืองไฟ หนามบ่า สนับแข้งทอง
-  attach(4, r.body, new THREE.BoxGeometry(0.56, 0.64, 0.16), dark, 0, 1.8, -0.3);
+  attach(4, AB, new THREE.BoxGeometry(0.56, 0.64, 0.16), dark, 0, 1.8, -0.3);
   for (const sd of [-1, 1]) {
-    attach(4, r.body, new THREE.CylinderGeometry(0.08, 0.1, 0.36, 10), gold, sd * 0.16, 1.58, -0.41);
-    attach(4, r.body, new THREE.CylinderGeometry(0.065, 0.065, 0.04, 10), glowO, sd * 0.16, 1.39, -0.41);
-    attach(4, r.body, new THREE.ConeGeometry(0.07, 0.3, 6), gold, sd * 0.46, 2.22, 0).rotation.z = -sd * 0.5;
-    attach(4, r.body, new THREE.ConeGeometry(0.05, 0.22, 6), gold, sd * 0.4, 2.26, -0.1).rotation.z = -sd * 0.6;
+    attach(4, AB, new THREE.CylinderGeometry(0.08, 0.1, 0.36, 10), gold, sd * 0.16, 1.58, -0.41);
+    attach(4, AB, new THREE.CylinderGeometry(0.065, 0.065, 0.04, 10), glowO, sd * 0.16, 1.39, -0.41);
+    attach(4, AB, new THREE.ConeGeometry(0.07, 0.3, 6), gold, sd * 0.46, 2.22, 0).rotation.z = -sd * 0.5;
+    attach(4, AB, new THREE.ConeGeometry(0.05, 0.22, 6), gold, sd * 0.4, 2.26, -0.1).rotation.z = -sd * 0.6;
   }
-  for (const l of r.knees) attach(4, l, new THREE.CylinderGeometry(0.115, 0.095, 0.32, 10), gold, 0, -0.24, 0.01);
+  for (const l of AK) attach(4, l, new THREE.CylinderGeometry(0.115, 0.095, 0.32, 10), gold, 0, -0.24, 0.01);
   // ระดับ 5: หงอนหมวก เขา วงแหวนพลังใต้เท้า ผลึกลอยวนรอบตัว
-  attach(5, r.head, new THREE.ConeGeometry(0.07, 0.6, 6), glowG, 0, 0.62, -0.05).rotation.x = -0.35;
-  for (const sd of [-1, 1]) attach(5, r.head, new THREE.ConeGeometry(0.06, 0.4, 6), glowG, sd * 0.36, 0.38, 0.02).rotation.z = -sd * 0.7;
+  attach(5, AH, new THREE.ConeGeometry(0.07, 0.6, 6), glowG, 0, 0.62, -0.05).rotation.x = -0.35;
+  for (const sd of [-1, 1]) attach(5, AH, new THREE.ConeGeometry(0.06, 0.4, 6), glowG, sd * 0.36, 0.38, 0.02).rotation.z = -sd * 0.7;
   const ringMat = new THREE.MeshBasicMaterial({ color: '#ffd76a', transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false });
   const ring = attach(5, r.root, new THREE.TorusGeometry(0.95, 0.04, 8, 40), ringMat, 0, 0.12, 0); ring.rotation.x = Math.PI / 2;
   const ring2 = attach(5, r.root, new THREE.TorusGeometry(1.2, 0.02, 6, 40), ringMat, 0, 0.18, 0); ring2.rotation.x = Math.PI / 2;
@@ -3626,6 +3772,7 @@ function unposeShooter(r) {
   if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0); limbs(r, -0.15);
+  if (r.glb) glbTick(r, 0, 'idle', {});
 }
 function battleSprites(on) {
   for (const r of runners.values()) for (const o of r.root.children) if (o.isSprite && o.renderOrder === 10) {
@@ -3911,7 +4058,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } stylizeTree(scene); setupComposer(); resize(); applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); pvInit(); lbChip(); fxInit(); frame();
+resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } stylizeTree(scene); setupComposer(); resize(); applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); pvInit(); lbChip(); fxInit(); frame(); loadChars();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
