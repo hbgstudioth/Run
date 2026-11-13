@@ -9,3 +9,11 @@ models/titan.glb
   License: CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/) - non-commercial use only
 
 Changes: arms re-posed from A-pose, rescaled, skin weights remapped to the game rig, textures downsized to 1024px.
+
+models/gun_pistol.glb - "Desert Eagle Gun" by attix84work (https://sketchfab.com/attix84work)
+  https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199 - CC BY 4.0
+models/gun_rifle.glb - "Gun M4A1" by Ivan008 (https://sketchfab.com/hukan008)
+  https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9 - CC BY 4.0
+models/gun_sniper.glb - "Sniper" by DJMaesen (https://sketchfab.com/bumstrum)
+  https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae - CC BY 4.0
+  Changes: decimated, re-oriented and rescaled, textures downsized.

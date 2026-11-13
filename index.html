@@ -98,6 +98,10 @@
   #pvBox::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px); }
   #pvCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
   #pvCanvas:active { cursor: grabbing; }
+  #mapPrev { position: relative; margin-top: 10px; aspect-ratio: 16/9; border: 1px solid rgba(57,255,20,.4); border-radius: 10px; overflow: hidden; background: #050505; box-shadow: 0 0 18px rgba(57,255,20,.12); }
+  #mapPrev img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .25s; }
+  #mapPrevCap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 8px; background: linear-gradient(transparent, rgba(5,5,5,.9)); font-size: 14px; color: #f4f1ea; }
+  #mapPrevCap b { color: #39FF14; letter-spacing: .04em; } #mapPrevCap small { display: block; font-size: 11px; opacity: .75; }
   #pvName { position: absolute; left: 14px; top: 10px; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 34px; letter-spacing: .08em; font-style: italic;
             background: var(--chrome); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 10px rgba(123,226,43,.35)); pointer-events: none; }
   #pvTag { position: absolute; left: 16px; top: 52px; font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; color: var(--acc); pointer-events: none; }
@@ -444,7 +448,7 @@
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
         <div class="secT">เครดิต</div>
-        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์</div>
+        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)</div>
       </div>
     </div>
   </section>
@@ -464,7 +468,8 @@
       <div id="roomSkinsBox"><div class="lobbyHead"><b>SKIN ชุดรบ</b></div><div id="roomSkins" class="skins"></div></div>
       <div class="lobbyHead"><b>หมวด</b><span id="modeLbl" style="color:var(--txt);font-size:14px;letter-spacing:0"></span></div>
       <div id="mapsBox"><div class="lobbyHead"><b>เลือกด่าน</b></div>
-      <div id="maps" class="diffs" style="grid-template-columns:repeat(2,1fr)"></div></div>
+      <div id="maps" class="diffs" style="grid-template-columns:repeat(2,1fr)"></div>
+      <div id="mapPrev"><img id="mapPrevImg" alt=""><div id="mapPrevCap"></div></div></div>
       <div class="lobbyHead"><b>ช่วงเวลา</b></div>
       <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · ปืนสั้น 30 นัด / ปืนกล 60 นัด / สไนเปอร์ 20 นัด · ยิงหัวแรง ×2 · เล็งซูม กระโดด นั่ง · ขึ้นตึก บันได ตู้คอนเทนเนอร์ และดาดฟ้าได้<br>กล่องแดง +50 เลือด · กล่องเขียว เติมกระสุนเต็มทุกกระบอก · กล่องฟ้า +50 เกราะ (สะสมได้ไม่จำกัด) · กล่องส้ม ∞ กระสุนไม่จำกัด 10 วิ · กล่องทอง ★ อมตะ 10 วิ · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
@@ -1045,7 +1050,7 @@ function buildCity(m) {
   const box = (x0, x1, y0, y1, z0, z1, mat, col = true, par = g) => {
     if (x1 - x0 < 0.01 || y1 - y0 < 0.01 || z1 - z0 < 0.01) return null;
     const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
-    o.castShadow = o.receiveShadow = true; par.add(o); if (col) cols.push({ x0, x1, y0, y1, z0, z1 }); return o;
+    o.castShadow = o.receiveShadow = true; par.add(o); if (col) cols.push({ x0, x1, y0, y1, z0, z1, o }); return o;
   };
   const cyl = (x, z, r, h, mat, y = 0, col = true, seg = 10) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), mat); o.position.set(x, y + h / 2, z); o.castShadow = true; g.add(o); if (col) cols.push({ x0: x - r, x1: x + r, z0: z - r, z1: z + r, y0: y, y1: y + h }); return o; };
   const noiseT = (base, n, a, stain) => { const t = canvasTex(256, 256, (x) => { x.fillStyle = base; x.fillRect(0, 0, 256, 256); for (let i = 0; i < n; i++) { const v = R() < .5 ? 0 : 255; x.fillStyle = `rgba(${v},${v},${v},${R() * a})`; const q = 2 + R() * 8; x.fillRect(R() * 256, R() * 256, q, q); } if (stain) for (let i = 0; i < 14; i++) { x.fillStyle = `rgba(40,35,25,${R() * .22})`; x.fillRect(R() * 256, R() * 120, 6 + R() * 20, 60 + R() * 140); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
@@ -1445,6 +1450,61 @@ function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
 const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]}};
+/* ---------- ปืนโมเดลจริง + การถือปืนแบบธรรมชาติ (วางปืนตามท่า แล้วให้มือทั้งสองจับด้วย IK) ---------- */
+const GUN_FILES = ['models/gun_pistol.glb', 'models/gun_rifle.glb', 'models/gun_sniper.glb'];
+const GUN_META = [{ muzzle: -0.322, sup: [0.045, 0.0, -0.035] }, { muzzle: -0.91, sup: [0, -0.476, 0.1] }, { muzzle: -1.426, sup: [0, -0.466, 0.01] }];
+const GUNR = [], GUN_PEND = [];
+function loadGuns(ld) {
+  return Promise.all(GUN_FILES.map((u, i) => ld.loadAsync(u).then(g => {
+    g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; const m = o.material; if (m) { m.envMapIntensity = 1.4; if (m.color && m.color.r < 0.06 && !m.map) m.color.multiplyScalar(1.6); } } });
+    GUNR[i] = g.scene;
+  }).catch(e => console.warn('gun', i, e)))).then(() => {
+    for (const p of GUN_PEND.splice(0)) if (GUNR[p.w]) { p.g.clear(); p.g.add(GUNR[p.w].clone()); p.g.userData.real = true; }
+    try { buildGunIcons(); } catch (e) { }
+  });
+}
+// ท่าวางปืน (พิกัดเทียบหน้าอก): ตำแหน่งด้ามจับ, ก้ม/เงย, หันเข้าลำตัว
+const WP_POSE = {
+  long: { aim: [-0.165, 0.13, 0.33, 0, 0], high: [-0.15, 0.0, 0.3, -0.38, 0.22], low: [-0.16, -0.2, 0.24, -0.9, 0.38], run: [-0.13, -0.06, 0.22, -0.55, 0.8] },
+  pistol: { aim: [-0.07, 0.17, 0.6, 0, 0.05], high: [-0.09, 0.0, 0.36, -0.45, 0.15], low: [-0.13, -0.3, 0.27, -1.05, 0.2], run: [-0.2, -0.33, 0.12, -1.25, 0.1] },
+};
+const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _vd = new THREE.Vector3(0, -1, 0);
+function armIK(r, i, T, pole, oneHand) { // T, pole: พิกัดเทียบ root
+  const a = r.arms[i], g = r.gA[i], e = r.elbows[i], [L1, L2] = r.armL[i];
+  r.root.updateMatrixWorld(true);
+  const S = a.getWorldPosition(_v1); r.root.worldToLocal(S);
+  const dir = _v2.copy(T).sub(S); let d = dir.length(); dir.normalize(); d = Math.max(Math.abs(L1 - L2) + 0.01, Math.min(L1 + L2 - 0.005, d));
+  const ax = (L1 * L1 - L2 * L2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, L1 * L1 - ax * ax));
+  const pv = _v3.copy(pole).addScaledVector(dir, -pole.dot(dir)).normalize();
+  const E = S.clone().addScaledVector(dir, ax).addScaledVector(pv, h), Tc = S.clone().addScaledVector(dir, d);
+  const u1 = E.clone().sub(S).normalize(), u2 = Tc.sub(E).normalize();
+  const rest = r.armRestQ[i], restDir = _vd.clone().applyQuaternion(rest);
+  const Qa = _q1.setFromUnitVectors(restDir, u1).multiply(rest);
+  // หมุนหัวไหล่ (เทียบพ่อ = หน้าอก)
+  const rq = r.root.getWorldQuaternion(_q2).invert(), pq = a.parent.getWorldQuaternion(_q3); const pRel = rq.multiply(pq);
+  a.quaternion.copy(pRel.invert()).multiply(Qa).multiply(g.quaternion.clone().invert());
+  const loc = u2.applyQuaternion(Qa.clone().invert()); e.quaternion.setFromUnitVectors(_vd, loc);
+}
+function heroWeapon(r, o) { // o: { w, pitch, aim, move, sprint, dt, crouch }
+  const W = r.wpS || (r.wpS = { a: 0, m: 0, s: 0, kick: 0 }), k = 1 - Math.exp(-(o.dt || 0.016) * 9);
+  W.a += ((o.aim ? 1 : 0) - W.a) * k; W.m += ((o.move && !o.aim ? 1 : 0) - W.m) * k; W.s += ((o.sprint && !o.aim ? 1 : 0) - W.s) * k;
+  const P = o.w === 0 ? WP_POSE.pistol : WP_POSE.long, mix = (key, i) => { const lo = P.low[i], hi = P.high[i], ru = P.run[i], am = P.aim[i]; let v = lo + (hi - lo) * W.m; v += (ru - v) * W.s; return v + (am - v) * W.a; };
+  const wp = r.wp; wp.position.set(mix('', 0), mix('', 1), mix('', 2));
+  const pitch = (o.pitch || 0) * W.a;
+  wp.rotation.set(-Math.PI / 2 - (mix('', 3) + pitch + W.kick), mix('', 4) - (r.twist || 0), 0, 'YXZ');
+  W.kick *= Math.exp(-(o.dt || 0.016) * 14);
+  // ปืนยาวเวลาเงยเล็ง: ยกด้ามตามมุมก้มเงยรอบหัวไหล่
+  if (W.a > 0.01) { const sh = 0.16; wp.position.y += Math.sin(pitch) * 0.33 * W.a; wp.position.z -= (1 - Math.cos(pitch)) * 0.3 * W.a; }
+  r.root.updateMatrixWorld(true);
+  const gm = GUN_META[o.w] || GUN_META[1], tR = _v1.set(0, 0, -0.012), tL = new THREE.Vector3(...gm.sup);
+  wp.localToWorld(tR); r.root.worldToLocal(tR); wp.localToWorld(tL); r.root.worldToLocal(tL);
+  const tr = tR.clone(), tl = tL.clone();
+  armIK(r, 0, tr, new THREE.Vector3(-0.6, -1, -0.35));
+  const oneHand = o.w === 0 && W.s > 0.5;
+  if (!oneHand) armIK(r, 1, tl, new THREE.Vector3(0.45, -1, -0.15));
+  else { r.arms[1].rotation.set(Math.sin(r.phase || 0) * 0.5, 0, 0.12); r.elbows[1].rotation.set(-0.5, 0, 0); }
+}
+
 /* ---------- ตัวละครหลัก 2 ตัว (โมเดลจริง) ผูกกับโครงกระดูกของเกม + การขยับแบบมีชีวิต ---------- */
 function heroPrep(scene) {
   const prims = []; scene.traverse(o => { if (o.isMesh && o.geometry.attributes.skinIndex) prims.push(o); });
@@ -1475,7 +1535,7 @@ function heroDyn(r, chest) { // ลำตัวท่อนบน: หายใ�
       st.bv += ((-Math.max(-4, Math.min(4, vy)) * 0.03 - st.bo) * 90 - st.bv * 11) * dt; st.bo += st.bv * dt;
     }
     const br = Math.sin(st.t * 1.85), br2 = Math.sin(st.t * 0.93 + 1);
-    chest.rotation.set(-0.015 + br * 0.02 + st.lean + st.bo, st.sw + br2 * 0.012, br2 * 0.014);
+    chest.rotation.set(-0.015 + br * 0.02 + st.lean + st.bo, st.sw + br2 * 0.012 + (r.chestTw || 0), br2 * 0.014);
     chest.scale.set(1 + br * 0.007, 1 + br * 0.005, 1 + br * 0.012);
     return base.call(this, force);
   };
@@ -1486,7 +1546,7 @@ function attachHero(r, kind) {
   r.body.scale.set(1, 1, 1);
   const sp = V(J.spine), chest = new THREE.Group(); chest.position.copy(sp); r.body.add(chest);
   chest.add(r.head); r.head.position.copy(V(J.neck)).sub(sp); r.head.rotation.set(0, 0, 0);
-  const gA = [], ext = [['RArm', 'RFore', 'RHand'], ['LArm', 'LFore', 'LHand']];
+  const gA = [], ext = [['RArm', 'RFore', 'RHand'], ['LArm', 'LFore', 'LHand']]; r.armL = []; r.armRestQ = [];
   let hand = null;
   r.arms.forEach((a, i) => {
     const [sA, sF, sH] = ext[i], u = V(J[sF]).sub(V(J[sA])), L = u.length(); u.normalize();
@@ -1494,6 +1554,7 @@ function attachHero(r, kind) {
     const Qu = new THREE.Quaternion().setFromUnitVectors(down, u), g = new THREE.Group();
     g.quaternion.copy(a.quaternion).invert().multiply(Qu); a.add(g); gA.push(g);
     const e = r.elbows[i]; g.add(e); e.position.set(0, -L, 0); e.rotation.set(0, 0, 0);
+    r.armL.push([L, V(J[sH]).distanceTo(V(J[sF])) + 0.1]); r.armRestQ.push(Qu.clone());
     if (i === 0) { const qi = Qu.clone().invert(); hand = new THREE.Group(); hand.position.copy(V(J[sH]).sub(V(J[sF])).applyQuaternion(qi)).add(new THREE.Vector3(0, -0.08, 0)); hand.quaternion.copy(qi); e.add(hand); }
   });
   r.legs.forEach((l, i) => { const up = V(J[i ? 'LUp' : 'RUp']), kn = V(J[i ? 'LLeg' : 'RLeg']); l.position.copy(up); l.rotation.set(0, 0, 0); r.knees[i].position.copy(kn).sub(up); r.knees[i].rotation.set(0, 0, 0); });
@@ -1503,7 +1564,8 @@ function attachHero(r, kind) {
   const skel = new THREE.Skeleton(bones), meshes = K.prims.map(p => { const m = new THREE.SkinnedMesh(p.geo, p.mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); return m; });
   r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand };
   r.girl = { meshes, base: meshes, skel, hero: kind };
-  r.chest = chest; heroDyn(r, chest);
+  r.chest = chest; r.gA = gA; heroDyn(r, chest);
+  r.wp = new THREE.Group(); chest.add(r.wp);
 }
 
 /* ---------- ตัวละครหญิง (โมเดลจริง CC-BY: Niko Haddad) ผูกกับโครงกระดูกของเกม ---------- */
@@ -1644,7 +1706,7 @@ const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
 function loadChars() {
   const ld = new GLTFLoader(), got = {};
-  Promise.all(Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))).then(() => {
+  Promise.all([loadGuns(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
       if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene) }; continue; }
@@ -2523,13 +2585,15 @@ function poseRunner(r, lane, dt, t, celebrate) {
   }
   const running = ws > 0.6, amp = running ? Math.min(1, 0.45 + ws / 25) : 0.28;
   r.phase += dt * (running ? 8 + ws * 0.35 : 6);
-  const s = Math.sin(r.phase);
-  r.legs[0].rotation.x = s * amp * 1.1; r.legs[1].rotation.x = -s * amp * 1.1;
-  r.arms[0].rotation.x = -s * amp * 1.2; r.arms[1].rotation.x = s * amp * 1.2;
-  r.body.position.y = Math.abs(Math.cos(r.phase)) * 0.14 * amp;
-  r.body.rotation.x = running ? 0.18 * amp : 0.03;
-  r.head.rotation.z = Math.sin(r.phase * 0.5) * 0.05;
-  limbs(r, running ? -1.3 : -0.35);
+  const s = Math.sin(r.phase), c = Math.cos(r.phase);
+  // สะโพกบิดตามจังหวะก้าว อกบิดสวน แขนแกว่งออกข้างนิดๆ เข่างอตอนเหวี่ยงขามาด้านหน้า
+  r.legs[0].rotation.set(s * amp * 1.05 - 0.04, 0, -0.025); r.legs[1].rotation.set(-s * amp * 1.05 - 0.04, 0, 0.025);
+  r.arms[0].rotation.set(-s * amp * 1.15 + 0.06, 0, -0.1 - amp * 0.06); r.arms[1].rotation.set(s * amp * 1.15 + 0.06, 0, 0.1 + amp * 0.06);
+  r.body.position.y = Math.abs(c) * 0.13 * amp - 0.03 * amp;
+  r.body.rotation.set(running ? 0.17 * amp : 0.03, s * 0.11 * amp, c * 0.03 * amp);
+  r.chestTw = -s * 0.2 * amp;
+  r.head.rotation.set(-0.05 * amp, -s * 0.12 * amp, Math.sin(r.phase * 0.5) * 0.03);
+  limbs(r, running ? -1.3 : -0.35, [0, 1].map(i => 0.14 + Math.max(0, -Math.cos(r.phase + i * Math.PI - 0.3)) * (running ? 1.45 : 0.7) * amp + (running ? 0.1 : 0)));
   if (r.glb) glbTick(r, dt, running ? 'run' : 'idle', { speed: ws });
 }
 
@@ -2861,7 +2925,7 @@ function posOf(id) {
   return remotes.get(id) || null;
 }
 function chooseSpawn(exceptId) {
-  const spots = arenaSpots(H.map), others = [];
+  const spots = playSpots(H.map), others = [];
   for (const [id, p] of H.players) if (id !== exceptId && p.alive) { const ps = posOf(id); if (ps) others.push(ps); }
   let best = spots[(Math.random() * spots.length) | 0], bestD = -1;
   for (let i = 0; i < 8; i++) {
@@ -2878,13 +2942,13 @@ function spawnPlayer(id, p) {
 }
 function initBattlePlayer(id, p) { Object.assign(p, { kills: 0, deaths: 0, ag: 0, hs: 0 }); spawnPlayer(id, p); }
 function freePickupSpot() {
-  const spots = pickupSpots(H.map).filter(s => !H.pickups.some(k => k.a && Math.hypot(k.x - s.x, k.z - s.z) < 3 && Math.abs((k.y || 0) - (s.y || 0)) < 1));
+  const spots = playPickSpots(H.map).filter(s => !H.pickups.some(k => k.a && Math.hypot(k.x - s.x, k.z - s.z) < 3 && Math.abs((k.y || 0) - (s.y || 0)) < 1));
   return spots[(Math.random() * spots.length) | 0];
 }
 function startBattle() {
   clearTimers();
   H.feed = []; H.pickups = []; H.bots.clear();
-  for (let i = 0; i < (H.map >= 1 ? 15 : 9); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
+  for (let i = 0; i < (H.map >= 1 ? 11 : 8); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const k of ['inf', 'god']) { const s = freePickupSpot(); H.pickups.push({ id: 'p' + k, k, x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const [id, p] of H.players) initBattlePlayer(id, p);
   H.state = 'countdown'; H.endsAt = Date.now() + 3200;
@@ -3222,7 +3286,7 @@ function render() {
   show('#qpanel', st === 'question' || st === 'reveal');
   show('#roundResult', st === 'reveal');
   show('#final', st === 'finished');
-  applyMap(inRoom ? (st === 'lobby' ? 5 : S.map) : 5, inRoom ? S.tod : 0);
+  applyMap(inRoom ? (st === 'lobby' ? 5 : S.map) : 5, inRoom ? S.tod : 0); fenceTick();
   if (!inRoom) { Music.play('lobby'); syncRunners([]); return; }
   syncRunners(S.players);
 
@@ -3250,6 +3314,7 @@ function render() {
     $('#modeLbl').textContent = shootMode ? '🎯 ยิงปืน' : '🏁 วิ่งแข่ง · สนามกีฬา';
     show('#mapsBox', shootMode);
     show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
+    if (shootMode) { const mi = (S.map | 0) || 1, im = $('#mapPrevImg'), src = `assets/map${mi}.jpg`; if (!im.src.endsWith(src)) im.src = src; $('#mapPrevCap').innerHTML = `<b>${MAPS[mi].name}</b><small>${MAPS[mi].sub || ''} · พื้นที่ 102×102 ม. มีรั้วพลังงานรอบสนาม</small>`; }
     if (shootMode) $('#maps').innerHTML = MAPS.map((m, i) => i === 0 ? '' : `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${m.name}<small style="display:block;font-size:10px;opacity:.7">${m.sub || ''}</small></button>`).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
@@ -3338,7 +3403,11 @@ function renderQuestion() {
    โหมดยิงกันเอง: สนาม ที่กำบัง การชน และการยิงเรย์
    ====================================================================== */
 const ARENA = [ROUT + 4.4, CITY_B, CITY_B, TOWN_B, 80];
-const inArena = (m, x, z, pad = 0) => m === 4 ? inHarbor(x, z, pad) : (m === 1 || m === 2) ? Math.abs(x) <= CITY_B + pad && Math.abs(z) <= CITY_B + pad : m === 3 ? Math.abs(x) <= TOWN_B + pad && Math.abs(z) <= TOWN_B + pad : stadiumDist(x, z) <= ARENA[m] + pad;
+// พื้นที่เล่นโหมดยิง: ทุกด่านขนาดเท่ากัน (~102×102 ม., เล็กลง 30% จากเดิม)
+const PLAY = [{ x0: -51, x1: 51, z0: -51, z1: 51 }, { x0: -51, x1: 51, z0: -51, z1: 51 }, { x0: -51, x1: 51, z0: -51, z1: 51 }, { x0: -51, x1: 51, z0: -51, z1: 51 }, { x0: -51, x1: 51, z0: -44, z1: 64 }];
+const inPlay = (m, x, z, pad = 0) => { const B = PLAY[m]; return !B || (x >= B.x0 - pad && x <= B.x1 + pad && z >= B.z0 - pad && z <= B.z1 + pad); };
+const inArena = (m, x, z, pad = 0) => inPlay(m, x, z, pad) && inArena0(m, x, z, pad);
+const inArena0 = (m, x, z, pad = 0) => m === 4 ? inHarbor(x, z, pad) : (m === 1 || m === 2) ? Math.abs(x) <= CITY_B + pad && Math.abs(z) <= CITY_B + pad : m === 3 ? Math.abs(x) <= TOWN_B + pad && Math.abs(z) <= TOWN_B + pad : stadiumDist(x, z) <= ARENA[m] + pad;
 function seeded(seed) { let x = (seed * 9301 + 49297) % 2147483647; if (x <= 0) x += 2147483646; return () => (x = x * 16807 % 2147483647) / 2147483647; }
 const COVERS = {}, COLS = {};
 function coverMats(m) {
@@ -3395,7 +3464,12 @@ function collidersFor(m) {
   }
   out.push(...world.bcols[m]);
   out.push(...buildCovers(m).cols);
-  return (COLS[m] = out);
+  // ลดที่กำบังเล็ก (ลังไม้ กระสอบทราย แบริเออร์) ลง 10% ในพื้นที่เล่น
+  const small = out.filter(c => c.o && c.y0 < 0.3 && c.y1 - c.y0 <= 2.6 && c.x1 - c.x0 <= 3.6 && c.z1 - c.z0 <= 3.6 && inPlay(m, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2, 2)).sort((a, b) => a.x0 - b.x0 || a.z0 - b.z0);
+  const drop = new Set(small.filter((_, i) => i % 10 === 3));
+  for (const c of out) if (c.o && !drop.has(c)) for (const d of drop) if (c.y0 >= d.y1 - 0.08 && c.x0 < d.x1 && c.x1 > d.x0 && c.z0 < d.z1 && c.z1 > d.z0) { drop.add(c); break; }
+  for (const d of drop) d.o.visible = false;
+  return (COLS[m] = out.filter(c => !drop.has(c)));
 }
 // ตารางแบ่งพื้นที่ เพื่อหาสิ่งกีดขวางใกล้ตัวได้เร็ว
 const GCELL = 8;
@@ -3436,6 +3510,8 @@ function arenaSpots(m) {
   if (m > 0) for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.02, ROUT + 4); c.push({ x, z }); }
   return (SPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 7 && !insideAny(s.x, s.z, 1.0, m)));
 }
+function playSpots(m) { return SPOTS['p' + m] || (SPOTS['p' + m] = arenaSpots(m).filter(s => inPlay(m, s.x, s.z, -2.5))); }
+function playPickSpots(m) { return PSPOTS['p' + m] || (PSPOTS['p' + m] = pickupSpots(m).filter(s => inPlay(m, s.x, s.z, -2.5))); }
 function pickupSpots(m) {
   if (PSPOTS[m]) return PSPOTS[m];
   const c = [];
@@ -3592,7 +3668,7 @@ const SIG = ['tactical', 'titan'];
 const SIG_NAME = ['สัญญาณยุทธวิธี', 'พลังไททัน'];
 const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'flex'];
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
+function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, gunAim: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
 function pvPose(name, t) {
   const P = pvBase(), sd = [-1, 1], br = Math.sin(t * 2.1);
   P.by = br * 0.012; P.hx = -0.02;
@@ -3623,7 +3699,7 @@ function pvPose(name, t) {
       P.a = sd.map(s => [-0.62, -s * 0.28]); P.e = sd.map(s => [-1.75, -s * 0.85]); break;
     case 'aim': { // เล็งปืนกวาดซ้ายขวา
       P.ry = 0.75 + Math.sin(t * 0.9) * 0.35; P.hy = -0.35; P.l = [-0.22, 0.28]; P.k = [0.35, 0.25]; P.by = -0.06; P.bx = 0.06;
-      P.a = [[-1.55, -0.04], [-1.36, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; break; }
+      P.a = [[-1.55, -0.04], [-1.36, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; P.gunAim = 1; break; }
     case 'scan': // ถือปืนลง มองระวังภัย
       P.hy = Math.sin(t * 1.4) * 0.65; P.l = [-0.1, 0.12]; P.k = [0.2, 0.2];
       P.a = [[-0.75, -0.04], [-0.65, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; break;
@@ -3665,11 +3741,13 @@ function pvLerp(A, B, k) {
   const o = {}; for (const key in A) o[key] = m(A[key], B[key]); return o;
 }
 function pvApply(r, P, yawX, dtX) {
+  r.chestTw = 0;
   r.root.rotation.y = P.ry + (yawX ?? (PV.yaw + (PV.spin || 0))); r.body.position.y = P.by; r.body.rotation.set(P.bx, 0, P.bz);
   r.head.rotation.set(P.hx, P.hy, P.hz);
   r.legs.forEach((l, i) => l.rotation.set(P.l[i], 0, 0)); r.knees.forEach((k, i) => { k.rotation.x = P.k[i]; });
   r.arms.forEach((a, i) => a.rotation.set(P.a[i][0], 0, P.a[i][1])); r.elbows.forEach((e, i) => e.rotation.set(P.e[i][0], 0, P.e[i][1]));
   if (r.guns) { r.guns.g.visible = P.gun > 0.5; r.guns.models.forEach((m, j) => { m.visible = j === (PV.gunW ?? 1); }); }
+  if (r.wp && P.gun > 0.5) heroWeapon(r, { w: PV.gunW ?? 1, pitch: 0, aim: P.gunAim > 0.5, move: false, sprint: false, dt: dtX ?? (PV.dt || 0.016) });
   if (r.glb) glbTick(r, dtX ?? (PV.dt || 0.016), P.run > 0.5 ? 'run' : 'idle', { dirs: P.ow > 0.01 ? { RU: P.oRU, RF: P.oRF, LU: P.oLU, LF: P.oLF } : null, w: P.ow, y: P.by, ts: P.run > 0.5 ? 0.75 : 0 });
 }
 function pvInit() {
@@ -3854,7 +3932,7 @@ const GRAV = 22, JUMP_V = 8.2;
 function onPos(a) {
   const id = a[0]; if (id === myId) return;
   let r = remotes.get(id); if (!r) { r = { rx: +a[1], rz: +a[2], ry: +a[8] || 0, ryaw: +a[3] }; remotes.set(id, r); }
-  Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, y: +a[8] || 0, cr: a[9] | 0, t: performance.now() });
+  Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, y: +a[8] || 0, cr: a[9] | 0, st: a[10] | 0, t: performance.now() });
 }
 // เส้นกระสุน + แสงปากกระบอก
 const tracers = [];
@@ -3938,6 +4016,7 @@ function updateTracers(dt) {
 }
 function onFx(a, local) {
   if (!local && a[0] === myId) return;
+  { const rr = remotes.get(a[0]); if (rr) rr.fireT = performance.now(); const ru = runners.get(a[0]); if (ru && ru.wpS) ru.wpS.kick = a[7] == 2 ? 0.2 : 0.09; }
   const A = new THREE.Vector3(+a[1], +a[2], +a[3]), B = new THREE.Vector3(+a[4], +a[5], +a[6]);
   tracer(A, B, a[7] | 0);
   const d = Math.hypot(A.x - me.x, A.z - me.z); Music.shot(a[7] | 0, clampN(1 - d / ((a[7] | 0) === 2 ? 140 : 80), 0.06, 0.8));
@@ -3954,7 +4033,8 @@ function gunMats() {
   return GUNM;
 }
 function makeGunModel(w) {
-  const g = new THREE.Group(), M = gunMats();
+  if (GUNR[w]) { const rg = new THREE.Group(); rg.add(GUNR[w].clone()); rg.userData.real = true; return rg; }
+  const g = new THREE.Group(), M = gunMats(); GUN_PEND.push({ g, w });
   // แกน y ติดลบ = ปลายลำกล้อง, z บวก = ด้านบนปืน
   const bx = (sx, sy, sz, m, x, y, z, rx = 0) => { const o = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); o.position.set(x, y, z); o.rotation.x = rx; o.castShadow = true; g.add(o); return o; };
   const cy = (r1, r2, l, m, x, y, z, seg = 12) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, l, seg), m); o.position.set(x, y, z); o.castShadow = true; g.add(o); return o; };
@@ -4006,7 +4086,7 @@ function buildGunIcons() {
 }
 function ensureGuns(r) {
   if (r.guns) return r.guns;
-  const g = new THREE.Group(); if (r.att) { g.position.set(0, -0.06, 0.03); r.att.hand.add(g); } else { g.position.set(0, -0.72, 0.02); r.arms[0].add(g); }
+  const g = new THREE.Group(); if (r.wp) { r.wp.add(g); } else if (r.att) { g.position.set(0, -0.06, 0.03); r.att.hand.add(g); } else { g.position.set(0, -0.72, 0.02); r.arms[0].add(g); }
   const models = [0, 1, 2].map(w => { const m = makeGunModel(w); g.add(m); return m; });
   g.visible = false;
   // เสื้อเกราะ (แสดงเมื่อมีเกราะ)
@@ -4014,8 +4094,9 @@ function ensureGuns(r) {
   r.guns = { g, models, vest }; buildArmorTiers(r);
   return r.guns;
 }
-function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
+function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor, st = 0) {
   const gs = ensureGuns(r); gs.g.visible = alive; gs.models.forEach((m, i) => m.visible = i === w); poseArmor(r, armor, alive);
+  if (alive && r.wp) return poseHeroShooter(r, mv, pitch, w, dt, cr, air, st);
   if (!alive) { r.body.rotation.x = -1.5; r.body.position.y = 0.32; r.legs.forEach(l => l.rotation.x = 0.1); r.arms.forEach(a => a.rotation.set(-0.3, 0, 0)); limbs(r, -0.2); gs.vest.visible = false; if (r.glb) glbTick(r, dt, 'idle', { dead: true }); return; }
   r.body.rotation.x = 0; r.phase += dt * (mv ? (cr ? 6 : 10) : 2);
   const s = Math.sin(r.phase), amp = mv ? (cr ? 0.35 : 0.75) : 0;
@@ -4027,6 +4108,25 @@ function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   r.head.rotation.x = -pitch * 0.5;
   limbs(r, 0, cr ? [1.55 - s * amp * 0.5, 1.85] : air ? [1.3, 0.5] : null);
   if (r.glb) glbTick(r, dt, mv ? (cr ? 'walk' : 'run') : 'idle', { aim: pitch, crouch: cr, ts: mv && cr ? 0.8 : 0 });
+}
+function poseHeroShooter(r, mv, pitch, w, dt, cr, air, st) {
+  const aim = st === 1, sprint = st === 2 && mv, H = r.hs || (r.hs = { sp: 0, tw: 0, t: 0 }), kk = 1 - Math.exp(-dt * 8);
+  H.sp += ((mv ? (sprint ? 1.3 : cr ? 0.6 : 1) : 0) - H.sp) * kk; H.t += dt;
+  const sp = Math.min(1.3, H.sp); r.phase += dt * (1.2 + sp * (cr ? 6.5 : 9.5));
+  const ph = r.phase, s = Math.sin(ph), idle = 1 - Math.min(1, sp);
+  H.tw += ((aim && w !== 0 ? 0.3 : aim ? 0.08 : 0) - H.tw) * kk; r.twist = H.tw;
+  const sway = Math.sin(H.t * 0.9) * 0.018 * idle;
+  r.body.rotation.set(0.045 * sp + (sprint ? 0.1 : 0) + (aim ? 0.04 : 0), H.tw + s * 0.06 * Math.min(1, sp), -s * 0.035 * Math.min(1, sp) + sway, 'XYZ');
+  const kn = i => 0.12 + Math.max(0, -Math.cos(ph + i * Math.PI - 0.25)) * 0.95 * Math.min(1, sp) + (aim ? 0.08 : 0);
+  if (cr) { r.body.position.y = -0.58; const a = Math.min(1, sp) * 0.3; r.legs[0].rotation.set(-1.2 + s * a, 0, 0); r.legs[1].rotation.set(-0.38 - s * a, 0, 0); r.knees[0].rotation.x = 1.55 - s * a * 0.6; r.knees[1].rotation.x = 1.85 + s * a * 0.4; }
+  else if (air) { r.body.position.y = 0; r.legs[0].rotation.set(-0.65, 0, 0); r.legs[1].rotation.set(0.25, 0, 0); r.knees[0].rotation.x = 1.05; r.knees[1].rotation.x = 0.45; }
+  else {
+    const amp = 0.58 * Math.min(1.25, sp), st0 = (aim ? [-0.16, 0.14] : [-0.06, 0.08]);
+    for (let i = 0; i < 2; i++) { r.legs[i].rotation.set(Math.sin(ph + i * Math.PI) * amp + st0[i] * idle, 0, (i ? 0.03 : -0.03) * idle); r.knees[i].rotation.x = kn(i); }
+    r.body.position.y = (1 - Math.abs(s)) * 0.055 * Math.min(1, sp) - 0.03 * Math.min(1, sp) - (aim ? 0.04 : 0) + Math.sin(H.t * 1.8) * 0.006 * idle;
+  }
+  r.head.rotation.set(-pitch * 0.55 + (aim ? 0.1 : 0.02) - 0.03 * sp, -H.tw * 0.9 + (aim ? 0.05 : 0), aim && w !== 0 ? 0.1 : 0);
+  r.chestTw = 0; heroWeapon(r, { w, pitch, aim, move: mv, sprint, dt, crouch: cr });
 }
 // ---------- เกราะ = โล่พลังงานแนบรูปร่างตัวละคร (ยิ่งเก็บเยอะ ยิ่งเข้ม) ----------
 const ARMOR_TIERS = ['โล่พลังงาน', 'โล่เสริมแรง', 'โล่หกเหลี่ยม', 'โล่ซิลเวอร์', 'โล่ตำนาน'];
@@ -4157,6 +4257,7 @@ const keys = {}; let firing = false, locked = false, joy = null, look = null;
 function swapWeapon(w) { me.w = w == null ? (me.w + 1) % WEAPONS.length : w; me.pressFired = false; me.cool = Math.max(me.cool, performance.now() + 250); Music.sfx('swap'); renderWeaponBar(); }
 function doJump() { if (me.grounded && battleOn() && S.state === 'battle') { if (me.cr) { me.cr = 0; return; } me.vy = JUMP_V; Music.sfx('swap'); } }
 function toggleCrouch() { if (!me.grounded) return; me.cr = me.cr ? 0 : 1; $('#crouchBtn').classList.toggle('on', !!me.cr); }
+function myStance() { return (me.aimK > 0.3 || performance.now() - (me.fireT || 0) < 1600) ? 1 : (me.mv && (keys.ShiftLeft || keys.ShiftRight) ? 2 : 0); }
 function setAim(v) { me.aim = v ? 1 : 0; $('#aimBtn').classList.toggle('on', !!me.aim); }
 addEventListener('keydown', e => {
   if (!battleOn() || document.activeElement.tagName === 'INPUT') return;
@@ -4209,6 +4310,7 @@ let toastT = 0;
 function toast(msg) { $('#bToast').textContent = msg; $('#bToast').style.opacity = 1; toastT = 1.6; }
 // ยิง
 function fireShot() {
+  me.fireT = performance.now(); { const ru = runners.get(myId); if (ru && ru.wpS) ru.wpS.kick = me.w === 2 ? 0.2 : me.w === 0 ? 0.14 : 0.07; }
   const W = WEAPONS[me.w], now = performance.now(); if (now < me.cool) return false;
   const Pm = S.players.find(p => p.id === myId), inf = !!Pm && (Pm.infU || 0) > hostNow();
   if (!inf && me.ammo[me.w] <= 0) { me.cool = now + 350; Music.sfx('empty'); toast(`${W.name} กระสุนหมด · เปลี่ยนปืน หรือไปเก็บกล่องกระสุน`); return true; }
@@ -4277,7 +4379,7 @@ function shooterFrame(dt, t) {
   me.rx = me.x; me.rz = me.z;
   if (firing && alive && battle) { if (WEAPONS[me.w].auto || !me.pressFired) { if (fireShot()) me.pressFired = true; } }
   if (alive && battle && S.pickups && performance.now() > me.pickT) for (const k of S.pickups) if (k.a && Math.hypot(k.x - me.x, k.z - me.z) < 1.7 && Math.abs(me.y - (k.y || 0)) < 1.4) { send('pick', { pid: k.id }); me.pickT = performance.now() + 700; break; }
-  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr]); }
+  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr, myStance()]); }
   // ตัวละคร
   const scoped = me.w === 2 && me.aimK > 0.6;
   for (const [id, r] of runners) {
@@ -4292,7 +4394,7 @@ function shooterFrame(dt, t) {
     r.root.position.set(src.rx, 0.07 + yy, src.rz); r.root.rotation.y = id === myId ? me.yaw : src.ryaw;
     updateHpBar(r, pl.hp ?? HP_MAX, pl.armor || 0, pl.alive !== false && !(id === myId && scoped));
     poseBuffs(r, pl, pl.alive !== false);
-    poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0);
+    poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0, id === myId ? myStance() : (performance.now() - (src.fireT || 0) < 1600 ? 1 : src.st | 0));
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
   }
   tickPickups(t);
@@ -4335,7 +4437,24 @@ function shooterFrame(dt, t) {
 }
 // ---------- แผนที่ย่อ ----------
 const MINI = {};
-function miniExtent(m) { return m === 4 ? 82 : m === 3 ? TOWN_B + 2 : (m === 1 || m === 2) ? CITY_B + 2 : L / 2 + ARENA[m] + 2; }
+// รั้วพลังงานรอบพื้นที่เล่น (ให้เห็นขอบเขตชัดเจน)
+const FENCES = [];
+function playFence(m) {
+  if (FENCES[m] || !PLAY[m]) return FENCES[m];
+  const B = PLAY[m], g = new THREE.Group(); g.visible = false; scene.add(g);
+  const tex = canvasTex(8, 128, x => { const gr = x.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, 'rgba(57,255,20,0)'); gr.addColorStop(0.75, 'rgba(57,255,20,0.35)'); gr.addColorStop(1, 'rgba(57,255,20,0.9)'); x.fillStyle = gr; x.fillRect(0, 0, 8, 128); });
+  const wm = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }), H = 5;
+  const pm = metalMat('#1b1e22'), nm = neonMat('#39FF14');
+  const side = (x0, z0, x1, z1) => {
+    const len = Math.hypot(x1 - x0, z1 - z0), w = new THREE.Mesh(new THREE.PlaneGeometry(len, H), wm); w.position.set((x0 + x1) / 2, H / 2, (z0 + z1) / 2); w.rotation.y = Math.atan2(-(z1 - z0), x1 - x0); g.add(w);
+    const n = Math.round(len / 8);
+    for (let i = 0; i <= n; i++) { const t = i / n, x = x0 + (x1 - x0) * t, z = z0 + (z1 - z0) * t; const p = new THREE.Mesh(new THREE.BoxGeometry(0.3, H + 0.4, 0.3), pm); p.position.set(x, (H + 0.4) / 2, z); g.add(p); const l = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, 0.34), nm); l.position.set(x, H + 0.15, z); g.add(l); }
+  };
+  side(B.x0, B.z0, B.x1, B.z0); side(B.x1, B.z0, B.x1, B.z1); side(B.x1, B.z1, B.x0, B.z1); side(B.x0, B.z1, B.x0, B.z0);
+  return (FENCES[m] = g);
+}
+function fenceTick() { const on = !!(S && S.mode === 'shoot' && S.state !== 'lobby' && S.players.some(p => p.id === myId)); for (let m = 1; m < PLAY.length; m++) { const f = on && S.map === m ? playFence(m) : FENCES[m]; if (f) f.visible = on && S.map === m; } }
+function miniExtent(m) { const B = PLAY[m]; return B ? Math.max(-B.x0, B.x1, -B.z0, B.z1) + 2 : L / 2 + ARENA[m] + 2; }
 function miniStatic(m) {
   if (MINI[m]) return MINI[m];
   const S2 = 360, cv = document.createElement('canvas'); cv.width = cv.height = S2;
