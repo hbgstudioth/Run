@@ -24,3 +24,7 @@ models/shade.glb - "Sexy Gangsta Girl 3" by EXOTIKA (https://sketchfab.com/exoti
 models/props.glb - scene props, CC0:
   Quaternius packs (street, survival, cyberpunk, RTS) via https://github.com/trebeljahr/quaternius-showcase
   Brazil Lowpoly Props Kit by kayquer - https://github.com/kayquer/kit-props-brasil-lowpoly
+
+models/car.glb - "Car Concept" from KhronosGroup/glTF-Sample-Assets (based on a public-domain model by Unity Fan)
+  https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept - CC BY 4.0 (excluding Khronos logos)
+  Changes: decimated, interior/plate removed, transmission/variants stripped, paint recoloured.
