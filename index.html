@@ -98,6 +98,7 @@
   #pvBox::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px); }
   #pvCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
   #pvCanvas:active { cursor: grabbing; }
+  #lbNav { display: none !important; }
   #mapPrev { position: relative; margin-top: 10px; aspect-ratio: 16/9; border: 1px solid rgba(57,255,20,.4); border-radius: 10px; overflow: hidden; background: #050505; box-shadow: 0 0 18px rgba(57,255,20,.12); }
   #mapPrev img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .25s; }
   #mapPrevCap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 8px; background: linear-gradient(transparent, rgba(5,5,5,.9)); font-size: 14px; color: #f4f1ea; }
@@ -448,7 +449,7 @@
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
         <div class="secT">เครดิต</div>
-        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)</div>
+        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>SHADE ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/sexy-gangsta-girl-3-aa1897f7fa684e83ae4e06c02f9dfea1" style="color:#39FF14" target="_blank" rel="noopener">"Sexy Gangsta Girl 3"</a> โดย <a href="https://sketchfab.com/exotika.3d" style="color:#39FF14" target="_blank" rel="noopener">EXOTIKA</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ตัดสุนัข/สายจูง/ปืนออก ลดโพลิกอน ใส่โครงกระดูก ยืดขา)<br>ของประกอบฉาก: Quaternius และ Brazil Lowpoly Props Kit (kayquer) — CC0<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)</div>
       </div>
     </div>
   </section>
@@ -566,6 +567,7 @@ const MAX_PLAYERS = 8;
 const SKIN = '#ffd9b8';
 const LOOKS = [
   { name: 'VANGUARD', skin: '#c99a7a', hair: '#1c1a18', hairStyle: 'short', top: '#3b3f36', pants: '#26282c', boots: '#1a1b1e', trim: '#1f2125', gear: 'helmet', helmet: '#2b2e30', vest: '#3e4134', glow: '#7d776d' },
+  { name: 'SHADE', skin: '#b98060', hair: '#111', hairStyle: 'short', top: '#151515', pants: '#151515', boots: '#eeeeee', trim: '#39FF14', gear: null, glow: '#39FF14' },
   { name: 'TITAN', skin: '#8f6248', hair: '#1b1612', hairStyle: 'buzz', top: '#2a2c2e', pants: '#2e3029', boots: '#1a1b1e', trim: '#6b2620', gear: 'helmet', helmet: '#1d1f22', vest: '#3a3d33', mask: '#121315', glow: '#ff3b3b' },
 ].map(l => ({ ...l, shirt: l.top }));
 const DIFFS = [
@@ -1449,7 +1451,46 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
-const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]}};
+const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"RWpn":[-0.346,1.354,0.096],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"LFing":[0.406,1.229,0.149],"LFing2":[0.375,1.176,0.174],"LTip":[0.338,1.158,0.183],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"RWpn":[-0.352,1.378,0.098],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"LFing":[0.414,1.25,0.152],"LFing2":[0.381,1.197,0.177],"LTip":[0.344,1.179,0.186],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]},"cc":{"spine":[-0.06,1.75,0.0],"neck":[-0.02,2.12,0.0],"RArm":[-0.33,2.05,-0.04],"RFore":[-0.36,1.64,-0.01],"RHand":[-0.385,1.3,0.05],"LArm":[0.19,2.04,-0.1],"LFore":[0.225,1.62,-0.1],"LHand":[0.28,1.28,-0.01],"RUp":[-0.155,1.21,0.0],"RLeg":[-0.185,0.603,0.0],"LUp":[0.115,1.18,0.0],"LLeg":[0.145,0.628,0.0],"RTip":[-0.38,1.12,0.05],"LTip":[0.27,1.1,0.02]}};
+
+/* ---------- ของประกอบฉาก (โมเดล CC0: Quaternius + Brazil props kit) ---------- */
+const PROP_META = {"lamp":[1.06,8.74,1.06,0],"tlight":[0.86,6.12,0.63,0],"stop":[0.14,3.35,0.86,0],"propane":[1.19,1.6,1.14,1],"trash":[0.8,1.46,1.05,1],"gascan":[0.44,0.58,0.14,0],"ac":[1.76,1.16,1.31,1],"acstack":[1.55,2.33,1.18,1],"antenna":[0.88,3.64,0.14,0],"barrel":[1.0,1.38,1.0,1],"crates":[1.17,2.48,1.17,1],"cone":[0.63,1.02,0.63,0],"hydrant":[0.79,1.16,0.75,1],"stall":[3.64,3.64,2.22,1],"booth":[1.18,3.2,1.13,1],"bin":[0.5,1.6,0.51,1],"bench":[2.85,1.31,0.88,1],"cyl":[0.66,0.87,0.66,0],"wreck":[2.04,2.04,4.08,1],"tires":[2.72,0.73,1.8,1],"drum":[1.78,1.38,1.62,1],"dumpster":[2.32,2.04,2.97,1],"bags":[1.6,0.87,0.92,0],"junk":[3.34,1.46,2.65,1],"rubble":[4.04,1.16,3.71,1],"sofa":[2.7,1.31,1.56,1]};
+const PROPS = {};
+const PROP_SETS = {
+  1: { wall: ['bin', 'trash', 'propane', 'cyl', 'ac', 'acstack', 'bags', 'hydrant', 'booth', 'stall', 'gascan'], open: ['cone', 'cone', 'stall', 'bench', 'tlight'], n: 46 },
+  2: { wall: ['dumpster', 'bags', 'junk', 'drum', 'tires', 'bin', 'sofa', 'trash', 'cyl'], open: ['wreck', 'wreck', 'rubble', 'tires', 'drum', 'cone', 'junk'], n: 52 },
+  3: { wall: ['barrel', 'crates', 'propane', 'trash', 'gascan', 'bench', 'cyl', 'bin'], open: ['barrel', 'crates', 'cone'], n: 40 },
+  4: { wall: ['barrel', 'drum', 'crates', 'propane', 'tires', 'cyl', 'gascan'], open: ['cone', 'barrel', 'drum', 'crates', 'tires'], n: 46 },
+};
+function loadProps(ld) {
+  return ld.loadAsync('models/props.glb').then(g => {
+    g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    for (const c of [...g.scene.children]) PROPS[c.name] = c;
+    try { placeProps(); } catch (e) { console.warn('props place', e); }
+  }).catch(e => console.warn('props', e));
+}
+function placeProps() {
+  world.propG = [];
+  for (const m of [1, 2, 3, 4]) {
+    const B = PLAY[m], set = PROP_SETS[m], R = seeded(777 + m * 31), g = new THREE.Group(); g.visible = false; scene.add(g); world.propG[m] = g;
+    const cols = collidersFor(m), spots = [...playSpots(m), ...playPickSpots(m)];
+    let placed = 0, tries = 0;
+    while (placed < set.n && tries++ < set.n * 60) {
+      const x = B.x0 + 3 + R() * (B.x1 - B.x0 - 6), z = B.z0 + 3 + R() * (B.z1 - B.z0 - 6), wallMode = R() < 0.7;
+      const list = wallMode ? set.wall : set.open, name = list[(R() * list.length) | 0], src = PROPS[name]; if (!src || !PROP_META[name]) continue;
+      const [sx, sy, sz, col] = PROP_META[name], ry = ((R() * 4) | 0) * Math.PI / 2 + (wallMode ? 0 : (R() - 0.5) * 0.8), rad = Math.max(sx, sz) / 2;
+      const gy = groundAt(x, z, 0.3, m); if (gy > 0.2) continue;
+      if (insideAny(x, z, rad + 0.3, m, 0)) continue;
+      const near = colsNear(m, x - 4, z - 4, x + 4, z + 4).some(c => c.y1 > 2.2 && x > c.x0 - 1.6 - rad && x < c.x1 + 1.6 + rad && z > c.z0 - 1.6 - rad && z < c.z1 + 1.6 + rad);
+      if (wallMode !== near) continue;
+      if (spots.some(s => Math.hypot(s.x - x, s.z - z) < rad + 1.4)) continue;
+      const o = src.clone(); o.position.set(x, gy, z); o.rotation.y = ry; g.add(o);
+      if (col) { const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), hw = (c * sx + s2 * sz) / 2 * 0.85, hd = (s2 * sx + c * sz) / 2 * 0.85; cols.push({ x0: x - hw, x1: x + hw, z0: z - hd, z1: z + hd, y0: gy, y1: gy + sy * 0.95 }); delete cols.grid; }
+      placed++;
+    }
+    if (cols.grid) delete cols.grid;
+  }
+}
 /* ---------- ปืนโมเดลจริง + การถือปืนแบบธรรมชาติ (วางปืนตามท่า แล้วให้มือทั้งสองจับด้วย IK) ---------- */
 const GUN_FILES = ['models/gun_pistol.glb', 'models/gun_rifle.glb', 'models/gun_sniper.glb'];
 const GUN_META = [{ muzzle: -0.322, sup: [0.045, 0.0, -0.035] }, { muzzle: -0.91, sup: [0, -0.476, 0.1] }, { muzzle: -1.426, sup: [0, -0.466, 0.01] }];
@@ -1465,54 +1506,77 @@ function loadGuns(ld) {
 }
 // ท่าวางปืน (พิกัดเทียบหน้าอก): ตำแหน่งด้ามจับ, ก้ม/เงย, หันเข้าลำตัว
 const WP_POSE = {
-  long: { aim: [-0.165, 0.13, 0.33, 0, 0], high: [-0.15, 0.0, 0.3, -0.38, 0.22], low: [-0.16, -0.2, 0.24, -0.9, 0.38], run: [-0.13, -0.06, 0.22, -0.55, 0.8] },
+  long: { aim: [-0.165, 0.13, 0.33, 0, 0], high: [-0.15, 0.02, 0.3, -0.35, 0.22], low: [-0.15, -0.08, 0.3, -0.62, 0.42], run: [-0.12, -0.02, 0.24, -0.45, 0.85] },
   pistol: { aim: [-0.07, 0.17, 0.6, 0, 0.05], high: [-0.09, 0.0, 0.36, -0.45, 0.15], low: [-0.13, -0.3, 0.27, -1.05, 0.2], run: [-0.2, -0.33, 0.12, -1.25, 0.1] },
 };
 const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _vd = new THREE.Vector3(0, -1, 0);
-function armIK(r, i, T, pole, oneHand) { // T, pole: พิกัดเทียบ root
-  const a = r.arms[i], g = r.gA[i], e = r.elbows[i], [L1, L2] = r.armL[i];
+const rootRelQ = (r, o) => r.root.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(o.getWorldQuaternion(new THREE.Quaternion()));
+// IK แขน 2 ท่อน: ข้อมือไปที่ T และหมุนข้อมือให้ได้ Hq (ทั้งหมดเทียบ root)
+function armIK(r, i, T, pole, Hq) {
+  const a = r.arms[i], g = r.gA[i], e = r.elbows[i], h = r.hands[i], [L1, L2] = r.armL[i], rest = r.armRestQ[i];
   r.root.updateMatrixWorld(true);
-  const S = a.getWorldPosition(_v1); r.root.worldToLocal(S);
-  const dir = _v2.copy(T).sub(S); let d = dir.length(); dir.normalize(); d = Math.max(Math.abs(L1 - L2) + 0.01, Math.min(L1 + L2 - 0.005, d));
-  const ax = (L1 * L1 - L2 * L2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, L1 * L1 - ax * ax));
-  const pv = _v3.copy(pole).addScaledVector(dir, -pole.dot(dir)).normalize();
-  const E = S.clone().addScaledVector(dir, ax).addScaledVector(pv, h), Tc = S.clone().addScaledVector(dir, d);
-  const u1 = E.clone().sub(S).normalize(), u2 = Tc.sub(E).normalize();
-  const rest = r.armRestQ[i], restDir = _vd.clone().applyQuaternion(rest);
-  const Qa = _q1.setFromUnitVectors(restDir, u1).multiply(rest);
-  // หมุนหัวไหล่ (เทียบพ่อ = หน้าอก)
-  const rq = r.root.getWorldQuaternion(_q2).invert(), pq = a.parent.getWorldQuaternion(_q3); const pRel = rq.multiply(pq);
-  a.quaternion.copy(pRel.invert()).multiply(Qa).multiply(g.quaternion.clone().invert());
-  const loc = u2.applyQuaternion(Qa.clone().invert()); e.quaternion.setFromUnitVectors(_vd, loc);
+  const S = a.getWorldPosition(new THREE.Vector3()); r.root.worldToLocal(S);
+  const dir = T.clone().sub(S); let d = dir.length(); dir.normalize(); d = Math.max(Math.abs(L1 - L2) + 0.01, Math.min(L1 + L2 - 0.003, d));
+  const ax = (L1 * L1 - L2 * L2 + d * d) / (2 * d), hh = Math.sqrt(Math.max(0, L1 * L1 - ax * ax));
+  const pv = pole.clone().addScaledVector(dir, -pole.dot(dir)).normalize();
+  const E = S.clone().addScaledVector(dir, ax).addScaledVector(pv, hh), Tc = S.clone().addScaledVector(dir, d);
+  const u1 = E.clone().sub(S).normalize(), u2 = Tc.clone().sub(E).normalize();
+  const restDir = _vd.clone().applyQuaternion(rest), Qa = new THREE.Quaternion().setFromUnitVectors(restDir, u1).multiply(rest);
+  a.quaternion.copy(rootRelQ(r, a.parent).invert()).multiply(Qa).multiply(g.quaternion.clone().invert());
+  // ปลายแขน: บิดตามข้อมือ (ลดการบิดเกลียวที่ข้อมือ)
+  const foreRest = h.position.clone().normalize().applyQuaternion(rest);
+  const Rh = Hq ? Hq.clone().multiply(rest.clone().invert()) : new THREE.Quaternion().setFromUnitVectors(restDir, u1);
+  const R = new THREE.Quaternion().setFromUnitVectors(foreRest.clone().applyQuaternion(Rh).normalize(), u2).multiply(Rh);
+  const Qe = R.clone().multiply(rest);
+  e.quaternion.copy(Qa.clone().invert().multiply(Qe));
+  h.quaternion.copy(Hq ? Qe.clone().invert().multiply(Hq) : new THREE.Quaternion());
 }
+function basisQ(x, y, z) { return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z)); }
 function heroWeapon(r, o) { // o: { w, pitch, aim, move, sprint, dt, crouch }
-  const W = r.wpS || (r.wpS = { a: 0, m: 0, s: 0, kick: 0 }), k = 1 - Math.exp(-(o.dt || 0.016) * 9);
+  const W = r.wpS || (r.wpS = { a: 0, m: 0, s: 0, kick: 0, sq: 0 }), dt = o.dt || 0.016, k = 1 - Math.exp(-dt * 9);
   W.a += ((o.aim ? 1 : 0) - W.a) * k; W.m += ((o.move && !o.aim ? 1 : 0) - W.m) * k; W.s += ((o.sprint && !o.aim ? 1 : 0) - W.s) * k;
-  const P = o.w === 0 ? WP_POSE.pistol : WP_POSE.long, mix = (key, i) => { const lo = P.low[i], hi = P.high[i], ru = P.run[i], am = P.aim[i]; let v = lo + (hi - lo) * W.m; v += (ru - v) * W.s; return v + (am - v) * W.a; };
-  const wp = r.wp; wp.position.set(mix('', 0), mix('', 1), mix('', 2));
-  const pitch = (o.pitch || 0) * W.a;
-  wp.rotation.set(-Math.PI / 2 - (mix('', 3) + pitch + W.kick), mix('', 4) - (r.twist || 0), 0, 'YXZ');
-  W.kick *= Math.exp(-(o.dt || 0.016) * 14);
-  // ปืนยาวเวลาเงยเล็ง: ยกด้ามตามมุมก้มเงยรอบหัวไหล่
-  if (W.a > 0.01) { const sh = 0.16; wp.position.y += Math.sin(pitch) * 0.33 * W.a; wp.position.z -= (1 - Math.cos(pitch)) * 0.3 * W.a; }
+  const P = o.w === 0 ? WP_POSE.pistol : WP_POSE.long, mix = i => { let v = P.low[i] + (P.high[i] - P.low[i]) * W.m; v += (P.run[i] - v) * W.s; return v + (P.aim[i] - v) * W.a; };
+  const wp = r.wp, pitch = (o.pitch || 0) * W.a;
+  wp.position.set(mix(0), mix(1), mix(2));
+  if (W.a > 0.01) { wp.position.y += Math.sin(pitch) * 0.33 * W.a; wp.position.z -= (1 - Math.cos(pitch)) * 0.3 * W.a; }
+  wp.position.z -= W.kick * 0.25;
+  wp.rotation.set(-Math.PI / 2 - (mix(3) + pitch + W.kick), mix(4) - (r.twist || 0), 0, 'YXZ');
+  W.kick *= Math.exp(-dt * 14); W.sq *= Math.exp(-dt * 10);
   r.root.updateMatrixWorld(true);
-  const gm = GUN_META[o.w] || GUN_META[1], tR = _v1.set(0, 0, -0.012), tL = new THREE.Vector3(...gm.sup);
-  wp.localToWorld(tR); r.root.worldToLocal(tR); wp.localToWorld(tL); r.root.worldToLocal(tL);
-  const tr = tR.clone(), tl = tL.clone();
-  armIK(r, 0, tr, new THREE.Vector3(-0.6, -1, -0.35));
-  const oneHand = o.w === 0 && W.s > 0.5;
-  if (!oneHand) armIK(r, 1, tl, new THREE.Vector3(0.45, -1, -0.15));
-  else { r.arms[1].rotation.set(Math.sin(r.phase || 0) * 0.5, 0, 0.12); r.elbows[1].rotation.set(-0.5, 0, 0); }
+  // มือขวา: ล็อกด้ามปืนให้อยู่ในกำมือพอดี
+  const Gq = rootRelQ(r, wp), Gp = wp.getWorldPosition(new THREE.Vector3()); r.root.worldToLocal(Gp);
+  const gi = r.gunInHand, Hq = Gq.clone().multiply(gi.q.clone().invert()), Hp = Gp.clone().sub(gi.p.clone().applyQuaternion(Hq));
+  armIK(r, 0, Hp, new THREE.Vector3(-0.7, -1, -0.3), Hq);
+  // มือซ้าย: ประคองการ์ดมือ (ปืนยาว) หรือกุมมือขวา (ปืนสั้น)
+  const oneHand = o.w === 0 && W.s > 0.5, gm = GUN_META[o.w] || GUN_META[1];
+  const gx = new THREE.Vector3(1, 0, 0).applyQuaternion(Gq), gy = new THREE.Vector3(0, 1, 0).applyQuaternion(Gq), gz = new THREE.Vector3(0, 0, 1).applyQuaternion(Gq);
+  const L = r.lhRest, Lrest = r.armRestQ[1];
+  if (!oneHand) {
+    let fD, pN, pc;
+    if (o.w === 0) { fD = gz.clone().multiplyScalar(-0.75).addScaledVector(gy, -0.35).addScaledVector(gx, -0.45).normalize(); pN = gx.clone().negate(); pc = Gp.clone().addScaledVector(gx, 0.055).addScaledVector(gz, -0.03).addScaledVector(gy, -0.01); }
+    else { fD = gy.clone().multiplyScalar(-0.45).addScaledVector(gx, -0.9).normalize(); pN = gz.clone(); pc = new THREE.Vector3(...gm.sup).applyQuaternion(Gq).add(Gp).addScaledVector(gz, -0.045).addScaledVector(gx, 0.035); }
+    pN.addScaledVector(fD, -pN.dot(fD)).normalize();
+    const restB = basisQ(L.f, L.p, new THREE.Vector3().crossVectors(L.f, L.p)), tgtB = basisQ(fD, pN, new THREE.Vector3().crossVectors(fD, pN));
+    const Rl = tgtB.multiply(restB.invert()), HqL = Rl.clone().multiply(Lrest);
+    const wrist = pc.clone().sub(L.palm.clone().multiplyScalar(0.55).applyQuaternion(Rl));
+    armIK(r, 1, wrist, new THREE.Vector3(0.5, -1, -0.1), HqL);
+    // งอนิ้วโอบ
+    const hinge = new THREE.Vector3().crossVectors(L.f, L.p).normalize().applyQuaternion(Lrest.clone().invert()), curl = o.w === 0 ? 1.05 : 0.95;
+    r.fing[1].forEach((f, j) => f.quaternion.setFromAxisAngle(hinge, curl * (j ? 0.9 : 1)));
+  } else {
+    r.arms[1].rotation.set(Math.sin(r.phase || 0) * 0.5, 0, 0.12); r.elbows[1].rotation.set(-0.5, 0, 0); r.hands[1].quaternion.identity();
+    r.fing[1].forEach(f => f.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.6));
+  }
 }
 
 /* ---------- ตัวละครหลัก 2 ตัว (โมเดลจริง) ผูกกับโครงกระดูกของเกม + การขยับแบบมีชีวิต ---------- */
-function heroPrep(scene) {
+function heroPrep(scene, bright = 1.45) {
   const prims = []; scene.traverse(o => { if (o.isMesh && o.geometry.attributes.skinIndex) prims.push(o); });
   return prims.map(o => {
     const g = o.geometry, m = o.material;
     if (g.attributes.skinWeight.normalized || !(g.attributes.skinWeight.array instanceof Float32Array)) { const a = g.attributes.skinWeight, f = new Float32Array(a.count * 4); for (let i = 0; i < a.count; i++) for (let c = 0; c < 4; c++) f[i * 4 + c] = a.getComponent(i, c); g.setAttribute('skinWeight', new THREE.BufferAttribute(f, 4)); }
     if (!(g.attributes.skinIndex.array instanceof Uint16Array)) g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(Uint16Array.from(g.attributes.skinIndex.array), 4));
-    m.color.setScalar(1.45); m.envMapIntensity = 1.3; m.side = THREE.FrontSide;
+    m.color.setScalar(bright); m.envMapIntensity = 1.3; m.side = THREE.FrontSide;
     if (m.emissiveMap) { m.emissive.setRGB(1, 1, 1); m.emissiveIntensity = 1.6; }
     if (m.normalScale) m.normalScale.set(1.1, 1.1);
     return { geo: g, mat: m };
@@ -1546,23 +1610,45 @@ function attachHero(r, kind) {
   r.body.scale.set(1, 1, 1);
   const sp = V(J.spine), chest = new THREE.Group(); chest.position.copy(sp); r.body.add(chest);
   chest.add(r.head); r.head.position.copy(V(J.neck)).sub(sp); r.head.rotation.set(0, 0, 0);
-  const gA = [], ext = [['RArm', 'RFore', 'RHand'], ['LArm', 'LFore', 'LHand']]; r.armL = []; r.armRestQ = [];
-  let hand = null;
+  const gA = [], ext = [['RArm', 'RFore', 'RHand'], ['LArm', 'LFore', 'LHand']]; r.armL = []; r.armRestQ = []; r.hands = []; r.fing = [];
   r.arms.forEach((a, i) => {
     const [sA, sF, sH] = ext[i], u = V(J[sF]).sub(V(J[sA])), L = u.length(); u.normalize();
     chest.add(a); a.position.copy(V(J[sA])).sub(sp);
-    const Qu = new THREE.Quaternion().setFromUnitVectors(down, u), g = new THREE.Group();
+    const Qu = new THREE.Quaternion().setFromUnitVectors(down, u), g = new THREE.Group(), qi = Qu.clone().invert();
     g.quaternion.copy(a.quaternion).invert().multiply(Qu); a.add(g); gA.push(g);
     const e = r.elbows[i]; g.add(e); e.position.set(0, -L, 0); e.rotation.set(0, 0, 0);
-    r.armL.push([L, V(J[sH]).distanceTo(V(J[sF])) + 0.1]); r.armRestQ.push(Qu.clone());
-    if (i === 0) { const qi = Qu.clone().invert(); hand = new THREE.Group(); hand.position.copy(V(J[sH]).sub(V(J[sF])).applyQuaternion(qi)).add(new THREE.Vector3(0, -0.08, 0)); hand.quaternion.copy(qi); e.add(hand); }
+    const fore = V(J[sH]).sub(V(J[sF]));
+    r.armL.push([L, fore.length()]); r.armRestQ.push(Qu.clone());
+    // ข้อมือ (หมุนได้อิสระ) และนิ้ว 2 ข้อ
+    const h = new THREE.Group(); h.position.copy(fore.clone().applyQuaternion(qi)); e.add(h); r.hands.push(h);
+    const fg = [];
+    if (J[i ? 'LFing' : 'RFing']) {
+      const f1 = new THREE.Group(); f1.position.copy(V(J[i ? 'LFing' : 'RFing']).sub(V(J[sH])).applyQuaternion(qi)); h.add(f1); fg.push(f1);
+      const n2 = i ? 'LFing2' : 'RFing2'; if (J[n2]) { const f2 = new THREE.Group(); f2.position.copy(V(J[n2]).sub(V(J[i ? 'LFing' : 'RFing'])).applyQuaternion(qi)); f1.add(f2); fg.push(f2); }
+    }
+    r.fing.push(fg);
   });
+  // ข้อมูลการจับปืน (ในกรอบข้อมือขณะพัก)
+  const HR = r.armRestQ[0], HRi = HR.clone().invert();
+  const barrel = new THREE.Vector3(0.084, -0.903, 0.422).normalize(), top = new THREE.Vector3(0.136, 0.43, 0.893);
+  if (!J.RWpn) { barrel.set(0, -0.94, 0.33).normalize(); top.set(0, 0.33, 0.94); }
+  top.addScaledVector(barrel, -top.dot(barrel)).normalize();
+  const gy = barrel.clone().negate(), gz = top, gx = new THREE.Vector3().crossVectors(gy, gz);
+  const gunRest = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(gx, gy, gz));
+  const sock = J.RWpn ? V(J.RWpn) : V(J.RHand).lerp(V(J.RTip || J.RHand), 0.5);
+  r.gunInHand = { q: HRi.clone().multiply(gunRest), p: sock.sub(V(J.RHand)).applyQuaternion(HRi).addScaledVector(new THREE.Vector3(0, 0, 0), 0) };
+  // มือซ้าย: ทิศนิ้ว + ทิศฝ่ามือ ขณะพัก (กรอบ root)
+  const LH = V(J.LHand), lf = J.LFing ? V(J.LTip || J.LFing).sub(LH).normalize() : V(J.LTip || J.LHand).sub(LH).normalize();
+  const pn = new THREE.Vector3(-1, 0, 0); pn.addScaledVector(lf, -pn.dot(lf)).normalize();
+  r.lhRest = { f: lf, p: pn, palm: (J.LFing ? V(J.LFing).sub(LH) : lf.clone().multiplyScalar(0.07)) };
   r.legs.forEach((l, i) => { const up = V(J[i ? 'LUp' : 'RUp']), kn = V(J[i ? 'LLeg' : 'RLeg']); l.position.copy(up); l.rotation.set(0, 0, 0); r.knees[i].position.copy(kn).sub(up); r.knees[i].rotation.set(0, 0, 0); });
   const bone = p => { const b = new THREE.Bone(); p.add(b); return b; };
-  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1]), bone(r.knees[0]), bone(r.knees[1]), bone(chest)];
+  const F0 = r.fing[0], F1 = r.fing[1], dummy = new THREE.Group(); r.hands[1].add(dummy);
+  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1]), bone(r.knees[0]), bone(r.knees[1]), bone(chest),
+    bone(r.hands[0]), bone(F0[0] || r.hands[0]), bone(r.hands[1]), bone(F1[0] || r.hands[1]), bone(F1[1] || F1[0] || r.hands[1])];
   r.root.updateMatrixWorld(true);
   const skel = new THREE.Skeleton(bones), meshes = K.prims.map(p => { const m = new THREE.SkinnedMesh(p.geo, p.mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); return m; });
-  r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand };
+  r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand: r.hands[0] };
   r.girl = { meshes, base: meshes, skel, hero: kind };
   r.chest = chest; r.gA = gA; heroDyn(r, chest);
   r.wp = new THREE.Group(); chest.add(r.wp);
@@ -1700,16 +1786,16 @@ function attachGirl(r, lookIdx, outfit, SK) {
 
 /* ---------- ตัวละครโมเดล 3D จริง (GLB มีโครงกระดูก + แอนิเมชัน) ---------- */
 const CHAR = { ready: false, kinds: {} };
-const CH_FILES = { ca: 'models/vanguard.glb', cb: 'models/titan.glb' };
+const CH_FILES = { ca: 'models/vanguard.glb', cc: 'models/shade.glb', cb: 'models/titan.glb' };
 const FEMALE = new Set();
 const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
 function loadChars() {
   const ld = new GLTFLoader(), got = {};
-  Promise.all([loadGuns(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
+  Promise.all([loadGuns(ld), loadProps(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
-      if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene) }; continue; }
+      if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene, k === 'cc' ? 1.08 : 1.45) }; continue; }
       if (k === 'girl') { let gm = null; g.scene.traverse(o => { if (!gm && o.isMesh) gm = o; }); if (gm && gm.geometry.attributes.skinIndex) CHAR.kinds.girl = { girl: true, ...girlPrep(gm.geometry, gm.material.map) }; continue; }
       g.scene.updateMatrixWorld(true);
       const bw = n => { for (const nn of BN(n)) { const b = g.scene.getObjectByName(nn); if (b) return b.getWorldPosition(new THREE.Vector3()).y; } return null; };
@@ -1729,7 +1815,7 @@ function loadChars() {
     CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
   });
 }
-function charKind(lookIdx, outfit) { const hk = ['ca', 'cb'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
+function charKind(lookIdx, outfit) { const hk = ['ca', 'cc', 'cb'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
 function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
   if (kind === 'girl') return attachGirl(r, lookIdx, outfit, SK);
   if (CHAR.kinds[kind] && CHAR.kinds[kind].hero) return attachHero(r, kind);
@@ -1857,7 +1943,7 @@ function onCharsReady() {
 function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac', skin = 0) {
   const base = LOOKS[lookIdx % LOOKS.length], sport = outfit === 'sport', SK = SKINS[(skin | 0) % SKINS.length];
   const lk = !sport ? { ...base, top: SK.top, pants: SK.pants, boots: SK.boots, vest: SK.armor, trim: SK.neon, knee: false, holster: true, helmet: SK.armor, cap: base.cap ? SK.armor : base.cap, mask: base.mask ? '#0b0c0e' : null, collar: false, tac: true } : sport ? { ...base, ...SPORT[lookIdx % SPORT.length], vest: false, pack: false, knee: false, collar: false, mask: null, phones: false, gear: SPORT[lookIdx % SPORT.length].band ? 'band' : null, sport: true } : base;
-  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body); root.userData.noCrop = true;
   const add = (p, geo, mat, x, y, z, shadow = true) => { const m = new THREE.Mesh(geo, typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); m.castShadow = shadow; p.add(m); return m; };
   const legs = [], arms = [], knees = [], elbows = [];
   const glove = (lk.vest || lk.gear === 'hood') ? '#1b1c1f' : lk.skin;
@@ -2601,112 +2687,148 @@ function poseRunner(r, lane, dt, t, celebrate) {
    เพลงประกอบ + เสียงเอฟเฟกต์ (สังเคราะห์สดด้วย Web Audio ไม่ต้องโหลดไฟล์)
    ====================================================================== */
 const Music = (() => {
-  let ctx = null, master, musicBus, sfxBus, noiseBuf, timer = null, step = 0, nextTime = 0, song = null, songName = null;
+  let ctx = null, master, comp, musicBus, duck, sfxBus, verb, verbSend, sfxVerb, noiseBuf, timer = null, step = 0, nextTime = 0, song = null, songName = null;
   let muted = localStorage.hrMute === '1';
   const midi = n => 440 * Math.pow(2, (n - 69) / 12);
-  // เมโลดี้แบบกำหนดตายตัว (สุ่มด้วย seed เพื่อให้ทุกเครื่องได้ทำนองเดียวกัน)
-  function melody(seed, len, density, range) {
-    let x = seed; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
-    const out = []; let cur = 2;
-    for (let i = 0; i < len; i++) {
-      const strong = i % 4 === 0, play = rnd() < (strong ? 0.85 : density);
-      if (!play) { out.push(-1); continue; }
-      cur = Math.max(0, Math.min(range - 1, cur + Math.round((rnd() - 0.5) * 4)));
-      out.push(cur);
-    }
-    return out;
-  }
+  function seq(seed, len, density) { let x = seed; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647; const o = []; let cur = 3; for (let i = 0; i < len; i++) { const strong = i % 4 === 0; if (rnd() > (strong ? 0.9 : density)) { o.push(-1); continue; } cur = Math.max(0, Math.min(7, cur + Math.round((rnd() - 0.5) * 4))); o.push(cur); } return o; }
+  // ชุดเพลง: คอร์ด 4 ห้อง, สเกลทำนอง, รูปแบบกลอง
   const SONGS = {
-    // ห้องรอ: บรรยากาศมืด ตึงเครียด ช้า
-    lobby: { bpm: 76, chords: [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [40, 47, 52, 56]], scale: [57, 60, 62, 64, 67, 69, 72], mel: melody(311, 64, 0.12, 7), lead: 'sine', drums: 1, pad: true, vol: 0.85 },
-    // แข่ง: จังหวะหนัก เบสกระแทก แบบหนังแอ็กชัน
-    race: { bpm: 128, chords: [[45, 52, 57], [41, 48, 53], [38, 45, 50], [40, 47, 52]], scale: [57, 60, 62, 64, 65, 67, 69, 72], mel: melody(97, 64, 0.35, 8), lead: 'triangle', drums: 2, pad: false, vol: 0.85 },
-    zombie: { bpm: 104, chords: [[40, 47, 52, 55], [41, 48, 53, 56], [40, 47, 52, 55], [39, 46, 51, 54]], scale: [52, 55, 56, 59, 60, 63, 64, 67], mel: melody(666, 64, 0.22, 8), lead: 'sine', drums: 4, pad: true, vol: 0.9 },
-    bkk: { bpm: 122, chords: [[38, 45, 50], [36, 43, 48], [33, 40, 45], [35, 42, 47]], scale: [62, 64, 67, 69, 71, 74, 76, 79], mel: melody(1234, 64, 0.45, 8), lead: 'ranat', drums: 3, pad: false, vol: 0.8 },
+    lobby: { bpm: 112, kit: 'half', chords: [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], scale: [69, 72, 74, 76, 79, 81, 84, 86], mel: seq(311, 64, 0.32), arp: true, vol: 0.8 },
+    race: { bpm: 140, kit: 'four', chords: [[52, 55, 59], [48, 52, 55], [55, 59, 62], [50, 54, 57]], scale: [64, 66, 67, 69, 71, 74, 76, 79], mel: seq(97, 64, 0.5), arp: true, stab: true, vol: 0.85 },
+    battle: { bpm: 152, kit: 'break', chords: [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]], scale: [62, 64, 65, 67, 69, 70, 73, 74], mel: seq(4242, 64, 0.42), reese: true, stab: true, vol: 0.85 },
+    zombie: { bpm: 126, kit: 'break', chords: [[40, 43, 47], [41, 44, 48], [40, 43, 47], [39, 42, 46]], scale: [52, 55, 56, 59, 60, 63, 64, 67], mel: seq(666, 64, 0.3), reese: true, choir: true, vol: 0.85 },
+    bkk: { bpm: 138, kit: 'four', chords: [[50, 54, 57], [48, 52, 55], [45, 48, 52], [47, 50, 54]], scale: [62, 64, 67, 69, 71, 74, 76, 79], mel: seq(1234, 64, 0.55), ranat: true, stab: true, vol: 0.82 },
   };
   function init() {
     if (ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     ctx = new AC();
-    master = ctx.createGain(); master.gain.value = muted ? 0 : 1; master.connect(ctx.destination);
-    musicBus = ctx.createGain(); musicBus.gain.value = 0.32; musicBus.connect(master);
-    sfxBus = ctx.createGain(); sfxBus.gain.value = 0.55; sfxBus.connect(master);
-    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    master = ctx.createGain(); master.gain.value = muted ? 0 : 1;
+    comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.18;
+    master.connect(comp); comp.connect(ctx.destination);
+    // รีเวิร์บสังเคราะห์
+    const len = ctx.sampleRate * 2.4, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    verb = ctx.createConvolver(); verb.buffer = ir; const vg = ctx.createGain(); vg.gain.value = 0.55; verb.connect(vg); vg.connect(master);
+    musicBus = ctx.createGain(); musicBus.gain.value = 0.36; musicBus.connect(master);
+    duck = ctx.createGain(); duck.connect(musicBus);          // เสียงที่ "ปั๊ม" ตามกระเดื่อง
+    verbSend = ctx.createGain(); verbSend.gain.value = 0.22; musicBus.connect(verbSend); verbSend.connect(verb);
+    sfxBus = ctx.createGain(); sfxBus.gain.value = 0.62; sfxBus.connect(master);
+    sfxVerb = ctx.createGain(); sfxVerb.gain.value = 0.35; sfxVerb.connect(verb);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     timer = setInterval(pump, 25);
   }
-  function tone(t, f, dur, type, vol, bus, attack = 0.006, glide) {
+  const env = (g, t, a, peak, dur, end = 0.0001) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(end, t + dur); };
+  function tone(t, f, dur, type, vol, bus, attack = 0.005, glide) {
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t); if (glide) o.frequency.exponentialRampToValueAtTime(glide, t + dur);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + 0.05);
+    env(g, t, attack, vol, dur); o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + 0.05);
   }
-  function noise(t, dur, vol, freq, type = 'highpass', bus = musicBus) {
+  function noise(t, dur, vol, freq, type = 'highpass', bus = musicBus, q = 0.8, sweep) {
     const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-    s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
-    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f); f.connect(g); g.connect(bus); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
+    s.buffer = noiseBuf; f.type = type; f.frequency.setValueAtTime(freq, t); f.Q.value = q; if (sweep) f.frequency.exponentialRampToValueAtTime(sweep, t + dur);
+    env(g, t, 0.002, vol, dur); s.connect(f); f.connect(g); g.connect(bus); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.05); return g;
   }
-  function kick(t, v) { tone(t, 150, 0.22, 'sine', v, musicBus, 0.002, 42); }
+  // เครื่องดนตรี
+  function kick(t, v) { tone(t, 170, 0.32, 'sine', v, musicBus, 0.002, 42); noise(t, 0.012, v * 0.35, 3500, 'highpass'); duck.gain.cancelScheduledValues(t); duck.gain.setValueAtTime(0.3, t); duck.gain.linearRampToValueAtTime(1, t + 0.22); }
+  function snare(t, v) { noise(t, 0.2, v, 1900, 'bandpass', musicBus, 0.7); tone(t, 220, 0.11, 'triangle', v * 0.5, musicBus, 0.001, 150); const s = noise(t, 0.3, v * 0.25, 2500, 'highpass'); s.connect(verbSend); }
+  function clap(t, v) { for (let k = 0; k < 3; k++) noise(t + k * 0.011, 0.05 + (k === 2) * 0.12, v, 1300, 'bandpass', musicBus, 1.2); }
+  function hat(t, v, open) { noise(t, open ? 0.22 : 0.035, v, 8500, 'highpass', musicBus, 0.6); }
+  function crash(t, v) { const g = noise(t, 2.2, v, 4500, 'highpass', musicBus, 0.5); g.connect(verbSend); }
+  function riser(t, dur, v) { const g = noise(t, dur, v, 400, 'bandpass', musicBus, 2.5, 7000); g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + dur * 0.95); g.gain.linearRampToValueAtTime(0, t + dur); }
+  function bass(t, f, dur, v, reese) {
+    const fl = ctx.createBiquadFilter(), g = ctx.createGain(); fl.type = 'lowpass'; fl.Q.value = 6;
+    fl.frequency.setValueAtTime(reese ? 300 : 180, t); fl.frequency.exponentialRampToValueAtTime(reese ? 900 + Math.random() * 500 : 1400, t + 0.03); fl.frequency.exponentialRampToValueAtTime(reese ? 400 : 260, t + dur);
+    env(g, t, 0.004, v, dur + 0.02); fl.connect(g); g.connect(duck);
+    for (const dt of reese ? [-9, 9] : [0, 7]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + dur + 0.05); }
+    tone(t, f / 2, dur, 'sine', v * 0.9, duck, 0.004);
+  }
+  function supersaw(t, notes, dur, v, cutoff = 2600, attack = 0.01) {
+    const fl = ctx.createBiquadFilter(), g = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = cutoff; fl.Q.value = 0.7;
+    env(g, t, attack, v, dur); fl.connect(g); g.connect(duck);
+    for (const n of notes) for (const dt of [-18, -7, 0, 7, 18]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = midi(n); o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + dur + 0.05); }
+  }
+  function pluck(t, f, v, type = 'square') {
+    const fl = ctx.createBiquadFilter(), g = ctx.createGain(), o = ctx.createOscillator(); fl.type = 'lowpass'; fl.Q.value = 4;
+    fl.frequency.setValueAtTime(5000, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.16);
+    o.type = type; o.frequency.value = f; env(g, t, 0.002, v, 0.2); o.connect(fl); fl.connect(g); g.connect(musicBus); g.connect(verbSend); o.start(t); o.stop(t + 0.25);
+  }
+  function lead(t, f, dur, v) {
+    const g = ctx.createGain(), fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 3200; env(g, t, 0.01, v, dur); fl.connect(g); g.connect(musicBus); g.connect(verbSend);
+    for (const [ty, dt] of [['sawtooth', -6], ['square', 6]]) { const o = ctx.createOscillator(), lfo = ctx.createOscillator(), lg = ctx.createGain(); o.type = ty; o.frequency.value = f; o.detune.value = dt; lfo.frequency.value = 5.5; lg.gain.value = 9; lfo.connect(lg); lg.connect(o.detune); o.connect(fl); o.start(t); lfo.start(t); o.stop(t + dur + 0.05); lfo.stop(t + dur + 0.05); }
+  }
   function ranat(t, f, v) { tone(t, f, 0.32, 'triangle', v, musicBus, 0.002); tone(t, f * 2.01, 0.12, 'sine', v * 0.35, musicBus, 0.002); }
   function schedule(i, t) {
-    const S = song, s16 = i % 16, bar = Math.floor(i / 16) % 4, ch = S.chords[bar], beat = 60 / S.bpm, st = beat / 4, v = S.vol;
-    // เบส
-    if (S.drums === 4) { if (s16 % 4 === 0) tone(t, midi(ch[0] - 12), beat * 0.9, 'sawtooth', 0.07 * v, musicBus, 0.05); }
-    else if (S.drums >= 2) { if (s16 % 2 === 0) tone(t, midi(ch[0] - 12), st * 1.5, 'sawtooth', (s16 % 4 === 0 ? 0.16 : 0.1) * v, musicBus); if (s16 === 0) tone(t, midi(ch[0] - 24), beat * 3.5, 'sine', 0.22 * v, musicBus, 0.02); }
-    else if (s16 % 8 === 0) tone(t, midi(ch[0] - 12), beat * 1.8, 'triangle', 0.22 * v, musicBus);
-    // คอร์ด
-    if (S.pad && s16 === 0) ch.forEach(n => { tone(t, midi(n), beat * 4.2, 'sine', 0.055 * v, musicBus, 0.6); tone(t, midi(n) * 1.004, beat * 4.2, 'triangle', 0.02 * v, musicBus, 0.6); });
-    if (!S.pad && s16 === 0) ch.forEach(n => tone(t, midi(n + 12), beat * 3.6, 'sawtooth', 0.012 * v, musicBus, 0.3));
+    const S = song, s16 = i % 16, bar = Math.floor(i / 16), b4 = bar % 4, b8 = bar % 8, ch = S.chords[b4], beat = 60 / S.bpm, st = beat / 4, v = S.vol;
+    const build = b8 === 7, drop = b8 === 0 && s16 === 0;
     // กลอง
-    if (S.drums === 4) { if (s16 === 0 || s16 === 3) tone(t, 62, 0.3, 'sine', 0.45 * v, musicBus, 0.003, 38); if (s16 % 4 === 2) noise(t, 0.05, 0.03 * v, 6000); if (s16 === 8 && bar % 2) noise(t, 1.2, 0.05 * v, 300, 'lowpass'); }
-    else if (S.drums === 1) { if (s16 === 0) kick(t, 0.4 * v); if (s16 === 8) tone(t, 80, 0.5, 'sine', 0.18 * v, musicBus, 0.002, 40); if (s16 % 4 === 2) noise(t, 0.03, 0.025 * v, 9000); }
-    else {
-      if (s16 % 4 === 0) kick(t, 0.6 * v);
-      if (s16 === 4 || s16 === 12) { noise(t, 0.22, 0.26 * v, 1400, 'bandpass'); tone(t, 180, 0.12, 'triangle', 0.1 * v, musicBus, 0.002, 90); }
-      if (s16 % 2 === 0) noise(t, 0.03, (s16 % 4 === 2 ? 0.12 : 0.06) * v, 8000);
-      if (S.drums === 3 && (s16 === 6 || s16 === 14)) { tone(t, 1250, 0.25, 'sine', 0.08 * v, musicBus, 0.001); tone(t, 1870, 0.18, 'sine', 0.05 * v, musicBus, 0.001); } // ฉิ่ง
+    if (drop && bar > 0) crash(t, 0.22 * v);
+    if (S.kit === 'four') {
+      if (s16 % 4 === 0 && !(build && s16 >= 8)) kick(t, 0.85 * v);
+      if (s16 === 4 || s16 === 12) clap(t, 0.32 * v);
+      if (s16 % 4 === 2) hat(t, 0.13 * v, true); else hat(t, 0.05 * v);
+    } else if (S.kit === 'half') {
+      if (s16 === 0 || s16 === 10 || (s16 === 7 && b4 === 3)) kick(t, 0.8 * v);
+      if (s16 === 8) snare(t, 0.32 * v);
+      if (s16 % 2 === 0) hat(t, (s16 % 4 === 2 ? 0.08 : 0.04) * v);
+    } else {
+      if (s16 === 0 || s16 === 10 || (s16 === 6 && b4 % 2)) kick(t, 0.85 * v);
+      if (s16 === 4 || s16 === 12) snare(t, 0.38 * v);
+      if (s16 === 7 || s16 === 15) snare(t, 0.07 * v);
+      hat(t, (s16 % 2 ? 0.035 : 0.075) * v, s16 === 14);
     }
-    // ทำนอง
+    if (build) { if (s16 >= 8 && (S.kit !== 'half' || s16 % 2 === 0)) snare(t, (0.08 + (s16 - 8) * 0.03) * v); if (s16 === 0) riser(t, beat * 4, 0.16 * v); }
+    // เบส
+    const root = ch[0] - 24;
+    if (S.reese) { if (s16 % 8 === 0) bass(t, midi(root), beat * 1.9, 0.2 * v, true); if (s16 === 14) bass(t, midi(root + 12), st * 1.6, 0.12 * v, true); }
+    else if (S.kit === 'half') { if (s16 % 4 === 2 || s16 === 0) bass(t, midi(root + (s16 === 6 || s16 === 14 ? 12 : 0)), st * 1.8, 0.16 * v); }
+    else if (s16 % 2 === 1 || s16 % 4 === 2) bass(t, midi(root + (s16 % 4 === 2 ? 12 : 0)), st * 0.9, 0.15 * v);
+    // คอร์ด / แพด
+    if (s16 === 0 && !build) supersaw(t, ch.map(n => n + (S.choir ? 0 : 12)), beat * 4, (S.choir ? 0.05 : 0.035) * v, S.choir ? 1200 : 2400, S.choir ? 0.4 : 0.08);
+    if (S.stab && (s16 === 6 || s16 === 14) && !build) supersaw(t, ch.map(n => n + 12), st * 1.2, 0.05 * v, 4200, 0.003);
+    if (S.arp) { const n = ch[[0, 1, 2, 1][s16 % 4]] + 24 + (s16 % 8 >= 4 ? 12 : 0); pluck(t, midi(n), 0.04 * v); }
+    // ทำนองหลัก (เล่นครึ่งหลังของ 8 ห้องเพื่อให้มีช่วงพัก-ช่วงพีค)
     const m = S.mel[i % 64];
-    if (m >= 0) {
+    if (m >= 0 && b8 >= 2 && !build) {
       const f = midi(S.scale[m]);
-      if (S.lead === 'ranat') { ranat(t, f, 0.16 * v); if (s16 % 2 === 1) ranat(t + st / 2, f, 0.08 * v); }
-      else tone(t, f, st * (S.pad ? 6 : 2.2), S.lead, (S.pad ? 0.05 : 0.06) * v, musicBus, S.pad ? 0.08 : 0.01);
+      if (S.ranat) { ranat(t, f, 0.15 * v); if (s16 % 2 === 1) ranat(t + st / 2, f, 0.07 * v); }
+      else if (s16 % 2 === 0) lead(t, f, st * 1.7, 0.045 * v);
     }
   }
   function pump() {
     if (!ctx || !song) return;
     if (nextTime < ctx.currentTime) nextTime = ctx.currentTime + 0.05;
-    while (nextTime < ctx.currentTime + 0.15) { schedule(step, nextTime); nextTime += 60 / song.bpm / 4; step++; }
+    while (nextTime < ctx.currentTime + 0.18) { schedule(step, nextTime); nextTime += 60 / song.bpm / 4; step++; }
   }
   function play(name) {
     if (songName === name) return; songName = name; song = name ? SONGS[name] : null; step = 0;
     if (ctx) nextTime = ctx.currentTime + 0.1;
   }
   function sfx(kind) {
-    if (!ctx || muted) return; const t = ctx.currentTime + 0.01;
-    if (kind === 'tick') { tone(t, 120, 0.25, 'sine', 0.45, sfxBus, 0.002, 60); tone(t, 1760, 0.05, 'triangle', 0.06, sfxBus); }
-    else if (kind === 'go') { tone(t, 90, 0.8, 'sine', 0.6, sfxBus, 0.002, 40); noise(t, 0.6, 0.25, 600, 'lowpass', sfxBus); tone(t, 440, 0.6, 'sawtooth', 0.06, sfxBus, 0.01, 880); }
-    else if (kind === 'click') tone(t, 600, 0.06, 'triangle', 0.25, sfxBus);
-    else if (kind === 'right') [69, 76, 81].forEach((n, i) => tone(t + i * 0.06, midi(n), 0.4, 'sine', 0.28, sfxBus));
-    else if (kind === 'wrong') { tone(t, 220, 0.35, 'sawtooth', 0.18, sfxBus, 0.005, 110); tone(t + 0.12, 180, 0.35, 'sawtooth', 0.14, sfxBus, 0.005, 90); }
-    else if (kind === 'win') { tone(t, 55, 2.2, 'sine', 0.4, sfxBus, 0.01, 50); [[57, 0], [64, .25], [69, .5], [72, .9]].forEach(([n, d]) => { tone(t + d, midi(n), 1.6, 'sawtooth', 0.06, sfxBus, 0.05); tone(t + d, midi(n + 12), 1.6, 'sine', 0.12, sfxBus, 0.05); }); }
-    else if (kind === 'step') noise(t, 0.05, 0.06, 900, 'lowpass', sfxBus);
-    else if (kind === 'hshit') { tone(t, 2600, 0.08, 'square', 0.14, sfxBus); tone(t + 0.04, 3400, 0.1, 'sine', 0.12, sfxBus); }
-    else if (kind === 'kill') { tone(t, 880, 0.12, 'triangle', 0.25, sfxBus); tone(t + 0.1, 1320, 0.25, 'triangle', 0.25, sfxBus); }
-    else if (kind === 'headshot') { tone(t, 70, 0.9, 'sine', 0.8, sfxBus, 0.002, 30); noise(t, 0.5, 0.45, 700, 'lowpass', sfxBus); tone(t + 0.02, 2200, 1.2, 'sine', 0.12, sfxBus, 0.005); tone(t + 0.02, 3300, 0.9, 'sine', 0.06, sfxBus, 0.005); [0, 0.09, 0.18].forEach(d => noise(t + 0.25 + d, 0.08, 0.25, 4000, 'highpass', sfxBus)); }
-    else if (kind === 'hit') { tone(t, 1900, 0.05, 'square', 0.12, sfxBus); tone(t + 0.03, 2500, 0.04, 'square', 0.08, sfxBus); }
-    else if (kind === 'hurt') { tone(t, 110, 0.25, 'sine', 0.5, sfxBus, 0.002, 50); noise(t, 0.15, 0.25, 500, 'lowpass', sfxBus); }
-    else if (kind === 'pick') { tone(t, 660, 0.15, 'triangle', 0.25, sfxBus); tone(t + 0.08, 990, 0.2, 'triangle', 0.25, sfxBus); }
-    else if (kind === 'empty') tone(t, 420, 0.03, 'square', 0.15, sfxBus);
-    else if (kind === 'swap') { noise(t, 0.05, 0.2, 3000, 'highpass', sfxBus); noise(t + 0.09, 0.04, 0.2, 2500, 'highpass', sfxBus); }
+    if (!ctx || muted) return; const t = ctx.currentTime + 0.01, B = sfxBus;
+    if (kind === 'tick') { tone(t, 880, 0.12, 'square', 0.12, B); tone(t, 110, 0.3, 'sine', 0.5, B, 0.002, 55); }
+    else if (kind === 'go') { tone(t, 120, 1.2, 'sine', 0.8, B, 0.002, 35); noise(t, 1.4, 0.45, 300, 'lowpass', B).connect(sfxVerb); noise(t, 0.9, 0.25, 6000, 'highpass', B).connect(sfxVerb); [64, 67, 71, 76].forEach(n => tone(t, midi(n), 0.9, 'sawtooth', 0.05, B, 0.01)); }
+    else if (kind === 'click') { tone(t, 1400, 0.04, 'square', 0.08, B); tone(t, 700, 0.06, 'sine', 0.15, B); }
+    else if (kind === 'right') [72, 76, 79, 84].forEach((n, i) => { tone(t + i * 0.055, midi(n), 0.35, 'square', 0.07, B); tone(t + i * 0.055, midi(n), 0.45, 'sine', 0.2, B); });
+    else if (kind === 'wrong') { tone(t, 196, 0.3, 'sawtooth', 0.16, B, 0.005, 98); tone(t + 0.14, 147, 0.4, 'sawtooth', 0.14, B, 0.005, 70); }
+    else if (kind === 'win') { tone(t, 55, 2.5, 'sine', 0.5, B, 0.01, 45); crash(t, 0.3); [[[57, 64, 69], 0], [[60, 67, 72], 0.35], [[64, 69, 76], 0.7], [[65, 72, 77], 1.1]].forEach(([ns, d]) => ns.forEach(n => { tone(t + d, midi(n), 1.4, 'sawtooth', 0.04, B, 0.02); tone(t + d, midi(n + 12), 1.4, 'sine', 0.06, B, 0.02); })); }
+    else if (kind === 'step') noise(t, 0.05, 0.05, 700, 'lowpass', B);
+    else if (kind === 'hshit') { tone(t, 2800, 0.06, 'sine', 0.22, B); tone(t, 4200, 0.05, 'sine', 0.1, B); }
+    else if (kind === 'hit') { tone(t, 2400, 0.045, 'sine', 0.25, B); noise(t, 0.03, 0.12, 5000, 'highpass', B); }
+    else if (kind === 'kill') { [76, 83, 88].forEach((n, i) => tone(t + i * 0.05, midi(n), 0.3, 'square', 0.08, B)); noise(t, 0.4, 0.2, 800, 'bandpass', B, 1, 6000); tone(t, 80, 0.4, 'sine', 0.5, B, 0.002, 40); }
+    else if (kind === 'headshot') { tone(t, 70, 1.0, 'sine', 0.85, B, 0.002, 28); noise(t, 0.6, 0.4, 600, 'lowpass', B); const d = noise(t, 1.3, 0.12, 3000, 'bandpass', B, 8); d.connect(sfxVerb); tone(t + 0.01, 2200, 1.3, 'sine', 0.14, B, 0.004); tone(t + 0.01, 3310, 1.0, 'sine', 0.07, B, 0.004); }
+    else if (kind === 'hurt') { tone(t, 95, 0.3, 'sine', 0.6, B, 0.002, 45); noise(t, 0.2, 0.3, 450, 'lowpass', B); }
+    else if (kind === 'pick') { [0, 4, 7, 12].forEach((s, i) => tone(t + i * 0.045, midi(79 + s), 0.25, 'triangle', 0.16, B)); noise(t, 0.3, 0.08, 6000, 'highpass', B).connect(sfxVerb); }
+    else if (kind === 'empty') { tone(t, 900, 0.025, 'square', 0.12, B); noise(t, 0.02, 0.2, 3000, 'highpass', B); }
+    else if (kind === 'swap') { noise(t, 0.04, 0.22, 2600, 'bandpass', B, 3); noise(t + 0.08, 0.05, 0.25, 1800, 'bandpass', B, 3); tone(t + 0.08, 300, 0.05, 'square', 0.05, B); }
   }
   function shot(w, vol = 1) {
-    if (!ctx || muted) return; const t = ctx.currentTime + 0.005;
-    if (w === 2) { noise(t, 0.35, 0.7 * vol, 900, 'bandpass', sfxBus); tone(t, 140, 0.4, 'sine', 0.7 * vol, sfxBus, 0.001, 35); noise(t + 0.05, 0.9, 0.12 * vol, 300, 'lowpass', sfxBus); }
-    else if (w) { noise(t, 0.07, 0.4 * vol, 1500, 'bandpass', sfxBus); tone(t, 130, 0.07, 'sine', 0.35 * vol, sfxBus, 0.001, 60); }
-    else { noise(t, 0.16, 0.55 * vol, 1200, 'bandpass', sfxBus); tone(t, 170, 0.16, 'sine', 0.5 * vol, sfxBus, 0.001, 50); noise(t + 0.02, 0.25, 0.08 * vol, 400, 'lowpass', sfxBus); }
+    if (!ctx || muted) return; const t = ctx.currentTime + 0.003, B = sfxBus;
+    noise(t, 0.012, 0.9 * vol, 4000, 'highpass', B);                                   // จังหวะแตก (crack)
+    if (w === 2) { noise(t, 0.45, 0.85 * vol, 700, 'bandpass', B, 0.6); tone(t, 120, 0.55, 'sine', 0.95 * vol, B, 0.001, 30); noise(t + 0.03, 1.6, 0.25 * vol, 350, 'lowpass', B).connect(sfxVerb); noise(t + 0.25, 0.9, 0.08 * vol, 900, 'bandpass', B).connect(sfxVerb); }
+    else if (w === 1) { noise(t, 0.09, 0.55 * vol, 1300, 'bandpass', B, 0.7); tone(t, 140, 0.1, 'sine', 0.55 * vol, B, 0.001, 50); noise(t + 0.02, 0.35, 0.08 * vol, 500, 'lowpass', B).connect(sfxVerb); }
+    else { noise(t, 0.18, 0.7 * vol, 1000, 'bandpass', B, 0.7); tone(t, 165, 0.2, 'sine', 0.7 * vol, B, 0.001, 45); noise(t + 0.02, 0.6, 0.12 * vol, 450, 'lowpass', B).connect(sfxVerb); }
   }
   function toggleMute() { muted = !muted; localStorage.hrMute = muted ? '1' : '0'; if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.05); return muted; }
   return { init, play, sfx, shot, toggleMute, get muted() { return muted; }, resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); } };
@@ -3314,7 +3436,7 @@ function render() {
     $('#modeLbl').textContent = shootMode ? '🎯 ยิงปืน' : '🏁 วิ่งแข่ง · สนามกีฬา';
     show('#mapsBox', shootMode);
     show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
-    if (shootMode) { const mi = (S.map | 0) || 1, im = $('#mapPrevImg'), src = `assets/map${mi}.jpg`; if (!im.src.endsWith(src)) im.src = src; $('#mapPrevCap').innerHTML = `<b>${MAPS[mi].name}</b><small>${MAPS[mi].sub || ''} · พื้นที่ 102×102 ม. มีรั้วพลังงานรอบสนาม</small>`; }
+    if (shootMode) { const mi = (S.map | 0) || 1, im = $('#mapPrevImg'), src = `assets/map${mi}.jpg`; if (!im.src.endsWith(src)) im.src = src; $('#mapPrevCap').innerHTML = `<b>${MAPS[mi].name}</b><small>${MAPS[mi].sub || ''} · พื้นที่ 102×102 ม.</small>`; }
     if (shootMode) $('#maps').innerHTML = MAPS.map((m, i) => i === 0 ? '' : `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${m.name}<small style="display:block;font-size:10px;opacity:.7">${m.sub || ''}</small></button>`).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
@@ -3336,7 +3458,7 @@ function render() {
   if (st === 'finished' && !sfxFinished) { sfxFinished = true; Music.sfx('win'); }
   if (st !== 'finished') sfxFinished = false;
   if (st === 'battle' || (shootMode && st === 'countdown')) renderBattleHud();
-  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' || st === 'battle' ? (S.map === 2 ? 'zombie' : S.map === 1 ? 'bkk' : 'race') : 'lobby');
+  Music.play(st === 'countdown' || st === 'question' || st === 'reveal' || st === 'battle' ? (S.map === 2 ? 'zombie' : S.mode === 'shoot' ? 'battle' : S.map === 1 ? 'bkk' : 'race') : 'lobby');
   if (st === 'reveal' && S.results) {
     $('#roundResult').innerHTML = `<h4>ผลข้อที่ ${S.round} · ตอบ ${S.q.answer}</h4>` + S.results.map(x => {
       const p = S.players.find(q => q.id === x.id); if (!p) return '';
@@ -3609,7 +3731,7 @@ function pickGeo() {
 }
 function makePickup(k) {
   const G = pickGeo(), col = PICK_COL[k], special = k === 'inf' || k === 'god', sc = special ? 1.25 : 1;
-  const m = new THREE.Group(); m.userData.k = k;
+  const m = new THREE.Group(); m.userData.k = k; m.userData.noCrop = true;
   const base = new THREE.Mesh(G.base, G.ped); base.position.y = -1.02; base.castShadow = true; base.receiveShadow = true; m.add(base);
   const bt = new THREE.Mesh(G.baseTop, G.frame); bt.position.y = -0.91; m.add(bt);
   const glowB = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
@@ -3662,10 +3784,10 @@ function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i
 
 /* ---------- พรีวิวตัวละครเต็มตัว + ท่าแอคติ้ง ---------- */
 const EMOTE_T = 3.4, BLEND_T = 0.5;
-const emoDur = n => n === 'tactical' ? 7.3 : n === 'titan' ? 6.3 : EMOTE_T, emoT = (n, tl, tg) => (n === 'tactical' || n === 'titan') ? tl : tg;
+const emoDur = n => n === 'tactical' ? 7.3 : n === 'titan' ? 6.3 : n === 'shade' ? 6.8 : EMOTE_T, emoT = (n, tl, tg) => (n === 'tactical' || n === 'titan' || n === 'shade') ? tl : tg;
 // ท่าประจำตัวของตัวละครแต่ละตัว (ไม่ซ้ำกัน)
-const SIG = ['tactical', 'titan'];
-const SIG_NAME = ['สัญญาณยุทธวิธี', 'พลังไททัน'];
+const SIG = ['tactical', 'shade', 'titan'];
+const SIG_NAME = ['สัญญาณยุทธวิธี', 'สายลับเงา', 'พลังไททัน'];
 const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'flex'];
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, gunAim: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
@@ -3711,6 +3833,13 @@ function pvPose(name, t) {
       const Q = heroMix([hold, point, comm], A);
       P.a = [Q.a0, [-0.12 + sw * 0.03, 0.2]]; P.e = [Q.e0, [-0.32 + sw * 0.04, 0]]; P.hy = Q.hy + Math.sin(t * 0.7) * 0.08; P.hx = Q.hx; P.hz = Q.hz || 0; P.bz = Q.bz; P.bx = Q.bx || 0;
       P.l = Q.l; P.k = Q.k; P.ry = Q.ry; P.by += Q.by || 0; break; }
+    case 'shade': { // กอดอกเอียงสะโพก → ชี้นิ้วท้าทาย → มือเท้าเอวมองข้ามไหล่
+      const c = t % 6.8, A = heroPh(c, [0, 2.4, 4.6, 6.8]), sw = Math.sin(t * 1.3);
+      const cross = { a0: [-0.62, 0.3], e0: [-1.75, 0.85], a1: [-0.62, -0.3], e1: [-1.75, -0.85], bz: 0.07 + sw * 0.015, l: [0.05, -0.16], k: [0.06, 0.3], hx: 0.06, hy: 0.25, hz: -0.1, ry: 0.2 };
+      const point = { a0: [-1.4, -0.12], e0: [-0.15, 0], a1: [-0.15, 0.55], e1: [-0.4, -1.4], bz: -0.05, l: [-0.2, 0.15], k: [0.2, 0.12], hx: 0.12, hy: -0.12, hz: 0.12, ry: -0.25 };
+      const hip = { a0: [-0.2, -0.6], e0: [-0.35, 1.5], a1: [-0.25, 0.62], e1: [-0.35, -1.5], bz: 0.09, l: [0.08, -0.2], k: [0.05, 0.35], hx: -0.04, hy: 0.55, hz: 0.06, ry: -0.35 };
+      const Q = heroMix([cross, point, hip], A);
+      P.a = [Q.a0, Q.a1]; P.e = [Q.e0, Q.e1]; P.bz = Q.bz; P.l = Q.l; P.k = Q.k; P.hx = Q.hx; P.hy = Q.hy + Math.sin(t * 0.7) * 0.06; P.hz = Q.hz; P.ry = Q.ry; break; }
     case 'titan': { // ทุบกำปั้นใส่ฝ่ามือ → ตั้งท่าเบ่งพลังคำราม
       const c = t % 6.4, A = heroPh(c, [0, 3.2, 6.4]), hit = Math.pow(Math.max(0, Math.sin(t * 6.2)), 6);
       const pound = { a0: [-1.02, 0.42], e0: [-1.25 - hit * 0.35, 0.1], a1: [-0.98, -0.4], e1: [-1.32, -0.1], bx: 0.06 + hit * 0.03, by: -0.05 - hit * 0.03, hx: 0.08 + hit * 0.05, l: [-0.15, 0.18], k: [0.28, 0.3], ry: 0.12 };
@@ -4437,23 +4566,30 @@ function shooterFrame(dt, t) {
 }
 // ---------- แผนที่ย่อ ----------
 const MINI = {};
-// รั้วพลังงานรอบพื้นที่เล่น (ให้เห็นขอบเขตชัดเจน)
-const FENCES = [];
-function playFence(m) {
-  if (FENCES[m] || !PLAY[m]) return FENCES[m];
-  const B = PLAY[m], g = new THREE.Group(); g.visible = false; scene.add(g);
-  const tex = canvasTex(8, 128, x => { const gr = x.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, 'rgba(57,255,20,0)'); gr.addColorStop(0.75, 'rgba(57,255,20,0.35)'); gr.addColorStop(1, 'rgba(57,255,20,0.9)'); x.fillStyle = gr; x.fillRect(0, 0, 8, 128); });
-  const wm = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }), H = 5;
-  const pm = metalMat('#1b1e22'), nm = neonMat('#39FF14');
-  const side = (x0, z0, x1, z1) => {
-    const len = Math.hypot(x1 - x0, z1 - z0), w = new THREE.Mesh(new THREE.PlaneGeometry(len, H), wm); w.position.set((x0 + x1) / 2, H / 2, (z0 + z1) / 2); w.rotation.y = Math.atan2(-(z1 - z0), x1 - x0); g.add(w);
-    const n = Math.round(len / 8);
-    for (let i = 0; i <= n; i++) { const t = i / n, x = x0 + (x1 - x0) * t, z = z0 + (z1 - z0) * t; const p = new THREE.Mesh(new THREE.BoxGeometry(0.3, H + 0.4, 0.3), pm); p.position.set(x, (H + 0.4) / 2, z); g.add(p); const l = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, 0.34), nm); l.position.set(x, H + 0.15, z); g.add(l); }
-  };
-  side(B.x0, B.z0, B.x1, B.z0); side(B.x1, B.z0, B.x1, B.z1); side(B.x1, B.z1, B.x0, B.z1); side(B.x0, B.z1, B.x0, B.z0);
-  return (FENCES[m] = g);
+// ด่านยิง: ตัดทุกอย่างที่อยู่นอกพื้นที่เล่นออก (คงพื้น/ท้องฟ้า/ทะเลไว้) — คืนค่าเมื่อออกจากด่าน
+const CROP = { m: null, list: [], inst: [] };
+function cropMap(m) {
+  if (CROP.m === m) return;
+  for (const o of CROP.list) o.visible = true;
+  for (const [im, i, mt] of CROP.inst) { im.setMatrixAt(i, mt); im.instanceMatrix.needsUpdate = true; }
+  CROP.list = []; CROP.inst = []; CROP.m = m;
+  const B = m != null && PLAY[m]; if (!B) return;
+  scene.updateMatrixWorld(true);
+  const bx = new THREE.Box3(), M = new THREE.Matrix4(), Z = new THREE.Matrix4().makeScale(0, 0, 0), v = new THREE.Vector3(), mg = 1.5;
+  const outside = (x0, x1, z0, z1) => x1 < B.x0 - mg || x0 > B.x1 + mg || z1 < B.z0 - mg || z0 > B.z1 + mg;
+  scene.traverseVisible(o => {
+    if (!(o.isMesh || o.isSprite || o.isPoints || o.isLine)) return;
+    for (let q = o; q; q = q.parent) if (q.userData.noCrop) return;
+    if (o.isInstancedMesh) {
+      for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, M); v.setFromMatrixPosition(M).applyMatrix4(o.matrixWorld); if (outside(v.x, v.x, v.z, v.z)) { CROP.inst.push([o, i, M.clone()]); o.setMatrixAt(i, Z); } }
+      o.instanceMatrix.needsUpdate = true; return;
+    }
+    bx.setFromObject(o); if (bx.isEmpty()) return;
+    if (bx.max.x - bx.min.x > 140 || bx.max.z - bx.min.z > 140) return;
+    if (outside(bx.min.x, bx.max.x, bx.min.z, bx.max.z)) { o.visible = false; CROP.list.push(o); }
+  });
 }
-function fenceTick() { const on = !!(S && S.mode === 'shoot' && S.state !== 'lobby' && S.players.some(p => p.id === myId)); for (let m = 1; m < PLAY.length; m++) { const f = on && S.map === m ? playFence(m) : FENCES[m]; if (f) f.visible = on && S.map === m; } }
+function fenceTick() { const inR = !!(S && S.players.some(p => p.id === myId)), on = inR && S.mode === 'shoot' && S.state !== 'lobby'; cropMap(on ? S.map : null); (world.propG || []).forEach((g, m) => { if (g) g.visible = inR && S.state !== 'lobby' && S.map === m; }); }
 function miniExtent(m) { const B = PLAY[m]; return B ? Math.max(-B.x0, B.x1, -B.z0, B.z1) + 2 : L / 2 + ARENA[m] + 2; }
 function miniStatic(m) {
   if (MINI[m]) return MINI[m];

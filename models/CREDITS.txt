@@ -17,3 +17,10 @@ models/gun_rifle.glb - "Gun M4A1" by Ivan008 (https://sketchfab.com/hukan008)
 models/gun_sniper.glb - "Sniper" by DJMaesen (https://sketchfab.com/bumstrum)
   https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae - CC BY 4.0
   Changes: decimated, re-oriented and rescaled, textures downsized.
+
+models/shade.glb - "Sexy Gangsta Girl 3" by EXOTIKA (https://sketchfab.com/exotika.3d)
+  https://sketchfab.com/3d-models/sexy-gangsta-girl-3-aa1897f7fa684e83ae4e06c02f9dfea1 - CC BY 4.0
+  Changes: dog, leash and gun removed, decimated, rigged to the game skeleton, legs straightened.
+models/props.glb - scene props, CC0:
+  Quaternius packs (street, survival, cyberpunk, RTS) via https://github.com/trebeljahr/quaternius-showcase
+  Brazil Lowpoly Props Kit by kayquer - https://github.com/kayquer/kit-props-brasil-lowpoly
