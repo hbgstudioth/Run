@@ -179,6 +179,21 @@
     #pvName { font-size: 32px; bottom: 22px; }
     .lbRight { position: relative; right: auto; top: 0; bottom: auto; width: auto; margin: 0 10px 14px; overflow: visible; }
   }
+  /* ห้องรอ: แถวตัวละคร 3D ด้านซ้าย + แผงควบคุมด้านขวา */
+  #lobby { padding: 0; display: block; overflow: hidden; }
+  #lobby:not(.hidden)::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 50%, rgba(5,5,5,.75) 72%), linear-gradient(180deg, rgba(5,5,5,.6), transparent 16%, transparent 82%, rgba(5,5,5,.6)); }
+  #lobby .panel { position: absolute; right: 18px; top: 18px; bottom: 18px; width: min(410px, 34vw); overflow-y: auto; margin: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: linear-gradient(180deg, rgba(57,255,20,.07), transparent 120px), rgba(8,10,8,.84); }
+  .roomTop { position: absolute; left: 18px; top: 16px; display: flex; gap: 10px; align-items: center; z-index: 3; }
+  .roomTop .btn { width: auto; padding: 10px 16px; font-size: 15px; background: rgba(5,5,5,.7); border-color: rgba(57,255,20,.4); }
+  .roomChip { font-family: "Oswald", sans-serif; font-size: 13px; letter-spacing: .2em; color: var(--silver, #c0c0c0); background: rgba(5,5,5,.7); border: 1px solid rgba(255,255,255,.14); padding: 9px 14px; }
+  .roomChip b { color: #39ff14; font-size: 18px; letter-spacing: .15em; margin-left: 6px; }
+  #lobby .looks { grid-template-columns: repeat(4, 1fr); margin-bottom: 8px; } #lobby .look.sel { border-color: #39ff14; box-shadow: 0 0 12px rgba(57,255,20,.35); }
+  #lobby .skins { margin-bottom: 10px; }
+  @media (max-width: 900px), (pointer: coarse) and (max-aspect-ratio: 23/20) {
+    #lobby:not(.hidden)::before { background: linear-gradient(180deg, rgba(5,5,5,.5), transparent 12%, transparent 38%, rgba(5,5,5,.85) 50%); }
+    #lobby .panel { left: 8px; right: 8px; width: auto; top: 44vh; bottom: 8px; }
+    .roomTop { left: 8px; top: 8px; } .roomTop .btn { padding: 8px 12px; font-size: 13px; }
+  }
   .code { font-family: "Oswald", sans-serif; font-size: 44px; font-weight: 600; letter-spacing: .35em; text-align: center; color: var(--acc); margin: 0 0 6px; padding-left: .35em; }
   .lobbyHead { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 7px; font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
   .lobbyHead b { font-weight: 400; }
@@ -434,6 +449,7 @@
 
   <!-- ล็อบบี้ -->
   <section id="lobby" class="screen hidden">
+    <div class="roomTop"><button id="backBtn" class="btn ghost">‹ กลับหน้าแรก</button><div class="roomChip">ROOM <b id="roomCode2"></b></div></div>
     <div class="panel">
       <div class="small">รหัสห้อง</div>
       <div id="roomCode" class="code"></div>
@@ -441,6 +457,9 @@
       <button id="copyBtn" class="btn ghost">คัดลอกลิงก์เชิญ</button>
       <div class="lobbyHead"><b>นักวิ่งในห้อง</b><span id="count" class="small"></span></div>
       <ul id="lobbyList"></ul>
+      <div class="lobbyHead"><b>ตัวละครของคุณ</b><span id="mySig" class="small"></span></div>
+      <div id="roomLooks" class="looks"></div>
+      <div id="roomSkinsBox"><div class="lobbyHead"><b>SKIN ชุดรบ</b></div><div id="roomSkins" class="skins"></div></div>
       <div class="lobbyHead"><b>หมวด</b><span id="modeLbl" style="color:var(--txt);font-size:14px;letter-spacing:0"></span></div>
       <div id="mapsBox"><div class="lobbyHead"><b>เลือกด่าน</b></div>
       <div id="maps" class="diffs" style="grid-template-columns:repeat(2,1fr)"></div></div>
@@ -1223,6 +1242,76 @@ function buildZombie() {
     world.zombies.push({ g: z, legs, arms, body, bx: x, bz: zz, ph: Math.random() * 6, v: rnd(0.5, 1), side });
   }
 }
+/* ---------- ฉากไซไฟ (หน้าแรก + ห้องรอ) ---------- */
+function buildSciFi() {
+  const g = new THREE.Group(); g.visible = false; scene.add(g); world.sf = g;
+  const R = seeded(777), A = { drones: [], blinks: [], beams: [], holo: [] };
+  const em = (c, on = 1.4) => { const m = new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0, roughness: 0.4 }); world.nightMats.push({ m, on }); return m; };
+  // พื้นเหล็กลายกริดนีออน
+  const grid = (neon) => canvasTex(256, 256, (x) => {
+    x.fillStyle = neon ? '#000' : '#0d1210'; x.fillRect(0, 0, 256, 256);
+    if (!neon) for (let i = 0; i < 900; i++) { const v = R() < .5 ? 0 : 255; x.fillStyle = `rgba(${v},${v},${v},${R() * 0.05})`; x.fillRect(R() * 256, R() * 256, 1 + R() * 3, 1 + R() * 3); }
+    x.strokeStyle = neon ? '#39ff14' : 'rgba(57,255,20,.4)'; x.lineWidth = 2; x.strokeRect(1, 1, 254, 254);
+    x.strokeStyle = neon ? 'rgba(57,255,20,.25)' : 'rgba(140,160,150,.18)'; x.lineWidth = 1; for (const k of [64, 128, 192]) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k, 256); x.moveTo(0, k); x.lineTo(256, k); x.stroke(); }
+  });
+  const ft = grid(false), fe = grid(true); for (const t of [ft, fe]) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(140, 140); }
+  const floorM = new THREE.MeshStandardMaterial({ map: ft, emissiveMap: fe, emissive: '#ffffff', emissiveIntensity: 0, metalness: 0.75, roughness: 0.3 }); world.nightMats.push({ m: floorM, on: 0.9 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(700, 700), floorM); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; g.add(floor);
+  // เวที
+  const dark = new THREE.MeshStandardMaterial({ color: '#141a17', metalness: 0.85, roughness: 0.28 }), neonG = em('#39ff14', 2.2), neonC = em('#7fe9ff', 1.6), silver = new THREE.MeshStandardMaterial({ color: '#c0c0c0', metalness: 0.95, roughness: 0.2 });
+  const plat = new THREE.Mesh(new THREE.CylinderGeometry(9.5, 10, 0.3, 64), dark); plat.position.y = -0.15; plat.receiveShadow = true; g.add(plat);
+  for (const [r0, t0, m0] of [[9.6, 0.07, neonG], [6.2, 0.03, neonG], [10.4, 0.05, neonC]]) { const rg = new THREE.Mesh(new THREE.TorusGeometry(r0, t0, 6, 96), m0); rg.rotation.x = Math.PI / 2; rg.position.y = 0.01; g.add(rg); }
+  for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.02, 3.2), neonG); b.position.set(Math.sin(a) * 7.9, 0.012, Math.cos(a) * 7.9); b.rotation.y = a; g.add(b); }
+  // ซุ้มประตูโค้งด้านหลัง
+  const arc = new THREE.Mesh(new THREE.TorusGeometry(15, 0.7, 10, 80, Math.PI), dark); arc.position.set(0, 0, -15); g.add(arc);
+  const arcN = new THREE.Mesh(new THREE.TorusGeometry(14.2, 0.1, 6, 80, Math.PI), neonG); arcN.position.set(0, 0, -14.6); g.add(arcN);
+  const arcS = new THREE.Mesh(new THREE.TorusGeometry(15.8, 0.08, 6, 80, Math.PI), neonC); arcS.position.set(0, 0, -15.3); g.add(arcS);
+  for (const sd of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(2.2, 4, 2.2), dark); p.position.set(sd * 15, 2, -15); g.add(p); const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.4, 2.24), neonG); s2.position.set(sd * 15 + sd * 1.12, 2, -15); g.add(s2); }
+  // โฮโลแกรมโลโก้ HAXY MATCH
+  const holoTex = new THREE.TextureLoader().load('logo.png'); holoTex.colorSpace = THREE.SRGBColorSpace;
+  const holo = new THREE.Mesh(new THREE.PlaneGeometry(26, 8.7), new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+  holo.position.set(0, 17, -32); g.add(holo); A.holo.push(holo);
+  const scan = new THREE.Mesh(new THREE.PlaneGeometry(30, 11), new THREE.MeshBasicMaterial({ color: '#39ff14', transparent: true, opacity: 0.05, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); scan.position.set(0, 17, -32.2); g.add(scan); A.holo.push(scan);
+  const beamUp = new THREE.Mesh(new THREE.CylinderGeometry(9, 2, 12, 32, 1, true), new THREE.MeshBasicMaterial({ color: '#39ff14', transparent: true, opacity: 0.04, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })); beamUp.position.set(0, 9, -32); g.add(beamUp);
+  // ตึกอนาคต
+  const winTex = (acc) => { const t = canvasTex(64, 256, (x) => { x.fillStyle = '#0a1018'; x.fillRect(0, 0, 64, 256); for (let r = 0; r < 42; r++) for (let c = 0; c < 6; c++) { const q = R(); x.fillStyle = q < 0.32 ? '#a9dcff' : q < 0.38 ? acc : q < 0.45 ? '#ffd9a0' : '#101824'; x.fillRect(3 + c * 10, 3 + r * 6, 7, 3); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  const wins = [winTex('#39ff14'), winTex('#7fe9ff'), winTex('#c0c0c0')].map(t => { const m = new THREE.MeshStandardMaterial({ map: t, emissiveMap: t, emissive: '#ffffff', emissiveIntensity: 0, metalness: 0.6, roughness: 0.25, color: '#9aa6b4' }); world.nightMats.push({ m, on: 1.1 }); return m; });
+  const blinkM = em('#ff3b30', 3);
+  for (let i = 0; i < 90; i++) {
+    const a = R() * Math.PI * 2, d = 55 + Math.pow(R(), 0.7) * 230, x = Math.sin(a) * d, z = Math.cos(a) * d - 40;
+    if (z > 10 && Math.abs(x) < 70) continue; // เว้นด้านหน้ากล้อง
+    const h = 30 + R() * (d > 140 ? 170 : 90), w = 8 + R() * 14, sides = [4, 6, 8][(R() * 3) | 0], top = w * (0.35 + R() * 0.6);
+    const tw = new THREE.Mesh(new THREE.CylinderGeometry(top / 1.4, w / 1.4, h, sides), wins[i % 3]); tw.position.set(x, h / 2, z); tw.rotation.y = R() * 3;
+    tw.material = wins[i % 3]; tw.material.map.repeat.set(sides / 2, h / 40); g.add(tw);
+    if (R() < 0.55) { const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.4, h * 0.9, 0.4), R() < .6 ? neonG : neonC); s2.position.set(x + w / 1.45, h * 0.45, z); g.add(s2); }
+    if (R() < 0.45) { const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.5, 14, 6), silver); sp.position.set(x, h + 7, z); g.add(sp); const bl = new THREE.Mesh(new THREE.SphereGeometry(0.55, 8, 6), blinkM); bl.position.set(x, h + 14.3, z); g.add(bl); A.blinks.push({ m: bl, ph: R() * 6 }); }
+    if (R() < 0.25) { const rg = new THREE.Mesh(new THREE.TorusGeometry(w / 1.2, 0.35, 6, 32), R() < .5 ? neonG : neonC); rg.rotation.x = Math.PI / 2; rg.position.set(x, h * (0.5 + R() * 0.4), z); g.add(rg); }
+  }
+  // โดรน / ยานบินวนรอบเมือง
+  const hullM = new THREE.MeshStandardMaterial({ color: '#1a1f24', metalness: 0.8, roughness: 0.3 });
+  for (let i = 0; i < 9; i++) {
+    const d = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(5, 1.2, 9), hullM); d.add(b);
+    for (const sd of [-1, 1]) { const wg = new THREE.Mesh(new THREE.BoxGeometry(4, 0.25, 3), hullM); wg.position.set(sd * 4, 0, 1); d.add(wg); const lt = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.6), sd < 0 ? neonG : neonC); lt.position.set(sd * 5.8, 0, 1); d.add(lt); }
+    const en = new THREE.Mesh(new THREE.BoxGeometry(3, 0.6, 0.3), neonC); en.position.set(0, 0, -4.6); d.add(en);
+    g.add(d); A.drones.push({ g: d, r: 60 + R() * 120, y: 28 + R() * 40, sp: (0.03 + R() * 0.05) * (R() < .5 ? 1 : -1), ph: R() * 6, cz: -60 });
+  }
+  // การจราจรลอยฟ้า
+  const TN = 260, tr = new THREE.InstancedMesh(new THREE.BoxGeometry(0.5, 0.25, 2.2), em('#ffe2a0', 2.5), TN); tr.frustumCulled = false; g.add(tr);
+  A.traffic = { m: tr, cars: Array.from({ length: TN }, (_, i) => ({ lane: i % 5, u: R() * Math.PI * 2, v: (0.04 + R() * 0.03) * (i % 2 ? 1 : -1) })) };
+  // ไฟส่องฟ้า
+  for (let k = 0; k < 5; k++) { const bm = new THREE.Mesh(new THREE.ConeGeometry(4, 160, 20, 1, true).translate(0, -80, 0), new THREE.MeshBasicMaterial({ color: k % 2 ? '#7fe9ff' : '#39ff14', transparent: true, opacity: 0.06, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })); const pv = new THREE.Group(); pv.position.set(-120 + k * 60, 0, -150); bm.rotation.x = Math.PI; pv.add(bm); g.add(pv); A.beams.push({ g: pv, ph: k * 1.3 }); }
+  world.sfAnim = A;
+}
+function sfTick(dt, t) {
+  const A = world.sfAnim; if (!A || !world.sf.visible) return;
+  for (const d of A.drones) { const a = d.ph + t * d.sp; d.g.position.set(Math.sin(a) * d.r, d.y + Math.sin(t * 0.7 + d.ph) * 2, Math.cos(a) * d.r + d.cz); d.g.rotation.y = a + (d.sp > 0 ? Math.PI / 2 : -Math.PI / 2) + Math.PI; }
+  for (const b of A.blinks) b.m.visible = Math.sin(t * 3 + b.ph) > 0.2;
+  for (const b of A.beams) { b.g.rotation.z = Math.sin(t * 0.25 + b.ph) * 0.4; b.g.rotation.x = Math.cos(t * 0.2 + b.ph) * 0.25; }
+  const fl = 0.82 + Math.sin(t * 13) * 0.04 + (Math.sin(t * 2.7) > 0.97 ? -0.4 : 0); A.holo[0].material.opacity = fl; A.holo[0].position.y = 17 + Math.sin(t * 0.8) * 0.25;
+  const T = A.traffic, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), s = new THREE.Vector3(1, 1, 1);
+  T.cars.forEach((c, i) => { c.u += c.v * dt; const r = 90 + c.lane * 28, y = 22 + c.lane * 7; p.set(Math.sin(c.u) * r, y, Math.cos(c.u) * r - 60); q.setFromEuler(e.set(0, c.u + (c.v > 0 ? Math.PI / 2 : -Math.PI / 2), 0)); m4.compose(p, q, s); T.m.setMatrixAt(i, m4); });
+  T.m.instanceMatrix.needsUpdate = true;
+}
 const MAPS = [
   { name: 'สนามกีฬา', track: '#a3452f', sub: 'ลู่วิ่ง ลานกว้าง' },
   { name: 'ถนนกรุงเทพ', track: '#35393f', sub: 'ตึกแถว ตรอกซอย รถไฟฟ้า' },
@@ -1244,14 +1333,15 @@ const ENV = [
   [{ top: '#4f8ad0', bot: '#e6e2da', fog: 0xd6dbdf, fn: 170, ff: 620, sky: 0xeef2f6, gnd: 0x5a5650, hemi: 1.15, sun: 0xfff0dc, sunI: 3.0, exp: 1.0, sp: [-50, 70, 40], cloud: '#ffffff' },
    { top: '#050a18', bot: '#1d2a40', fog: 0x121a28, fn: 100, ff: 420, sky: 0x8aa0c8, gnd: 0x0c0c0c, hemi: 0.7, sun: 0xb8c8f0, sunI: 1.3, exp: 1.2, sp: [-40, 70, 30], cloud: '#1e2636' }],
 ];
+{ const sfE = { top: '#071226', bot: '#24506a', fog: 0x13283a, fn: 80, ff: 460, sky: 0xa8c8ff, gnd: 0x0a0f0c, hemi: 0.95, sun: 0xd2e4ff, sunI: 1.7, exp: 1.08, sp: [-40, 60, 35], cloud: '#2c3a4e' }; ENV[5] = [sfE, sfE]; }
 const sunOff = new THREE.Vector3(40, 90, 30);
 let curEnv = '';
 function applyMap(m, tod = 0) {
-  m = Math.max(0, Math.min(MAPS.length - 1, m | 0)); tod = tod ? 1 : 0;
+  m = m === 5 ? 5 : Math.max(0, Math.min(MAPS.length - 1, m | 0)); tod = tod ? 1 : 0; if (m === 5) tod = 1;
   const key = m + '-' + tod; if (key === curEnv || !world.bkk) return; curEnv = key;
   const e = ENV[m][tod];
-  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2; if (world.town) world.town.visible = m === 3; if (world.harbor) world.harbor.visible = m === 4; world.trackG.visible = m === 0;
-  world.trackMat.color.set(MAPS[m].track);
+  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2; if (world.town) world.town.visible = m === 3; if (world.harbor) world.harbor.visible = m === 4; if (world.sf) world.sf.visible = m === 5; world.trackG.visible = m === 0; if (world.podiumG) world.podiumG.visible = m === 0; world.clouds && world.clouds.forEach(c => { c.visible = m !== 5; });
+  world.trackMat.color.set((MAPS[m] || MAPS[0]).track);
   skyMat.uniforms.top.value.set(e.top); skyMat.uniforms.bot.value.set(e.bot);
   scene.fog.color.set(e.fog); scene.fog.near = e.fn; scene.fog.far = e.ff;
   hemi.color.set(e.sky); hemi.groundColor.set(e.gnd); hemi.intensity = e.hemi;
@@ -1416,6 +1506,25 @@ function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
   const hp = new THREE.Vector3(); if (B.RightHand) { B.RightHand.getWorldPosition(hp); r.root.worldToLocal(hp); } else hp.set(-0.38, 1.28, 0);
   r.att = { body: anchor(B.Spine, T(0, 0, 0)), head: anchor(B.Head, T(0, 2.43, 0.01, 0.5)), knees: [anchor(B.RightLeg, T(-0.135, 0.62, 0)), anchor(B.LeftLeg, T(0.135, 0.62, 0))],
     elbows: [anchor(B.RightForeArm, T(-0.38, 1.65, 0)), anchor(B.LeftForeArm, T(0.38, 1.65, 0))], hand: anchor(B.RightHand, T(hp.x, hp.y, hp.z)) };
+  if (kind === 'soldier') { // รูปร่าง + อุปกรณ์ประจำตัวที่ไม่ซ้ำกัน
+    const LF = [{ b: 1.0, h: 1.0, acc: 'cape' }, { b: 0.86, h: 0.96, acc: 'pony', hair: '#15110e' }, { b: 1.16, h: 1.05, acc: 'pads' }, { b: 1.0, h: 1.01, acc: 'jet' },
+      { b: 0.86, h: 0.97, acc: 'katana', hair: '#2b1a10' }, { b: 0.84, h: 0.94, acc: 'long', hair: '#c9a063' }, { b: 1.06, h: 1.02, acc: 'pack' }, { b: 0.86, h: 0.96, acc: 'pony', hair: '#7a2a16' }][lookIdx % 8];
+    m.scale.x *= LF.b; m.scale.z *= LF.b; m.scale.y *= LF.h;
+    const nm = neonMat(neon), am = toon(SK.armor), dk = toon('#15181a'), mt = metalMat(SK.metal);
+    const put = (par, geo, mat, x, y, z, rx = 0, rz = 0) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, 0, rz); o.castShadow = true; par.add(o); return o; };
+    r._accFn = () => { const A = r.att.body, H = r.att.head;
+      if (LF.hair) { const hm = toon(LF.hair);
+        if (LF.acc === 'pony' || LF.acc === 'katana') { put(H, new THREE.SphereGeometry(0.2, 10, 8), hm, 0, 0.35, -0.5); for (let k = 0; k < 4; k++) put(H, new THREE.CapsuleGeometry(0.13 - k * 0.022, 0.36, 4, 8), hm, 0, 0.15 - k * 0.42, -0.62 - k * 0.06, 0.25); }
+        if (LF.acc === 'long') put(H, new THREE.CapsuleGeometry(0.42, 1.0, 6, 12), hm, 0, -0.45, -0.38).scale.set(1.05, 1, 0.42);
+      }
+      if (LF.acc === 'cape') { const c = put(A, new THREE.PlaneGeometry(0.85, 1.35, 1, 6), new THREE.MeshStandardMaterial({ color: '#141617', side: THREE.DoubleSide, roughness: 0.9 }), 0, 1.45, -0.33, 0.12); const tr = put(A, new THREE.BoxGeometry(0.86, 0.025, 0.02), nm, 0, 0.78, -0.4, 0.12); }
+      if (LF.acc === 'pads') for (const sd of [-1, 1]) { put(A, new THREE.BoxGeometry(0.34, 0.12, 0.42), am, sd * 0.47, 2.12, 0, 0, -sd * 0.3); put(A, new THREE.BoxGeometry(0.35, 0.02, 0.43), nm, sd * 0.47, 2.19, 0, 0, -sd * 0.3); }
+      if (LF.acc === 'jet') for (const sd of [-1, 1]) { put(A, new THREE.CylinderGeometry(0.1, 0.12, 0.62, 10), mt, sd * 0.16, 1.72, -0.36); put(A, new THREE.CylinderGeometry(0.08, 0.08, 0.04, 10), nm, sd * 0.16, 1.39, -0.36); }
+      if (LF.acc === 'katana') { const k = put(A, new THREE.BoxGeometry(0.035, 1.25, 0.08), mt, 0.05, 1.75, -0.36, 0, -0.65); put(A, new THREE.CylinderGeometry(0.03, 0.03, 0.32, 8), dk, -0.33, 2.25, -0.36, 0, -0.65); put(A, new THREE.BoxGeometry(0.16, 0.025, 0.1), nm, -0.24, 2.15, -0.36, 0, -0.65); }
+      if (LF.acc === 'pack') { put(A, new THREE.BoxGeometry(0.46, 0.55, 0.22), am, 0, 1.72, -0.38); put(A, new THREE.CylinderGeometry(0.012, 0.012, 0.9, 6), mt, 0.16, 2.3, -0.42); put(A, new THREE.SphereGeometry(0.035, 6, 6), nm, 0.16, 2.76, -0.42); }
+    };
+    try { r._accFn(); } catch (e) { console.warn('acc', e); }
+  }
   if (outfit !== 'sport' && kind === 'michelle') { // เกราะยุทธวิธีให้ตัวละครหญิง
     const nm = neonMat(neon), am = toon(SK.armor), A = r.att.body, add = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.castShadow = true; A.add(o); return o; };
     add(G.plate, am, 0, 1.72, 0.15).scale.set(0.66, 0.8, 0.7); add(G.plate, am, 0, 1.72, -0.15).scale.set(0.66, 0.8, 0.7);
@@ -1583,13 +1692,13 @@ function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac', skin = 
   if (lk.phones) { for (const sd of [-1, 1]) { const p = add(head, G.phone, '#1b1c1f', sd * 0.43, 0, 0); p.rotation.z = Math.PI / 2; } const b = add(head, G.band, '#1b1c1f', 0, 0.02, 0); b.rotation.y = Math.PI / 2; }
   if (lk.build) body.scale.set(lk.build * 0.92 + 0.08, 1.02, lk.build * 0.88 + 0.12);
   root.scale.setScalar(0.95);
-  if (name) root.add(nameSprite(name, isMe));
+  let tagSp = null; if (name) { tagSp = nameSprite(name, isMe); root.add(tagSp); }
   const blob = new THREE.Mesh(new THREE.CircleGeometry(0.55, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: .32, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2; blob.position.y = 0.08; root.add(blob);
   parent.add(root);
   const aura = [];
   if (name) for (let k = 0; k < 14; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
-  const R0 = { outfit, skin: skin | 0, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
+  const R0 = { tagSp, outfit, skin: skin | 0, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
   if (CHAR.ready) { const kd = charKind(lookIdx, outfit); if (kd) try { attachGLB(R0, kd, lookIdx, outfit, SK, lk); } catch (e) { console.warn('glb', e); } }
   return R0;
 }
@@ -1598,7 +1707,7 @@ function flutter() {}
 function limbs(r, elbow, kn) {
   if (!r.knees) return;
   r.legs.forEach((l, i) => { const a = l.rotation.x; r.knees[i].rotation.x = kn ? kn[i] : 0.06 + Math.max(0, a) * 1.25 + Math.max(0, -a) * 1.1; });
-  r.elbows.forEach(e => { e.rotation.x = elbow; });
+  r.elbows.forEach(e => { e.rotation.set(elbow, 0, 0); });
 }
 // ฝุ่นจากรองเท้าตอนวิ่ง
 function updateAura(r, dt) {
@@ -2810,6 +2919,14 @@ $('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === my
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
 $('#tods').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setTod', { tod: +b.dataset.t }); };
+$('#roomLooks').onclick = e => { const el = e.target.closest('.look'); if (!el) return; myLook = +el.dataset.i; localStorage.hrLook = myLook; Music.sfx('click'); send('join', { name: myName(), look: myLook, skin: mySkin }); };
+$('#roomSkins').onclick = e => { const el = e.target.closest('.skin'); if (!el) return; mySkin = pvSkin = +el.dataset.i; localStorage.hrSkin = mySkin; Music.sfx('click'); send('join', { name: myName(), look: myLook, skin: mySkin }); };
+let backArm = 0;
+function leaveRoom() { try { if (isHost) pub('down', { closed: true }, true); else if (myId) pub('up', { id: myId, type: 'leave' }); } catch {} setTimeout(() => location.replace(location.pathname), 350); }
+$('#backBtn').onclick = () => {
+  if (Date.now() - backArm > 2500) { backArm = Date.now(); $('#backBtn').textContent = isHost ? 'แตะอีกครั้ง = ปิดห้องและออก' : 'แตะอีกครั้งเพื่อออก'; setTimeout(() => { if (Date.now() - backArm >= 2400) $('#backBtn').textContent = '‹ กลับหน้าแรก'; }, 2600); return; }
+  leaveRoom();
+};
 let homeMode = localStorage.hrMode === 'shoot' ? 'shoot' : 'race', homeTab = 'play', pvKit = null, pvSkin = mySkin;
 const W_ALIAS = ['PISTOL', 'ASSAULT RIFLE', 'SNIPER'];
 function lbChip() {
@@ -2913,13 +3030,20 @@ function render() {
   show('#qpanel', st === 'question' || st === 'reveal');
   show('#roundResult', st === 'reveal');
   show('#final', st === 'finished');
-  applyMap(inRoom ? S.map : 0, inRoom ? S.tod : 0);
-  if (world.podiumG) world.podiumG.visible = !(inRoom && S.mode === 'shoot');
+  applyMap(inRoom ? (st === 'lobby' ? 5 : S.map) : 5, inRoom ? S.tod : 0);
   if (!inRoom) { Music.play('lobby'); syncRunners([]); return; }
   syncRunners(S.players);
 
+  if (st !== 'lobby') for (const r of runners.values()) { if (r.rdy) r.rdy.visible = false; if (r.tagSp) { r.tagSp.position.y = 3.4; r.tagSp.scale.set(3.1, 0.9, 1); } }
   if (st === 'lobby') {
-    $('#roomCode').textContent = roomCode;
+    $('#roomCode').textContent = roomCode; $('#roomCode2').textContent = roomCode;
+    { const meP = S.players.find(p => p.id === myId), ml = meP ? meP.look : myLook, msk = meP ? meP.skin | 0 : mySkin;
+      const html = LOOKS.map((l, i) => `<div class="look${i === ml ? ' sel' : ''}" data-i="${i}">${ava(i)}${l.name}</div>`).join('');
+      if ($('#roomLooks').dataset.h !== html) { $('#roomLooks').innerHTML = html; $('#roomLooks').dataset.h = html; }
+      $('#mySig').textContent = 'ท่าประจำตัว: ' + SIG_NAME[ml % SIG.length];
+      show('#roomSkinsBox', S.mode === 'shoot');
+      const sh = SKINS.map((k, i) => `<button class="skin${i === msk ? ' sel eq' : ''}" data-i="${i}"><i style="background:linear-gradient(135deg, ${k.armor} 0 45%, ${k.neon} 45% 55%, ${k.top} 55% 80%, ${k.metal} 80%)"></i>${k.name}<small>${i === msk ? 'EQUIPPED' : 'SKIN ' + (i + 1)}</small></button>`).join('');
+      if ($('#roomSkins').dataset.h !== sh) { $('#roomSkins').innerHTML = sh; $('#roomSkins').dataset.h = sh; } }
     $('#count').textContent = `${S.players.length}/${MAX_PLAYERS} คน`;
     $('#lobbyList').innerHTML = S.players.map(p => `<li>${ava(p.look)}${esc(p.name)}${p.id === myId ? ' <span class="small">(คุณ)</span>' : ''}${p.bot ? ' <span class="small">BOT</span>' : ''}
       <span class="st ${p.ready ? 'y' : 'n'}">${p.id === 'host' ? 'เจ้าของห้อง' : p.ready ? 'พร้อม' : 'รอ'}</span></li>`).join('');
@@ -3245,6 +3369,10 @@ function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i
 
 /* ---------- พรีวิวตัวละครเต็มตัว + ท่าแอคติ้ง ---------- */
 const EMOTE_T = 3.4, BLEND_T = 0.5;
+// ท่าประจำตัวของตัวละครแต่ละตัว (ไม่ซ้ำกัน)
+const SIG = ['salute', 'wave', 'flex', 'point', 'guard', 'stretch', 'pump', 'dance'];
+const SIG_NAME = ['วันทยหัตถ์', 'โบกมือทักทาย', 'เบ่งกล้าม', 'ชี้ท้าทาย', 'ตั้งการ์ดชก', 'ยืดเหยียด', 'ชูกำปั้น', 'เต้นโชว์'];
+const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'scan'];
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
 function pvPose(name, t) {
@@ -3285,7 +3413,11 @@ function pvPose(name, t) {
       P.hx = -0.05; P.l = [0, 0]; P.k = [0.04, 0.04];
       P.a = [[-0.55, -1.15], [0, 0.06]]; P.e = [[0, -2.65], [-0.05, 0]]; P.ry = 0.15; break;
   }
-  const gd = GDIR[name === 'idle2' ? 'idle2' : name];
+  let gd = GDIR[name === 'idle2' ? 'idle2' : name];
+  if (name === 'wave') { const wv = Math.sin(t * 9) * 0.55; gd = { RU: [-0.6, 0.75, 0.25], RF: [-0.15 + wv, 0.95, 0.2], LU: [0.15, -0.98, 0.05], LF: [0.1, -0.95, 0.2] }; P.hz = 0.08; P.hy = -0.15; }
+  if (name === 'point') { const pp = Math.sin(t * 2.2) * 0.06; gd = { RU: [-0.18, 0.08 + pp, 1], RF: [-0.08, 0.1 + pp, 1], LU: [0.55, -0.8, -0.1], LF: [-0.75, -0.55, 0.3] }; P.hx = -0.1; P.ry = -0.15; }
+  if (name === 'guard') { const bb = Math.sin(t * 6); gd = { RU: [-0.35, -0.72, 0.6], RF: [0.3, 0.85, 0.45], LU: [0.35, -0.7, 0.62], LF: [-0.3, 0.88, 0.4] }; P.by = Math.abs(bb) * 0.05; P.ry = 0.35 + bb * 0.05; P.l = [-0.2, 0.25]; }
+  if (name === 'dance') { const d2 = Math.sin(t * 6); gd = { RU: [-0.6, 0.3 + d2 * 0.5, 0.5], RF: [-0.2, 0.9, 0.3 - d2 * 0.3], LU: [0.6, 0.3 - d2 * 0.5, 0.5], LF: [0.2, 0.9, 0.3 + d2 * 0.3] }; P.by = Math.abs(d2) * 0.08; P.ry = d2 * 0.3; P.run = 0; }
   if (gd) { P.ow = 1; P.oRU = gd.RU; P.oRF = gd.RF; P.oLU = gd.LU; P.oLF = gd.LF; }
   if (name === 'lunge') P.run = 1;
   return P;
@@ -3294,13 +3426,13 @@ function pvLerp(A, B, k) {
   const m = (a, b) => typeof a === 'number' ? a + (b - a) * k : Array.isArray(a) ? a.map((v, i) => m(v, b[i])) : b;
   const o = {}; for (const key in A) o[key] = m(A[key], B[key]); return o;
 }
-function pvApply(r, P) {
-  r.root.rotation.y = P.ry + PV.yaw + (PV.spin || 0); r.body.position.y = P.by; r.body.rotation.set(P.bx, 0, P.bz);
+function pvApply(r, P, yawX, dtX) {
+  r.root.rotation.y = P.ry + (yawX ?? (PV.yaw + (PV.spin || 0))); r.body.position.y = P.by; r.body.rotation.set(P.bx, 0, P.bz);
   r.head.rotation.set(P.hx, P.hy, P.hz);
   r.legs.forEach((l, i) => l.rotation.set(P.l[i], 0, 0)); r.knees.forEach((k, i) => { k.rotation.x = P.k[i]; });
   r.arms.forEach((a, i) => a.rotation.set(P.a[i][0], 0, P.a[i][1])); r.elbows.forEach((e, i) => e.rotation.set(P.e[i][0], 0, P.e[i][1]));
   if (r.guns) { r.guns.g.visible = P.gun > 0.5; r.guns.models.forEach((m, j) => { m.visible = j === (PV.gunW ?? 1); }); }
-  if (r.glb) glbTick(r, PV.dt || 0.016, P.run > 0.5 ? 'run' : 'idle', { dirs: P.ow > 0.01 ? { RU: P.oRU, RF: P.oRF, LU: P.oLU, LF: P.oLF } : null, w: P.ow, y: P.by, ts: P.run > 0.5 ? 0.75 : 0 });
+  if (r.glb) glbTick(r, dtX ?? (PV.dt || 0.016), P.run > 0.5 ? 'run' : 'idle', { dirs: P.ow > 0.01 ? { RU: P.oRU, RF: P.oRF, LU: P.oLU, LF: P.oLF } : null, w: P.ow, y: P.by, ts: P.run > 0.5 ? 0.75 : 0 });
 }
 function pvInit() {
   const cv = $('#pvCanvas'); if (!cv || PV.ready) return;
@@ -3330,11 +3462,11 @@ function pvSetLook(i, intro = true) {
   if (PV.ch) PV.sc.remove(PV.ch.root);
   const ch = makeRunner(i, null, false, PV.sc, of, of === 'tac' ? pvSkin : 0); PV.ch = ch; ch.root.scale.setScalar(0.92);
   if (of === 'tac') { ensureGuns(ch); poseArmor(ch, 0, true); ch.guns.vest.visible = false; }
-  PV.seq = of === 'sport' ? ['idle', 'stretch', 'flex', 'idle2', 'lunge', 'pump', 'cross'] : ['idle', 'aim', 'salute', 'idle2', 'scan', 'cross', 'aim'];
+  const sg = SIG[i % SIG.length]; PV.seq = of === 'sport' ? [sg, 'idle', 'idle2', sg, 'cross', 'idle'] : [sg, 'idle', 'aim', 'idle2', sg, 'scan'];
   if (PV.loadout) PV.seq = ['aim', 'scan', 'aim'];
-  PV.emote = 0; PV.emT = 0; PV.intro = intro ? 1 : 0; PV.prevPose = null;
-  if (intro) { PV.seq = [of === 'sport' ? 'pump' : 'aim', ...PV.seq]; Music.sfx && Music.sfx('click'); }
-  $('#pvName').textContent = LOOKS[i % LOOKS.length].name; $('#pvTag').textContent = of === 'sport' ? 'RACE KIT · ชุดแข่งวิ่ง' : SKINS[pvSkin].name + ' · COMBAT KIT'; if (typeof lbChip === 'function') lbChip();
+  PV.emote = 0; PV.emT = 0; PV.intro = 0; PV.prevPose = null; PV.prevName = 'idle';
+  if (intro && Music.sfx) Music.sfx('click');
+  $('#pvName').textContent = LOOKS[i % LOOKS.length].name; $('#pvTag').textContent = (of === 'sport' ? 'RACE KIT' : SKINS[pvSkin].name) + ' · ท่าประจำตัว: ' + SIG_NAME[i % SIG.length]; if (typeof lbChip === 'function') lbChip();
 }
 function pvTick(dt) {
   if (!PV.ready || !PV.ch) return;
@@ -3367,11 +3499,25 @@ function frame() {
   if (shooting) shooterFrame(dt, t);
   else if (!inRoom) {
     pvTick(dt);
-    for (const d of demo) {
-      const P = 2 * L + 2 * Math.PI * laneR(d.lane);
-      d.v += (Math.random() - .5) * 0.002; d.v = Math.min(0.034, Math.max(0.02, d.v));
-      d.u += d.v * dt; d.speed = d.v * P; poseRunner(d, d.lane, dt, t, false);
-    }
+    for (const d of demo) d.root.visible = false;
+  } else if (st === 'lobby') {
+    // แถวตัวละครเต็มตัวของผู้เล่นทุกคนบนเวที
+    const ids = S.players.map(p => p.id), n = ids.length, sp = n <= 3 ? 1.8 : n <= 5 ? 1.45 : 1.2;
+    S.players.forEach((p, i) => {
+      const r = runners.get(p.id); if (!r) return;
+      r.root.visible = true; r.root.position.set((i - (n - 1) / 2) * sp, 0, i % 2 ? -0.5 : 0);
+      if (r.tagSp) { r.tagSp.position.y = 3.15 + (i % 2) * 0.45; r.tagSp.scale.set(2.4, 0.7, 1); } r.u = 0; r.target = 0;
+      if (r.scoreSp) clearScore(r);
+      const L0 = r.lob || (r.lob = { name: SIG[r.look % SIG.length], t: 0, ph: Math.random() * 10 });
+      L0.t += dt; if (L0.t > EMOTE_T) { L0.prev = L0.name; L0.t = 0; L0.name = L0.name === 'idle' ? (Math.random() < 0.5 ? SIG[r.look % SIG.length] : EM_POOL[(Math.random() * EM_POOL.length) | 0]) : 'idle'; }
+      if (p.ready && !L0.wasReady) { L0.prev = L0.name; L0.name = 'pump'; L0.t = 0; } L0.wasReady = p.ready;
+      let P = pvPose(L0.name, t + L0.ph); if (L0.prev && L0.t < BLEND_T) P = pvLerp(pvPose(L0.prev, t + L0.ph), P, easeIO(L0.t / BLEND_T));
+      if (P.gun && !(S.mode === 'shoot')) { P = pvPose('idle', t + L0.ph); }
+      if (S.mode === 'shoot') { ensureGuns(r); poseArmor(r, 0, true); r.guns.vest.visible = false; }
+      pvApply(r, P, 0, dt);
+      if (!r.rdy) { r.rdy = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.035, 6, 40), neonMat('#39ff14')); r.rdy.rotation.x = Math.PI / 2; r.rdy.position.y = 0.03; r.root.add(r.rdy); }
+      r.rdy.visible = !!(p.ready || p.id === 'host'); r.rdy.scale.setScalar(1 + Math.sin(t * 4) * 0.05);
+    });
   } else {
     const finalSlots = st === 'finished' && S.final ? new Map(S.final.map((p, i) => [p.id, [i, p.points, p.hs]])) : null;
     if (world.confMesh) world.confMesh.visible = !!finalSlots;
@@ -3389,11 +3535,11 @@ function frame() {
   // กล้อง
   if (shooting) { /* กล้องตั้งใน shooterFrame */ }
   else if (!inRoom) {
-    const a = t * 0.06;
-    tmpV.set(Math.cos(a) * 105, 42, Math.sin(a) * 85); tmpL.set(0, 0, 0);
+    tmpV.set(Math.sin(t * 0.04) * 9, 6 + Math.sin(t * 0.13), 27 + Math.cos(t * 0.05) * 3); tmpL.set(Math.sin(t * 0.03) * 4, 9, -20);
   } else if (st === 'lobby') {
-    const zm = (RIN + ROUT) / 2;
-    tmpV.set(10 + Math.sin(t * 0.3) * 1.5, 3.2, zm + Math.sin(t * 0.2) * 2); tmpL.set(0, 1.6, zm);
+    const n = S.players.length, sp = n <= 3 ? 1.8 : n <= 5 ? 1.45 : 1.2, wide = innerWidth / innerHeight > 1.15, span = Math.max(1, n - 1) * sp + 1;
+    const dist = wide ? Math.max(5.2, span * 0.85 + 2.8) : Math.max(6.5, span * 1.5 + 3.2), cx = wide ? span * 0.32 + 0.9 : 0;
+    tmpV.set(cx + Math.sin(t * 0.2) * 0.4, wide ? 1.9 : 2.6, dist); tmpL.set(cx, wide ? 1.35 : 1.7, 0);
   } else {
     const me = runners.get(myId) || [...runners.values()][0];
     if (me) {
@@ -3454,7 +3600,7 @@ function frame() {
     for (const el of document.querySelectorAll('#dots div')) { const r = runners.get(el.dataset.id); if (r) el.style.left = (r.u * 100) + '%'; }
   } else $('#big').textContent = '';
 
-  fxUpdate(dt, t);
+  fxUpdate(dt, t); sfTick(dt, t);
   renderFrame();
   requestAnimationFrame(frame);
 }
@@ -4058,7 +4204,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } stylizeTree(scene); setupComposer(); resize(); applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); pvInit(); lbChip(); fxInit(); frame(); loadChars();
+resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } buildSciFi(); stylizeTree(scene); setupComposer(); resize(); applyMap(5, 1); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); pvInit(); lbChip(); fxInit(); frame(); loadChars();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
