@@ -3,14 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>H-Runner – แข่งคิดเลข วิ่งเข้าเส้นชัย</title>
+<title>HAXY MATCH – แข่งวิ่ง · ยิงปืน ออนไลน์</title>
+<link rel="icon" href="favicon.png">
+<meta name="theme-color" content="#0b100b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
 <style>
-  :root { --panel: rgba(15,22,32,.86); --line: rgba(236,232,225,.14); --txt: #ece8e1; --mut: #8f97a3; --acc: #ff4f5e; --acc2: #ffb347; --ok: #4fd1a5; --bad: #ff4f5e; }
+  :root { --panel: rgba(10,14,11,.88); --line: rgba(190,235,170,.16); --txt: #eef2ec; --mut: #8d9a8f; --acc: #7be22b; --acc2: #c8ff6a; --accd: #2f9e0f; --ok: #7be22b; --bad: #ff5a4a; --chrome: linear-gradient(180deg, #ffffff 0%, #d7dcdf 38%, #8e979c 55%, #e9ecee 75%, #b9c0c4 100%); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0b0d; font-family: "Oswald", "Kanit", system-ui, sans-serif; color: var(--txt); user-select: none; }
   #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
@@ -22,7 +24,7 @@
   .hidden { display: none !important; }
 
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 0; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); padding: 20px; width: min(92vw, 440px);
+  .panel { background: linear-gradient(180deg, rgba(123,226,43,.08), transparent 70px), var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--acc); border-radius: 0; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); padding: 20px; width: min(92vw, 440px);
            box-shadow: 0 30px 80px rgba(0,0,0,.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   label { display: block; font-family: "Kanit", sans-serif; font-weight: 400; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); margin: 2px 0 7px; }
   input { font-family: "Kanit", sans-serif; font-size: 17px; padding: 11px 13px; border-radius: 4px; border: 1px solid var(--line); width: 100%;
@@ -34,7 +36,7 @@
   .btn:hover { border-color: rgba(255,255,255,.25); }
   .btn:active { transform: translateY(1px); }
   .btn:disabled { opacity: .4; cursor: default; }
-  .btn.green { background: linear-gradient(180deg, #ff5e6c, #e23b4c); color: #fff; border-color: #ff8a94; box-shadow: 0 10px 30px rgba(255,79,94,.28); clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
+  .btn.green { background: linear-gradient(180deg, #a8ff4f 0%, #6fe01a 45%, #3fae10 100%); color: #08130a; border-color: #d4ff9a; text-shadow: 0 1px 0 rgba(255,255,255,.35); box-shadow: 0 10px 30px rgba(123,226,43,.28); clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
   .btn.blue { background: rgba(255,255,255,.08); }
   .btn.ghost { background: transparent; color: var(--mut); font-size: 13px; padding: 10px; }
   .btn.big { font-size: 19px; padding: 15px; }
@@ -42,12 +44,13 @@
   .row { display: flex; gap: 8px; margin-bottom: 12px; }
 
   #home { justify-content: flex-start; padding-top: max(4vh, 16px); }
+  .logoImg { width: min(78vw, 560px); height: auto; display: block; filter: drop-shadow(0 12px 30px rgba(0,0,0,.75)) drop-shadow(0 0 24px rgba(123,226,43,.25)); animation: rise 1s cubic-bezier(.2,.8,.2,1) both; margin-bottom: -4px; }
   .logo { font-family: "Oswald", sans-serif; font-weight: 700; font-size: clamp(54px, 14vw, 112px); line-height: .95; letter-spacing: .05em; text-transform: uppercase;
           filter: drop-shadow(0 10px 30px rgba(0,0,0,.8)); white-space: nowrap; animation: rise 1s cubic-bezier(.2,.8,.2,1) both; }
-  .logo .h { background: linear-gradient(180deg, #ff7a85, #e23b4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .logo .dash { color: #ffb347; }
+  .logo .h { background: linear-gradient(180deg, #b6ff5e, #3fae10); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .logo .dash { color: #7be22b; }
   .logo .run { background: linear-gradient(180deg, #f4f2ee 0%, #b9bcc1 55%, #6d727a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .tagline { margin: 6px 0 22px; font-family: "Kanit", sans-serif; font-weight: 400; font-size: clamp(12px, 3.4vw, 15px); letter-spacing: .32em; text-transform: uppercase; color: #b9b5ad;
+  .tagline { margin: 6px 0 22px; font-family: "Kanit", sans-serif; font-weight: 400; font-size: clamp(12px, 3.4vw, 15px); letter-spacing: .32em; text-transform: uppercase; color: #e4ebe0; text-shadow: 0 2px 8px rgba(0,0,0,.9);
              display: flex; align-items: center; gap: 12px; animation: rise 1s .15s both; }
   .tagline::before, .tagline::after { content: ""; width: 34px; height: 1px; background: var(--acc); opacity: .7; }
   @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
@@ -55,13 +58,13 @@
   .looks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
   .look { border: 1px solid var(--line); border-radius: 4px; padding: 4px 2px 5px; background: rgba(255,255,255,.03); cursor: pointer; text-align: center;
           font-size: 12px; letter-spacing: .08em; color: var(--mut); transition: border-color .2s, background .2s; }
-  .look.sel { border-color: var(--acc); background: rgba(255,79,94,.12); color: var(--txt); }
+  .look.sel { border-color: var(--acc); background: rgba(123,226,43,.12); color: var(--txt); }
   .ava { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: inline-block; flex: none; object-fit: cover;
          background: radial-gradient(circle at 50% 30%, #3a3f47, #121418); }
   .look .ava { width: 92%; height: auto; aspect-ratio: 1; display: block; border-radius: 3px; margin: 0 auto 3px; border: 0; }
   .diffs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
   .diff { font-family: "Kanit", sans-serif; border: 1px solid var(--line); border-radius: 4px; padding: 7px 0; background: rgba(255,255,255,.03); font-size: 13px; cursor: pointer; color: var(--mut); }
-  .diff.sel { border-color: var(--acc); background: rgba(255,79,94,.14); color: var(--txt); }
+  .diff.sel { border-color: var(--acc); background: rgba(123,226,43,.14); color: var(--txt); }
   .diff:disabled { cursor: default; } .diff:disabled:not(.sel) { opacity: .45; }
   .joinRow { display: flex; gap: 8px; margin-top: 10px; }
   .joinRow input { margin: 0; text-transform: uppercase; letter-spacing: .35em; text-align: center; font-family: "Oswald", sans-serif; }
@@ -75,17 +78,31 @@
   .modeCard { position: relative; overflow: hidden; cursor: pointer; text-align: left; color: var(--txt); border: 1px solid var(--line); padding: 18px 16px 38px; min-height: 200px;
               background: linear-gradient(160deg, rgba(30,40,54,.92), rgba(12,16,22,.92)); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
               display: flex; flex-direction: column; gap: 6px; transition: transform .15s, border-color .2s, box-shadow .2s; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
-  .modeCard:hover { transform: translateY(-3px); border-color: var(--acc); box-shadow: 0 24px 60px rgba(255,79,94,.18); }
+  .modeCard::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--acc), transparent); }
+  .modeCard:hover { transform: translateY(-3px); border-color: var(--acc); box-shadow: 0 24px 60px rgba(123,226,43,.18); }
   .modeCard svg { width: 54px; height: 54px; margin-bottom: 4px; }
-  .modeCard b { font-family: "Kanit", sans-serif; font-weight: 600; font-size: 26px; letter-spacing: .02em; }
+  .modeCard b { font-family: "Kanit", sans-serif; font-weight: 600; font-size: 26px; letter-spacing: .02em; background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
   .modeCard span { font-family: "Kanit", sans-serif; font-size: 13px; color: #b9b5ad; line-height: 1.45; }
   .modeCard i { position: absolute; right: 14px; bottom: 12px; font-style: normal; font-family: "Oswald", sans-serif; font-size: 13px; letter-spacing: .2em; color: var(--acc); }
-  .modeCard.race { background: linear-gradient(160deg, rgba(58,40,30,.92), rgba(16,14,14,.92)); }
-  .modeCard.shoot { background: linear-gradient(160deg, rgba(28,44,58,.92), rgba(12,14,20,.92)); }
+  .modeCard.race { background: linear-gradient(160deg, rgba(44,52,56,.94), rgba(10,12,13,.94)); }
+  .modeCard.shoot { background: linear-gradient(160deg, rgba(24,52,20,.94), rgba(8,14,8,.94)); }
   .modeHead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .modeHead .tag { font-family: "Kanit", sans-serif; font-size: 15px; font-weight: 500; padding: 4px 12px; background: rgba(255,79,94,.15); border: 1px solid var(--acc); color: var(--txt); }
+  .modeHead .tag { font-family: "Kanit", sans-serif; font-size: 15px; font-weight: 500; padding: 4px 12px; background: rgba(123,226,43,.15); border: 1px solid var(--acc); color: var(--txt); }
   .modeHead .btn { width: auto; margin-left: auto; padding: 6px 10px; font-size: 12px; }
   @media (max-width: 420px) { .modeCard { min-height: 170px; padding: 14px 12px 34px; } .modeCard i { right: 10px; bottom: 9px; font-size: 11px; } .logo { font-size: 46px; } .modeCard b { font-size: 21px; } .modeCard svg { width: 42px; height: 42px; } }
+  #homePanel { width: min(94vw, 800px); }
+  .hpGrid { display: grid; grid-template-columns: 290px 1fr; gap: 16px; align-items: stretch; }
+  #pvBox { position: relative; min-height: 400px; overflow: hidden; border: 1px solid var(--line);
+           background: radial-gradient(ellipse at 50% 88%, rgba(123,226,43,.28), transparent 55%), radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.07), transparent 60%), linear-gradient(180deg, #141a14, #050705);
+           clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
+  #pvBox::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px); }
+  #pvCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  #pvCanvas:active { cursor: grabbing; }
+  #pvName { position: absolute; left: 14px; top: 10px; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 34px; letter-spacing: .08em; font-style: italic;
+            background: var(--chrome); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 10px rgba(123,226,43,.35)); pointer-events: none; }
+  #pvTag { position: absolute; left: 16px; top: 52px; font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; color: var(--acc); pointer-events: none; }
+  #pvHint { position: absolute; right: 12px; bottom: 10px; font-family: "Kanit", sans-serif; font-size: 11px; color: var(--mut); pointer-events: none; }
+  @media (max-width: 720px) { .hpGrid { grid-template-columns: 1fr; } #pvBox { min-height: 290px; } #pvName { font-size: 28px; } }
   .code { font-family: "Oswald", sans-serif; font-size: 44px; font-weight: 600; letter-spacing: .35em; text-align: center; color: var(--acc); margin: 0 0 6px; padding-left: .35em; }
   .lobbyHead { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 7px; font-family: "Kanit", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
   .lobbyHead b { font-weight: 400; }
@@ -110,7 +127,7 @@
   #board { position: absolute; left: 12px; top: 100px; list-style: none; margin: 0; padding: 0; pointer-events: none; }
   #board li { display: flex; align-items: center; gap: 8px; background: rgba(10,12,15,.72); border-left: 3px solid transparent; border-radius: 2px; padding: 3px 10px 3px 4px;
               margin-bottom: 3px; font-size: 13px; letter-spacing: .05em; min-width: 160px; }
-  #board li.me { border-left-color: var(--acc); background: rgba(60,18,26,.82); }
+  #board li.me { border-left-color: var(--acc); background: rgba(22,48,14,.85); }
   #board .ava { width: 22px; height: 22px; }
   #board .pts { margin-left: auto; color: var(--acc); font-weight: 600; }
   #board .ok { color: var(--ok); }
@@ -118,7 +135,7 @@
               font-size: 11px; letter-spacing: .2em; color: #c9c5bd; text-shadow: 0 2px 4px #000; pointer-events: none; }
   #bar { flex: 1; height: 3px; background: rgba(255,255,255,.22); position: relative; }
   #dots div { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%,-50%); border: 2px solid #0a0b0d; }
-  #dots div.me { width: 16px; height: 16px; border: 2px solid var(--acc); z-index: 2; box-shadow: 0 0 10px rgba(255,79,94,.6); }
+  #dots div.me { width: 16px; height: 16px; border: 2px solid var(--acc); z-index: 2; box-shadow: 0 0 10px rgba(123,226,43,.6); }
 
   #qpanel { position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); width: min(94vw, 430px); background: rgba(15,22,32,.74); border: 1px solid var(--line);
             border-radius: 6px; padding: 7px 9px 8px; box-shadow: 0 24px 60px rgba(0,0,0,.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
@@ -131,9 +148,9 @@
   .ch:hover:not(:disabled) { background: rgba(255,255,255,.1); }
   .ch:active { transform: translateY(1px); }
   .ch small { position: absolute; left: 4px; top: 1px; font-size: 9px; color: var(--mut); }
-  .ch0 { --k: #d9a441; } .ch1 { --k: #6f8aa6; } .ch2 { --k: #7d8f5a; } .ch3 { --k: #b4432e; }
+  .ch0 { --k: #7be22b; } .ch1 { --k: #6f8aa6; } .ch2 { --k: #7d8f5a; } .ch3 { --k: #b4432e; }
   .ch:disabled { cursor: default; opacity: .4; }
-  .ch.picked { opacity: 1; border-color: var(--acc); background: rgba(255,79,94,.16); }
+  .ch.picked { opacity: 1; border-color: var(--acc); background: rgba(123,226,43,.16); }
   .ch.right { opacity: 1; border-color: var(--ok); background: rgba(106,169,107,.28); }
   .ch.wrong { opacity: 1; border-color: var(--bad); background: rgba(192,80,58,.25); text-decoration: line-through; }
   #choices.vocab { grid-template-columns: 1fr 1fr; } #choices.vocab .ch { font-family: "Kanit", sans-serif; font-size: clamp(12px, 3.4vw, 15px); padding: 6px 6px; line-height: 1.15; min-height: 34px; }
@@ -147,7 +164,7 @@
   #roundResult div { display: flex; gap: 8px; padding: 1px 0; } #roundResult span:last-child { margin-left: auto; color: var(--acc); }
   @keyframes slide { from { transform: translateX(30px); opacity: 0; } }
   #big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-family: "Oswald", sans-serif;
-         font-size: 150px; font-weight: 700; letter-spacing: .08em; color: #f4f1ea; text-shadow: 0 0 60px rgba(255,79,94,.45), 0 6px 30px rgba(0,0,0,.8); }
+         font-size: 150px; font-weight: 700; letter-spacing: .08em; color: #f4f1ea; text-shadow: 0 0 60px rgba(123,226,43,.45), 0 6px 30px rgba(0,0,0,.8); }
 
   #final { justify-content: flex-end; padding-bottom: 14px; }
   #final .panel { width: min(94vw, 520px); padding: 14px 16px; animation: up .7s 1.2s both cubic-bezier(.2,.9,.3,1); }
@@ -156,13 +173,13 @@
   #final h2 span { color: var(--txt); }
   #podium { margin-bottom: 10px; max-height: 32vh; overflow-y: auto; }
   #podium .r { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-left: 2px solid transparent; background: rgba(255,255,255,.035); margin-bottom: 4px; border-radius: 2px; }
-  #podium .r.me { border-left-color: var(--acc); background: rgba(255,79,94,.1); }
+  #podium .r.me { border-left-color: var(--acc); background: rgba(123,226,43,.1); }
   #podium .m { font-size: 22px; width: 34px; text-align: center; font-weight: 600; color: var(--mut); }
   #podium .n { font-size: 16px; letter-spacing: .04em; } #podium .d { font-family: "Kanit", sans-serif; font-size: 11px; color: var(--mut); }
   #podium .p { margin-left: auto; font-size: 18px; font-weight: 600; color: var(--acc); }
   #final .row .btn { margin: 0 !important; }
-  #winTitle { position: absolute; top: 18px; left: 0; right: 0; text-align: center; pointer-events: none; font-family: "Oswald", sans-serif; font-size: clamp(30px, 8vw, 60px);
-              font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: #f4f1ea; text-shadow: 0 0 40px rgba(255,79,94,.45), 0 4px 20px #000; animation: rise 1s .3s both; }
+  #winTitle { position: absolute; top: 18px; left: 0; right: 0; text-align: center; pointer-events: none; font-family: "Oswald", sans-serif; font-size: clamp(30px, 8vw, 60px); background: var(--chrome); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+              font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: #f4f1ea; filter: drop-shadow(0 4px 12px rgba(0,0,0,.85)) drop-shadow(0 0 18px rgba(123,226,43,.35)); animation: rise 1s .3s both; }
 
   #shootHud { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
   #dmgFlash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 40%, rgba(170,20,10,.75) 100%); }
@@ -191,7 +208,7 @@
   #shootHud.shake { animation: shake .4s; }
   @keyframes shake { 0%, 100% { transform: translate(0,0); } 20% { transform: translate(-8px,4px); } 40% { transform: translate(7px,-5px); } 60% { transform: translate(-5px,-3px); } 80% { transform: translate(4px,3px); } }
   #killFx { position: absolute; left: 50%; top: 36%; transform: translate(-50%,-50%); font-family: "Oswald", sans-serif; font-size: 30px; font-weight: 600; letter-spacing: .3em; color: #f4f1ea;
-            text-shadow: 0 0 20px rgba(255,79,94,.7), 0 3px 10px #000; pointer-events: none; opacity: 0; }
+            text-shadow: 0 0 20px rgba(123,226,43,.7), 0 3px 10px #000; pointer-events: none; opacity: 0; }
   #killFx.play { animation: hsFade 1.2s ease-out both; }
   #minimap { position: absolute; right: 58px; top: 10px; width: 180px; height: 180px; border: 1px solid var(--line); border-radius: 4px; background: rgba(10,12,15,.6); pointer-events: none; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
   #killFeed { top: 200px !important; }
@@ -204,7 +221,7 @@
             background: rgba(10,12,15,.7); border: 1px solid var(--line); padding: 2px 16px; border-radius: 3px; pointer-events: none; }
   #bScore { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 6px; background: rgba(10,12,15,.68); border: 1px solid var(--line); border-radius: 4px; pointer-events: none; font-size: 13px; min-width: 220px; }
   #bScore li { display: grid; grid-template-columns: 26px 1fr 24px 28px 24px; align-items: center; gap: 6px; padding: 2px 4px; }
-  #bScore li.hd { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #bScore li.me { background: rgba(255,79,94,.18); } #bScore li.dead { opacity: .45; }
+  #bScore li.hd { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #bScore li.me { background: rgba(123,226,43,.18); } #bScore li.dead { opacity: .45; }
   #bScore .ava { width: 22px; height: 22px; } #bScore li span:nth-child(3) { color: var(--acc); text-align: right; } #bScore li span:nth-child(4) { color: #ff6b5a; text-align: right; } #bScore li span:nth-child(5) { color: var(--mut); text-align: right; } #bScore li.hd span { color: var(--mut) !important; }
   #killFeed { position: absolute; right: 60px; top: 12px; text-align: right; pointer-events: none; font-size: 13px; }
   #killFeed div { background: rgba(10,12,15,.7); padding: 3px 10px; margin-bottom: 3px; border-radius: 2px; animation: slide .3s both; }
@@ -221,7 +238,7 @@
   .wslot { position: relative; width: 108px; height: 62px; background: rgba(10,12,15,.66); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: .6; transition: all .15s; }
   .wslot img { width: 96px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 3px #000); }
   .wslot .n { font-family: "Kanit", sans-serif; font-size: 11px; color: var(--mut); } .wslot .k { position: absolute; left: 5px; top: 2px; font-size: 11px; color: var(--mut); }
-  .wslot.on { opacity: 1; border-color: var(--acc); background: rgba(60,18,26,.85); transform: translateY(-4px); box-shadow: 0 6px 20px rgba(255,79,94,.25); } .wslot.on .n { color: var(--acc); }
+  .wslot.on { opacity: 1; border-color: var(--acc); background: rgba(22,48,14,.88); transform: translateY(-4px); box-shadow: 0 6px 20px rgba(123,226,43,.25); } .wslot.on .n { color: var(--acc); }
   #ammoBox .am { background: rgba(10,12,15,.72); border: 1px solid var(--line); padding: 4px 12px; border-radius: 4px; text-align: right; pointer-events: none; }
   #ammoBox .am span { display: block; font-family: "Kanit", sans-serif; font-size: 11px; color: var(--mut); } #ammoNum { font-size: 34px; font-weight: 600; line-height: 1; } #ammoNum.low { color: #e0866f; }
   #scope { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .12s; background: radial-gradient(circle at center, transparent 0, transparent 34vmin, rgba(0,0,0,.96) 34.4vmin); }
@@ -232,9 +249,9 @@
   #redDot::after { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #ff3b30; box-shadow: 0 0 8px #ff3b30; }
   #crosshair.sn i:nth-child(1) { top: -22px; } #crosshair.sn i:nth-child(2) { top: 14px; } #crosshair.sn i:nth-child(3) { left: -22px; } #crosshair.sn i:nth-child(4) { left: 14px; }
   #fireBtn, #swapBtn, #aimBtn, #jumpBtn, #crouchBtn { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); color: #fff; font-family: "Kanit", sans-serif; display: none; touch-action: none; background: rgba(13,15,19,.6); font-size: 12px; width: 60px; height: 60px; }
-  #fireBtn { right: 24px; bottom: 116px; width: 92px; height: 92px; background: rgba(192,80,58,.55); font-size: 18px; }
+  #fireBtn { right: 24px; bottom: 116px; width: 92px; height: 92px; background: rgba(90,180,30,.5); font-size: 18px; }
   #aimBtn { right: 126px; bottom: 132px; } #jumpBtn { right: 30px; bottom: 222px; } #crouchBtn { right: 104px; bottom: 206px; } #swapBtn { right: 180px; bottom: 186px; }
-  #aimBtn.on, #crouchBtn.on { background: rgba(255,79,94,.6); border-color: var(--acc); }
+  #aimBtn.on, #crouchBtn.on { background: rgba(123,226,43,.6); border-color: var(--acc); }
   #joy { position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); display: none; pointer-events: none; }
   #joy.on { display: block; } #joyKnob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.35); }
   #respawnMsg { position: absolute; left: 50%; top: 40%; transform: translate(-50%,-50%); text-align: center; font-size: 40px; font-weight: 600; letter-spacing: .06em; color: #f4f1ea;
@@ -256,20 +273,23 @@
 <div id="ui">
   <!-- หน้าแรก -->
   <section id="home" class="screen">
-    <div class="logo"><span class="h">H</span><span class="dash">-</span><span class="run">Runner</span></div>
-    <div class="tagline">ตอบไว · วิ่งไกล · เข้าเส้นชัย</div>
+    <img class="logoImg" src="logo.png" alt="HAXY MATCH">
+    <div class="tagline">แข่งวิ่ง · ยิงมันส์ · ชนะเลิศ</div>
     <div id="modePick" class="modePick">
       <button class="modeCard race" data-mode="race">
-        <svg viewBox="0 0 64 64" fill="none" stroke="#ffb347" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="36" r="20"/><path d="M32 36 L32 24 M32 36 L41 41 M26 8 h12 M32 8 v8 M50 18 l4-4"/></svg>
+        <svg viewBox="0 0 64 64" fill="none" stroke="#e9eef0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="36" r="20"/><path d="M32 36 L32 24 M32 36 L41 41 M26 8 h12 M32 8 v8 M50 18 l4-4"/></svg>
         <b>วิ่งแข่ง</b><span>ตอบโจทย์เลข หรือศัพท์อังกฤษ ยิ่งตอบไว ยิ่งวิ่งไกล ในสนามกีฬา</span><i>RACE ›</i>
       </button>
       <button class="modeCard shoot" data-mode="shoot">
-        <svg viewBox="0 0 64 64" fill="none" stroke="#ff4f5e" stroke-width="3.2" stroke-linecap="round"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="3" fill="#ff4f5e"/><path d="M32 4 v12 M32 48 v12 M4 32 h12 M48 32 h12"/></svg>
+        <svg viewBox="0 0 64 64" fill="none" stroke="#7be22b" stroke-width="3.2" stroke-linecap="round"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="3" fill="#7be22b"/><path d="M32 4 v12 M32 48 v12 M4 32 h12 M48 32 h12"/></svg>
         <b>ยิงปืน</b><span>ยิงกันเองมุมมองบุคคลที่สาม เลือกได้หลายด่าน ทั้งเมือง เขาวงกต และท่าเรือ</span><i>SHOOTER ›</i>
       </button>
     </div>
     <div id="homePanel" class="panel hidden">
       <div class="modeHead"><span id="modeTag" class="tag"></span><button id="backMode" class="btn ghost">‹ เปลี่ยนหมวด</button></div>
+      <div class="hpGrid">
+      <div id="pvBox"><canvas id="pvCanvas"></canvas><div id="pvName"></div><div id="pvTag"></div><div id="pvHint">⟲ ลากเพื่อหมุน</div></div>
+      <div class="hpForm">
       <label>ชื่อผู้เล่น</label>
       <input id="nameInput" maxlength="12" placeholder="ใส่ชื่อของคุณ">
       <label>เลือกตัวละคร</label>
@@ -280,6 +300,7 @@
         <button id="joinBtn" class="btn blue">เข้าห้อง</button>
       </div>
       <div id="status"></div>
+      </div></div>
     </div>
     <div id="howRace" class="howto hidden">
       <div><b>1</b>โจทย์เลข หรือศัพท์อังกฤษ โผล่ขึ้นมา</div>
@@ -431,9 +452,10 @@ const BOT_NAMES = ['BOT ALPHA', 'BOT BRAVO', 'BOT DELTA', 'BOT SIERRA', 'BOT TAN
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const THUMBS = [];
-const ava = i => { i = i % LOOKS.length; const l = LOOKS[i];
-  return THUMBS[i] ? `<img class="ava" src="${THUMBS[i]}" alt="">` : `<span class="ava" style="background:linear-gradient(${l.hair} 0 38%, ${SKIN} 38% 70%, ${l.shirt} 70%)"></span>`; };
+const THUMBS = { tac: [], sport: [] };
+const curOutfit = () => (typeof S !== 'undefined' && S && S.players && S.players.some(p => p.id === myId)) ? (S.mode === 'shoot' ? 'tac' : 'sport') : (typeof homeMode !== 'undefined' && homeMode === 'shoot' ? 'tac' : 'sport');
+const ava = i => { i = i % LOOKS.length; const l = LOOKS[i], T = THUMBS[curOutfit()];
+  return T[i] ? `<img class="ava" src="${T[i]}" alt="">` : `<span class="ava" style="background:linear-gradient(${l.hair} 0 38%, ${SKIN} 38% 70%, ${l.shirt} 70%)"></span>`; };
 const ord = n => n + `<sup>${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}</sup>`;
 const medal = i => String(i + 1);
 
@@ -747,9 +769,9 @@ function buildWorld() {
   const bw = ROUT - RIN + 4;
   const bannerTex = canvasTex(1024, 160, (x, w, h) => {
     const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#1a1e25'); g.addColorStop(1, '#0b0e13');
-    x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = '#d9a441'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
+    x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
     x.font = '700 96px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ece9e2'; x.fillText('H-RUNNER  ·  FINISH', w / 2, h / 2 + 4);
+    x.fillStyle = '#ece9e2'; x.fillText('HAXY MATCH  ·  FINISH', w / 2, h / 2 + 4);
   });
   world.bannerTex = bannerTex;
   const bannerBox = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2.4, bw), toon('#15181d')); bannerBox.position.set(0, 7.6, (RIN + ROUT) / 2); gate.add(bannerBox);
@@ -759,7 +781,7 @@ function buildWorld() {
   }
 
   // ป้ายโฆษณารอบสนาม
-  const boardDefs = [['H-RUNNER', '#14171c', '#d9a441'], ['คิดไว วิ่งไว', '#22262d', '#e7e5e0'], ['MATH RACE', '#101317', '#cfd3d8'], ['+ − × ÷', '#2a2118', '#d9a441']];
+  const boardDefs = [['HAXY MATCH', '#0d140c', '#7be22b'], ['คิดไว วิ่งไว', '#22262d', '#e7e5e0'], ['MATH RACE', '#101317', '#cfd3d8'], ['+ − × ÷', '#2a2118', '#d9a441']];
   const boardTex = boardDefs.map(([t, bg, fg]) => canvasTex(512, 96, (x, w, h) => {
     x.fillStyle = bg; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(255,255,255,.04)'; x.fillRect(0, 0, w, h / 2);
     x.font = '700 60px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = fg; x.fillText(t, w / 2, h / 2 + 4);
@@ -825,9 +847,9 @@ function buildWorld() {
 
   // เสาไฟสนาม
   const flood = new THREE.MeshStandardMaterial({ color: '#7a7e84', emissive: '#ffffff', emissiveIntensity: 0 }); world.nightMats.push({ m: flood, on: 4 });
-  for (const [x, z] of [[-L / 2 - 30, ROUT + 22], [L / 2 + 30, ROUT + 22], [-L / 2 - 30, -ROUT - 22], [L / 2 + 30, -ROUT - 22]]) {
+  for (const [x, z] of [[-L / 2 - 30, ROUT + 22], [L / 2 + 30, ROUT + 22], [-L / 2 - 30, -ROUT - 22], [L / 2 + 30, -ROUT - 22]]) { // เสาไฟสนาม
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 30, 8), toon('#6b6f75')); pole.position.set(x, 15, z); stad.add(pole);
-    const head = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.6), flood); head.position.set(x, 31, z); head.lookAt(0, 0, 0); stad.add(head);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(5, 2.6, 0.5), flood); head.position.set(x, 31, z); head.lookAt(0, 0, 0); stad.add(head);
   }
   // ดวงดาว
   { const pts = []; for (let i = 0; i < 900; i++) { const th = Math.random() * Math.PI * 2, ph = Math.random() * 1.3; pts.push(Math.cos(th) * Math.sin(ph) * 520, Math.cos(ph) * 520, Math.sin(th) * Math.sin(ph) * 520); }
@@ -844,239 +866,246 @@ function buildWorld() {
   }
 }
 const world = { nightMats: [] };
-/* ---------- ฉากถนนกรุงเทพ ---------- */
-function buildBangkok() {
-  const g = new THREE.Group(); g.visible = false; scene.add(g); world.bkk = g;
-  const flatRing = (r1, r2, c, y) => { const m = new THREE.Mesh(ringGeo(r1, r2), flat(c, { side: THREE.DoubleSide })); m.position.y = y; m.receiveShadow = true; g.add(m); return m; };
-  const box = (w, h, d, mat, x, y, z, parent = g) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
-  const cyl = (rt, rb, h, mat, x, y, z, parent = g, seg = 10) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
-
-  // พื้นเมือง + ทางเท้า + ถนนรอบนอก
-  const tileTex = canvasTex(128, 128, (x) => { x.fillStyle = '#cfc6b6'; x.fillRect(0, 0, 128, 128); x.strokeStyle = '#b5ab99'; x.lineWidth = 3; for (let i = 0; i <= 128; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 128); x.stroke(); x.beginPath(); x.moveTo(0, i); x.lineTo(128, i); x.stroke(); } });
-  tileTex.wrapS = tileTex.wrapT = THREE.RepeatWrapping; tileTex.repeat.set(250, 250);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshLambertMaterial({ map: tileTex, color: '#d8d2c8' }));
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
-  const plazaTex = canvasTex(128, 128, (x) => { x.fillStyle = '#e9dcc4'; x.fillRect(0, 0, 128, 128); x.fillStyle = '#d9c7a6'; x.fillRect(0, 0, 64, 64); x.fillRect(64, 64, 64, 64); });
-  plazaTex.wrapS = plazaTex.wrapT = THREE.RepeatWrapping; plazaTex.repeat.set(1 / 6, 1 / 6);
-  const shape = new THREE.Shape(); const n = 40;
-  for (let i = 0; i < 4 * n; i++) { const p = segPt(i / n, RIN - 1.4); i ? shape.lineTo(p[0], -p[1]) : shape.moveTo(p[0], -p[1]); }
-  const plaza = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshLambertMaterial({ map: plazaTex }));
-  plaza.geometry.rotateX(-Math.PI / 2); plaza.position.y = 0.02; plaza.receiveShadow = true; g.add(plaza);
-  flatRing(ROUT + 1.4, ROUT + 6, '#c4bcae', 0.035);
-  flatRing(ROUT + 6, ROUT + 13, '#4a4d55', 0.03);
-  flatRing(ROUT + 9.35, ROUT + 9.5, '#facc15', 0.045); flatRing(ROUT + 9.7, ROUT + 9.85, '#facc15', 0.045);
-  flatRing(ROUT + 13, ROUT + 15.5, '#c4bcae', 0.035);
-
-  // ขอบฟุตบาทลายแดงขาว
-  const curbGeo = new THREE.BoxGeometry(0.7, 0.25, 1.15), perR = r => 2 * L + 2 * Math.PI * r;
-  for (const [r, w] of [[RIN - 1.05, 0], [ROUT + 1.05, 0], [ROUT + 6.2, 0], [ROUT + 12.8, 0]]) {
-    const cnt = Math.round(perR(r) / 1.2), im = new THREE.InstancedMesh(curbGeo, new THREE.MeshLambertMaterial(), cnt);
-    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), c = new THREE.Color(), up = new THREE.Vector3(0, 1, 0);
-    for (let i = 0; i < cnt; i++) {
-      const [x, z] = posAt(i / cnt, r), [x2, z2] = posAt(i / cnt + 0.001, r);
-      q.setFromAxisAngle(up, Math.atan2(x2 - x, z2 - z)); m.compose(new THREE.Vector3(x, 0.12, z), q, new THREE.Vector3(1, 1, 1));
-      im.setMatrixAt(i, m); im.setColorAt(i, c.set(i % 2 ? '#ffffff' : '#d62828'));
-    }
-    g.add(im);
-  }
-
-  // ป้ายร้านภาษาไทย บนตึกแถว
-  const SIGNS = ['ข้าวมันไก่', 'ก๋วยเตี๋ยวเรือ', 'ร้านทอง', 'ร้านขายยา', 'ชาไทย', 'ผัดไทย', 'ข้าวเหนียวมะม่วง', 'กาแฟโบราณ', 'มินิมาร์ท', 'ส้มตำ', 'โจ๊กเจ้าเก่า', 'ร้านตัดผม', 'นวดแผนไทย', 'หมูปิ้ง', 'บะหมี่เกี๊ยว', 'ร้านขายของชำ'];
-  const WALLS = ['#f4e3c3', '#f1c6a8', '#d9e7f2', '#f6d2d8', '#e8e0c8', '#cfe3c8', '#f3d9a4', '#e6d3f0'];
-  const SIGNC = [['#c62828', '#ffffff'], ['#f9c80e', '#7f1d1d'], ['#1565c0', '#ffffff'], ['#2e7d32', '#ffffff'], ['#ffffff', '#b91c1c'], ['#111827', '#facc15']];
-  const facades = SIGNS.map((sign, i) => {
-    const floors = 3 + (i % 2), wall = WALLS[i % WALLS.length], [sb, sf] = SIGNC[i % SIGNC.length];
-    const tex = canvasTex(256, 128 * floors, (x, w, h) => {
-      const fh = h / floors;
-      x.fillStyle = wall; x.fillRect(0, 0, w, h);
-      for (let f = 0; f < floors - 1; f++) {
-        const y = f * fh;
-        for (const wx of [30, 140]) {
-          x.fillStyle = '#ffffff'; x.fillRect(wx - 4, y + 22, 94, 78);
-          const gr = x.createLinearGradient(0, y + 26, 0, y + 96); gr.addColorStop(0, '#8ec5e8'); gr.addColorStop(1, '#4f7fa6');
-          x.fillStyle = gr; x.fillRect(wx, y + 26, 86, 70); x.fillStyle = '#ffffff'; x.fillRect(wx + 41, y + 26, 4, 70);
-          if ((f + wx + i) % 3 === 0) { x.fillStyle = '#e5e7eb'; x.fillRect(wx + 50, y + 82, 34, 22); x.fillStyle = '#9ca3af'; for (let k = 0; k < 4; k++) x.fillRect(wx + 53, y + 86 + k * 4, 28, 2); }
-        }
-        x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(0, y + fh - 8, w, 8);
-        x.strokeStyle = '#6b7280'; x.lineWidth = 3; for (let k = 0; k < 13; k++) { x.beginPath(); x.moveTo(20 + k * 18, y + fh - 26); x.lineTo(20 + k * 18, y + fh - 8); x.stroke(); }
-        x.beginPath(); x.moveTo(16, y + fh - 26); x.lineTo(w - 16, y + fh - 26); x.stroke();
-      }
-      const gy = (floors - 1) * fh;
-      x.fillStyle = sb; x.fillRect(6, gy - 2, w - 12, 40); x.strokeStyle = sf; x.lineWidth = 3; x.strokeRect(10, gy + 2, w - 20, 32);
-      x.fillStyle = sf; x.font = '800 26px Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(sign, w / 2, gy + 19, w - 30);
-      x.fillStyle = '#3b2f28'; x.fillRect(12, gy + 42, w - 24, fh - 42);
-      x.fillStyle = '#f5b74a'; x.fillRect(22, gy + 52, w - 44, fh - 62);
-      x.fillStyle = 'rgba(80,60,40,.55)'; for (let k = 0; k < 8; k++) x.fillRect(22, gy + 52 + k * 6, w - 44, 3);
-      x.fillStyle = '#7c2d12'; for (let k = 0; k < 4; k++) x.fillRect(40 + k * 50, gy + fh - 30, 24, 20);
-    });
-    const mat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.85 }); world.nightMats.push({ m: mat, on: 0.38 });
-    return { mat, floors, wall };
-  });
-  const roofMat = toon('#9ca3af');
-  const AWN = ['#dc2626', '#2563eb', '#16a34a', '#f59e0b', '#db2777', '#0d9488'];
-  let fi = 0;
-  function shophouse(x, z, w, tx, tz) {
-    const f = facades[fi++ % facades.length], h = f.floors * 3.2, side = toon(f.wall);
-    const grp = new THREE.Group(); grp.position.set(x, 0, z); g.add(grp);
-    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 8), [side, side, roofMat, roofMat, f.mat, side]); b.position.set(0, h / 2, 0); grp.add(b);
-    const aw = box(w - 0.4, 0.15, 1.6, AWN[fi % AWN.length], 0, 3.0, 4.75, grp); aw.rotation.x = 0.28;
-    box(w + 0.2, 0.5, 8.4, '#e5e7eb', 0, h + 0.25, 0, grp);
-    grp.lookAt(tx, 0, tz);
-  }
-  for (const sd of [1, -1]) for (let x = -L / 2; x < L / 2 - 2;) { const w = 4.6 + ((x * 7 + sd * 3) & 3) * 0.5; shophouse(x + w / 2, sd * (ROUT + 19.5), w - 0.1, x + w / 2, 0); x += w; }
-  for (const [k, cx] of [[1, L / 2], [3, -L / 2]]) {
-    const R2 = ROUT + 19.5, cnt = Math.round(Math.PI * R2 / 5.4);
-    for (let i = 1; i < cnt; i++) { const [x, z] = segPt(k + i / cnt, R2); shophouse(x, z, 5.6, cx, 0); }
-  }
-
-  // ตึกสูงย่านธุรกิจ
-  const glass = canvasTex(64, 128, (x) => { x.fillStyle = '#1f3b57'; x.fillRect(0, 0, 64, 128); for (let r = 0; r < 16; r++) for (let c = 0; c < 4; c++) { x.fillStyle = Math.random() < 0.25 ? '#ffe9a8' : (Math.random() < .5 ? '#5f8fb8' : '#45739c'); x.fillRect(c * 16 + 2, r * 8 + 2, 12, 5); } });
-  glass.wrapS = glass.wrapT = THREE.RepeatWrapping; glass.repeat.set(2, 6);
-  const towerTints = ['#ffffff', '#cfe4ff', '#ffe9d1', '#d9f2e6', '#e6e6e6'];
-  for (let i = 0; i < 46; i++) {
-    const a = (i / 46) * Math.PI * 2 + Math.random() * 0.1, dist = ROUT + 48 + Math.random() * 90;
-    const x = Math.cos(a) * (dist + L / 2 * Math.abs(Math.cos(a))), z = Math.sin(a) * dist;
-    const w = 10 + Math.random() * 9, h = 28 + Math.random() * (i % 7 === 0 ? 90 : 55);
-    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, w * (0.8 + Math.random() * .4)), (() => { const mt = new THREE.MeshStandardMaterial({ map: glass, emissiveMap: glass, emissive: '#ffe2a0', emissiveIntensity: 0, color: towerTints[i % 5], roughness: 0.35, metalness: 0.4 }); world.nightMats.push({ m: mt, on: 0.55 }); return mt; })());
-    t.position.set(x, h / 2, z); t.rotation.y = Math.random() * Math.PI; g.add(t);
-    if (i % 3 === 0) { const top = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, h * 0.18, w * 0.6), t.material); top.position.set(x, h + h * 0.09, z); top.rotation.y = t.rotation.y; g.add(top); }
-    if (i % 4 === 1) cyl(0.15, 0.25, 9, '#e5e7eb', x, h + 4.5, z);
-  }
-
-  // รถไฟฟ้ายกระดับ
-  const btsZ = -(ROUT + 9.6);
-  box(200, 1.3, 4.2, '#d1d5db', 0, 9.2, btsZ).castShadow = true;
-  box(200, 0.5, 0.3, '#9ca3af', 0, 10.1, btsZ - 2);
-  box(200, 0.5, 0.3, '#9ca3af', 0, 10.1, btsZ + 2);
-  for (let x = -98; x <= 98; x += 14) { cyl(0.9, 1.1, 8.6, '#d1d5db', x, 4.3, btsZ, g, 12); box(3.4, 0.9, 4.4, '#c4c9d0', x, 8.3, btsZ); }
-  const stn = new THREE.Group(); stn.position.set(52, 0, btsZ); g.add(stn);
-  box(26, 0.6, 10, '#e5e7eb', 0, 9.4, 0, stn); box(26, 0.4, 10.5, '#64748b', 0, 14.2, 0, stn);
-  for (const sx of [-12, 12]) for (const sz of [-4.6, 4.6]) cyl(0.25, 0.25, 4.8, '#94a3b8', sx, 11.8, sz, stn);
-  const stnSign = canvasTex(512, 96, (x, w, h) => { x.fillStyle = '#0f766e'; x.fillRect(0, 0, w, h); x.fillStyle = '#fff'; x.font = '800 54px Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('สถานีรถไฟฟ้า H-Runner', w / 2, h / 2 + 3); });
-  const ss = new THREE.Mesh(new THREE.PlaneGeometry(14, 2.6), new THREE.MeshBasicMaterial({ map: stnSign })); ss.position.set(0, 15.9, 5.3); stn.add(ss);
-  const trainTex = canvasTex(256, 64, (x, w, h) => { x.fillStyle = '#f8fafc'; x.fillRect(0, 0, w, h); x.fillStyle = '#16a34a'; x.fillRect(0, 44, w, 10); x.fillStyle = '#1d4ed8'; x.fillRect(0, 54, w, 5); x.fillStyle = '#1e293b'; for (let k = 0; k < 6; k++) x.fillRect(10 + k * 42, 12, 30, 22); });
-  const train = new THREE.Group(); g.add(train); world.train = train;
-  const carMat = [toon('#f1f5f9'), toon('#f1f5f9'), toon('#e2e8f0'), toon('#e2e8f0'), new THREE.MeshLambertMaterial({ map: trainTex }), new THREE.MeshLambertMaterial({ map: trainTex })];
-  for (let k = 0; k < 4; k++) { const c = new THREE.Mesh(new THREE.BoxGeometry(10.5, 3, 2.9), [carMat[4], carMat[5], carMat[2], carMat[3], carMat[4], carMat[5]]); c.position.set(k * 11, 11.6, btsZ + 1); c.castShadow = true; train.add(c); }
-
-  // วัด: พระปรางค์
-  const dotTex = canvasTex(128, 128, (x) => { x.fillStyle = '#f3ede0'; x.fillRect(0, 0, 128, 128); const cs = ['#e57373', '#64b5f6', '#81c784', '#ffd54f', '#ba68c8']; for (let i = 0; i < 70; i++) { x.fillStyle = cs[i % 5]; x.beginPath(); x.arc(Math.random() * 128, Math.random() * 128, 2.5 + Math.random() * 3, 0, 7); x.fill(); } });
-  dotTex.wrapS = dotTex.wrapT = THREE.RepeatWrapping; dotTex.repeat.set(6, 4);
-  const prangMat = new THREE.MeshStandardMaterial({ map: dotTex, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 });
-  const prof = [[6, 0], [6, 1.4], [5.2, 1.4], [5.2, 2.8], [4.4, 2.8], [4.4, 4.2], [3.7, 4.2], [3.55, 7], [3.25, 10], [2.8, 13], [2.2, 16], [1.55, 18.5], [1.0, 20.3], [0.6, 21.6], [0.3, 22.6], [0.05, 23.4]].map(([r, y]) => new THREE.Vector2(r, y));
-  const prangGeo = new THREE.LatheGeometry(prof, 8);
-  function prang(x, z, s) {
-    const p = new THREE.Mesh(prangGeo, prangMat); p.position.set(x, 0, z); p.scale.setScalar(s); p.castShadow = true; g.add(p);
-    const tip = cyl(0.04 * s, 0.28 * s, 3.2 * s, '#f5c518', x, 23.4 * s + 1.6 * s, z, g, 8); tip.castShadow = true;
-    for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; box(0.5 * s, 1.6 * s, 0.5 * s, '#f5c518', x + Math.cos(a) * 3.0 * s, 8 * s, z + Math.sin(a) * 3.0 * s); }
-  }
-  const PX = -L / 2 - 4;
-  prang(PX, 0, 1); for (const [dx, dz] of [[-8, -8], [8, -8], [-8, 8], [8, 8]]) prang(PX + dx, dz, 0.42);
-  box(24, 0.8, 24, '#e7dfcf', PX, 0.4, 0);
-
-  // อุโบสถ หลังคาซ้อนชั้น
-  const hall = new THREE.Group(); hall.position.set(0, 0, -15); g.add(hall);
-  box(11, 1.2, 15, '#f1ece2', 0, 0.6, 0, hall); box(8.6, 4.2, 12.4, '#fbf8f2', 0, 3.3, 0, hall);
-  box(2.2, 3, 0.2, '#b91c1c', 0, 2.7, 6.25, hall); box(2.4, 0.2, 0.25, '#f5c518', 0, 4.25, 6.25, hall);
-  for (const sx of [-3.6, -1.8, 1.8, 3.6]) cyl(0.28, 0.32, 4.4, '#fbf8f2', sx, 3.4, 6.9, hall, 10);
-  const roofTier = (w, h, len, y, color, z = 0) => {
-    const sh = new THREE.Shape([new THREE.Vector2(-w / 2, 0), new THREE.Vector2(w / 2, 0), new THREE.Vector2(0, h)]);
-    const geo = new THREE.ExtrudeGeometry(sh, { depth: len, bevelEnabled: false }); geo.translate(0, 0, -len / 2);
-    const m = new THREE.Mesh(geo, toon(color)); m.position.set(0, y, z); m.castShadow = true; hall.add(m);
-    const gold = toon('#f5c518');
-    for (const sd of [-1, 1]) { const e = new THREE.Mesh(new THREE.BoxGeometry(0.18, Math.hypot(w / 2, h) + 0.2, 0.25), gold); e.position.set(sd * w / 4, y + h / 2, z + len / 2 + 0.05); e.rotation.z = -sd * Math.atan2(w / 2, h); hall.add(e); }
-    const cf = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1.3, 6), gold); cf.position.set(0, y + h + 0.45, z + len / 2 + 0.1); cf.rotation.x = 0.7; hall.add(cf);
-    const gable = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape([new THREE.Vector2(-w * 0.32, 0.25), new THREE.Vector2(w * 0.32, 0.25), new THREE.Vector2(0, h * 0.82)])), toon('#d4a017'));
-    gable.position.set(0, y, z + len / 2 + 0.02); hall.add(gable);
+const PV = { ready: false, yaw: 0, t: 0, emote: 0, emT: 0, intro: 0, lastDrag: 0 };
+/* ---------- ด่านเมือง (โหมดยิง): กรุงเทพ = 1, เมืองซอมบี้ = 2 · ตึกแถวเดินเข้าได้ ตรอกหลังบ้าน ถนนหลายสาย ---------- */
+const CITY_B = 73.5;
+const CBX = [[-66, -42], [-31, -8.5], [13.5, 36], [47, 66]], CBZ = [[-66, -42], [-31, -11], [11, 31], [42, 66]];
+const CITY_SITE = { 1: ['0,2', '3,1'], 2: ['2,3', '1,0'] };
+const cityClear = (x, z, p = 0) => x > -9 - p && x < 14 + p && z > -8 - p && z < 44 + p; // ลานรอ/ลานประกาศผล
+// บ้าน/ตึกแถวเดินเข้าได้ หลายชั้น หลังคาดาดฟ้า
+function cityHouse(box, floors, o) {
+  const T = 0.3, { x0, x1, z0, z1, f, wm, fm, sm, doors, front } = o, fh = o.fh || 3.6, by = 0, cx = (x0 + x1) / 2;
+  const opensFor = (a0, a1, yb, door, shop) => {
+    const op = [], len = a1 - a0;
+    if (shop) op.push({ a: a0 + 1.2, b: a1 - 1.2, y0: yb, y1: yb + 2.8 });
+    else if (door != null) op.push({ a: door - 1.15, b: door + 1.15, y0: yb, y1: yb + 2.7 });
+    if (!shop) { const n = Math.max(1, Math.floor((len - 1) / 3.6)); for (let k = 0; k < n; k++) { const c = a0 + len * (k + 0.5) / n; if (door != null && Math.abs(c - door) < 2.2) continue; if (c - 0.65 < a0 + 0.5 || c + 0.65 > a1 - 0.5) continue; op.push({ a: c - 0.65, b: c + 0.65, y0: yb + 1.15, y1: yb + 2.55 }); } }
+    return op;
   };
-  roofTier(11.4, 3.2, 12.6, 5.4, '#d9531e', 0.8);
-  roofTier(9.4, 3.4, 11, 6.6, '#2f855a', 0.4);
-  roofTier(7.2, 3.4, 9.6, 8.0, '#d9531e', 0);
-
-  // เสาชิงช้า
-  const swing = new THREE.Group(); swing.position.set(L / 2 + 6, 0, 0); g.add(swing);
-  box(6, 0.5, 10, '#e7e1d4', 0, 0.25, 0, swing); box(4.6, 0.5, 8.6, '#f1ece2', 0, 0.75, 0, swing);
-  for (const sz of [-3.1, 3.1]) { const p = cyl(0.42, 0.55, 21, '#c81e1e', 0, 11.5, sz, swing, 12); p.castShadow = true; box(1.6, 0.6, 1.6, '#f1ece2', 0, 1.3, sz, swing); }
-  box(0.9, 0.9, 8.6, '#c81e1e', 0, 21.4, 0, swing).castShadow = true;
-  box(1.1, 0.3, 9.2, '#f5c518', 0, 21.95, 0, swing);
-  for (const sz of [-4.2, 4.2]) box(0.5, 0.9, 0.5, '#f5c518', 0, 21.4, sz, swing);
-
-  // ธงชาติไทย
-  const flagTex = canvasTex(96, 64, (x, w, h) => { const s = h / 6; [['#a51931', 0, 1], ['#f4f5f8', 1, 1], ['#2d2a4a', 2, 2], ['#f4f5f8', 4, 1], ['#a51931', 5, 1]].forEach(([c, y, n]) => { x.fillStyle = c; x.fillRect(0, y * s, w, n * s); }); });
-  const flagMat = new THREE.MeshLambertMaterial({ map: flagTex, side: THREE.DoubleSide });
-  const flagGeo = new THREE.PlaneGeometry(1.8, 1.2).translate(0.9, 0, 0);
-  world.bkkFlags = [];
-  for (let i = 0; i < 26; i++) {
-    const [x, z] = posAt(i / 26 + 0.02, ROUT + 3.6);
-    cyl(0.06, 0.08, 6, '#e5e7eb', x, 3, z, g, 6);
-    const f = new THREE.Mesh(flagGeo, flagMat); f.position.set(x, 5.3, z); g.add(f); world.bkkFlags.push(f);
+  const wall = (side, yb, yt, ground) => {
+    const ax = side === 'n' || side === 's' ? 'x' : 'z';
+    const fixed = side === 'n' ? z1 - T / 2 : side === 's' ? z0 + T / 2 : side === 'e' ? x1 - T / 2 : x0 + T / 2;
+    const a0 = ax === 'x' ? x0 : z0 + T, a1 = ax === 'x' ? x1 : z1 - T;
+    const hasDoor = ground && doors.includes(side), door = hasDoor ? (ax === 'x' ? cx : z1 - 2.4) : null;
+    const op = opensFor(a0, a1, yb, door, hasDoor && side === front && o.shop).sort((p, q) => p.a - q.a);
+    const put = (p0, p1, q0, q1) => ax === 'x' ? box(p0, p1, q0, q1, fixed - T / 2, fixed + T / 2, wm) : box(fixed - T / 2, fixed + T / 2, q0, q1, p0, p1, wm);
+    let cur = a0; for (const q of op) { put(cur, q.a, yb, yt); put(q.a, q.b, yb, q.y0); put(q.a, q.b, q.y1, yt); cur = q.b; } put(cur, a1, yb, yt);
+  };
+  for (let fl = 0; fl < f; fl++) {
+    const yb = by + fl * fh, yt = yb + fh;
+    for (const sd of ['n', 's', 'e', 'w']) wall(sd, yb, yt, fl === 0);
+    const left = fl % 2 === 0, sx0 = left ? x0 + T : x1 - T - 2.0, sx1 = sx0 + 2.0, zs = z0 + T + 1.4, n = 10, dz = 0.4, rise = fh / n;
+    for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, sm);
+    const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.25;
+    box(x0, hx0, ys, yt, z0, z1, fm); box(hx1, x1, ys, yt, z0, z1, fm); box(hx0, hx1, ys, yt, z0, hz0, fm); box(hx0, hx1, ys, yt, hz1, z1, fm);
+    floors.push({ x: left ? cx + (x1 - x0) * 0.2 : cx - (x1 - x0) * 0.2, z: z1 - 2.0, y: yt });
   }
-  // เสาไฟถนน
-  for (let i = 0; i < 22; i++) {
-    const [x, z] = posAt(i / 22 + 0.045, ROUT + 5.4), [x2, z2] = posAt(i / 22 + 0.046, ROUT + 5.4);
-    const lp = new THREE.Group(); lp.position.set(x, 0, z); lp.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; g.add(lp);
-    cyl(0.1, 0.14, 7, '#475569', 0, 3.5, 0, lp, 6); box(0.12, 0.12, 1.8, '#475569', 0, 7, 0.85, lp); box(0.5, 0.2, 0.7, world.lampMat || (world.lampMat = (() => { const mt = new THREE.MeshStandardMaterial({ color: '#fff3d6', emissive: '#ffd59a', emissiveIntensity: 0 }); world.nightMats.push({ m: mt, on: 3 }); return mt; })()), 0, 6.9, 1.7, lp);
-  }
-  // รถเข็นขายอาหารริมทาง
-  const UMB = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#ec4899'];
-  for (let i = 0; i < 18; i++) {
-    const u = i / 18 + 0.013, [x, z] = posAt(u, ROUT + 14.2), [x2, z2] = posAt(u + 0.001, ROUT + 14.2);
-    const c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = Math.atan2(x2 - x, z2 - z); g.add(c);
-    box(1.8, 0.9, 0.9, '#cbd5e1', 0, 0.85, 0, c); box(1.6, 0.6, 0.8, new THREE.MeshLambertMaterial({ color: '#e0f2fe', transparent: true, opacity: .55 }), 0, 1.6, 0, c);
-    for (const sx of [-0.6, 0.6]) cyl(0.25, 0.25, 0.12, '#1f2937', sx, 0.25, 0.48, c, 10).rotation.x = Math.PI / 2;
-    cyl(0.04, 0.04, 2.6, '#6b7280', 0.7, 1.5, -0.3, c, 6);
-    const um = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.6, 10), toon(UMB[i % 5])); um.position.set(0.7, 2.9, -0.3); um.castShadow = true; c.add(um);
-  }
-  // ต้นปาล์ม
-  const palms = [];
-  function palm(x, z, s = 1) {
-    if (BLD[1].some(b => Math.abs(x - b.x) < b.w / 2 + 2 && Math.abs(z - b.z) < b.d / 2 + 8)) return;
-    palms.push([x, 0, z, s, Math.random() * 6]); world.bcols[1].push({ x0: x - 0.3, x1: x + 0.3, z0: z - 0.3, z1: z + 0.3, y0: 0, y1: 7 * s });
-  }
-  for (let i = 0; i < 12; i++) { const [x, z] = posAt(i / 12 + 0.04, RIN - 3.2); palm(x, z, 0.85 + (i % 3) * 0.1); }
-  for (const [x, z] of [[-20, 10], [-14, -10], [16, 11], [14, -12], [-6, 12], [7, -9]]) palm(x, z, 0.9);
-  plantInstances(g, 'palm', palms);
-
-  // ตุ๊กตุ๊กและแท็กซี่วิ่งบนถนนรอบนอก
-  world.cars = [];
-  const wheelGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.22, 12).rotateZ(Math.PI / 2);
-  function tuktuk(body, canopy) {
-    const t = new THREE.Group();
-    box(1.5, 0.55, 2.2, body, 0, 0.75, -0.3, t); box(1.4, 0.7, 0.3, body, 0, 1.3, -1.3, t);
-    box(0.8, 1.0, 0.9, body, 0, 1.2, 1.05, t); box(0.75, 0.55, 0.06, new THREE.MeshLambertMaterial({ color: '#bae6fd', transparent: true, opacity: .7 }), 0, 1.9, 1.42, t);
-    box(1.6, 0.14, 2.9, canopy, 0, 2.35, -0.1, t); box(1.6, 0.35, 0.14, canopy, 0, 2.2, 1.3, t);
-    for (const [px, pz] of [[-0.7, -1.4], [0.7, -1.4], [-0.35, 1.25], [0.35, 1.25]]) cyl(0.04, 0.04, 1.3, '#94a3b8', px, 1.7, pz, t, 6);
-    box(1.3, 0.3, 0.7, '#7f1d1d', 0, 1.2, -0.7, t);
-    for (const [wx, wz] of [[-0.75, -0.8], [0.75, -0.8], [0, 1.3]]) { const w = new THREE.Mesh(wheelGeo, toon('#111827')); w.position.set(wx, 0.34, wz); t.add(w); }
-    box(0.3, 0.15, 0.1, '#fde68a', 0, 1.6, 1.52, t);
-    t.traverse(o => { if (o.isMesh) o.castShadow = true; }); return t;
-  }
-  function taxi(c1, c2) {
-    const t = new THREE.Group();
-    box(1.9, 0.75, 4.2, c1, 0, 0.75, 0, t); box(1.7, 0.65, 2.2, c2, 0, 1.45, -0.2, t);
-    box(1.72, 0.5, 2.1, new THREE.MeshLambertMaterial({ color: '#1e293b' }), 0, 1.45, -0.2, t).scale.set(1.01, 0.8, 0.9);
-    const sign = canvasTex(64, 24, (x) => { x.fillStyle = '#fde047'; x.fillRect(0, 0, 64, 24); x.fillStyle = '#111'; x.font = '900 16px Arial'; x.textAlign = 'center'; x.fillText('TAXI', 32, 18); });
-    box(0.7, 0.25, 0.3, new THREE.MeshBasicMaterial({ map: sign }), 0, 1.9, -0.2, t);
-    for (const wx of [-0.9, 0.9]) for (const wz of [-1.35, 1.35]) { const w = new THREE.Mesh(wheelGeo, toon('#111827')); w.position.set(wx, 0.34, wz); t.add(w); }
-    t.traverse(o => { if (o.isMesh) o.castShadow = true; }); return t;
-  }
-  const fleet = [tuktuk('#1e88e5', '#ffd600'), tuktuk('#43a047', '#e53935'), tuktuk('#e53935', '#1e88e5'), tuktuk('#fdd835', '#43a047'), tuktuk('#8e24aa', '#ffd600'), tuktuk('#1e88e5', '#e53935'),
-    taxi('#ff4fa3', '#ff4fa3'), taxi('#f6d32b', '#2bb34a'), taxi('#1d4ed8', '#1d4ed8'), taxi('#f97316', '#f97316'), taxi('#ff4fa3', '#ff4fa3'), taxi('#f6d32b', '#2bb34a')];
-  fleet.forEach((m, i) => { g.add(m); world.cars.push({ m, u: i / fleet.length, r: i % 2 ? ROUT + 8 : ROUT + 11.2, dir: i % 2 ? 1 : -1, v: 9 + (i % 4) * 1.6 }); });
-
-  // ป้ายบนซุ้มเส้นชัย
-  world.bkkBanner = canvasTex(1024, 160, (x, w, h) => {
-    const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2a1512'); gr.addColorStop(1, '#130a08');
-    x.fillStyle = gr; x.fillRect(0, 0, w, h); x.fillStyle = '#f5c518'; x.fillRect(0, 0, w, 10); x.fillRect(0, h - 10, w, 10);
-    x.font = '700 80px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ece4d4'; x.fillText('กรุงเทพมหานคร · BANGKOK', w / 2, h / 2 + 6);
-  });
+  const top = by + f * fh;
+  for (const [a, b, c, d] of [[x0, x1, z0, z0 + T], [x0, x1, z1 - T, z1], [x0, x0 + T, z0, z1], [x1 - T, x1, z0, z1]]) box(a, b, top, top + 1.0, c, d, wm);
+  return top;
 }
-
+function buildCity(m) {
+  const ZOM = m === 2, g = new THREE.Group(); g.visible = false; scene.add(g);
+  const cols = world.bcols[m], floors = world.bFloors[m], R = Math.random, rnd = (a, b) => a + R() * (b - a);
+  const box = (x0, x1, y0, y1, z0, z1, mat, col = true, par = g) => {
+    if (x1 - x0 < 0.01 || y1 - y0 < 0.01 || z1 - z0 < 0.01) return null;
+    const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    o.castShadow = o.receiveShadow = true; par.add(o); if (col) cols.push({ x0, x1, y0, y1, z0, z1 }); return o;
+  };
+  const cyl = (x, z, r, h, mat, y = 0, col = true, seg = 10) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), mat); o.position.set(x, y + h / 2, z); o.castShadow = true; g.add(o); if (col) cols.push({ x0: x - r, x1: x + r, z0: z - r, z1: z + r, y0: y, y1: y + h }); return o; };
+  const noiseT = (base, n, a, stain) => { const t = canvasTex(256, 256, (x) => { x.fillStyle = base; x.fillRect(0, 0, 256, 256); for (let i = 0; i < n; i++) { const v = R() < .5 ? 0 : 255; x.fillStyle = `rgba(${v},${v},${v},${R() * a})`; const q = 2 + R() * 8; x.fillRect(R() * 256, R() * 256, q, q); } if (stain) for (let i = 0; i < 14; i++) { x.fillStyle = `rgba(40,35,25,${R() * .22})`; x.fillRect(R() * 256, R() * 120, 6 + R() * 20, 60 + R() * 140); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  // ---------- วัสดุ ----------
+  const WALLC = ZOM ? ['#8a857a', '#7a7a70', '#9a8f80', '#6f7470', '#857565', '#77736a'] : ['#f4e3c3', '#f1c6a8', '#d9e7f2', '#f6d2d8', '#e8e0c8', '#cfe3c8', '#f3d9a4', '#e6d3f0'];
+  const wallMs = WALLC.map(c => new THREE.MeshStandardMaterial({ map: noiseT(c, 500, 0.06, ZOM), roughness: 0.95 }));
+  const floorM = toon(ZOM ? '#6d6a63' : '#bfb3a0'), stairM = toon(ZOM ? '#7a776f' : '#c9bfae');
+  const asphT = canvasTex(256, 256, (x) => { x.fillStyle = ZOM ? '#3e3e3b' : '#46484d'; x.fillRect(0, 0, 256, 256); for (let i = 0; i < 9000; i++) { const v = R() < .5 ? 0 : 255; x.fillStyle = `rgba(${v},${v},${v},${R() * 0.09})`; x.fillRect(R() * 256, R() * 256, 1 + R() * 2, 1 + R() * 2); } x.strokeStyle = 'rgba(15,15,14,.35)'; x.lineWidth = 1.5; for (let k = 0; k < (ZOM ? 6 : 2); k++) { x.beginPath(); let px = R() * 256, py = R() * 256; x.moveTo(px, py); for (let j = 0; j < 7; j++) { px += (R() - .5) * 50; py += (R() - .5) * 50; x.lineTo(px, py); } x.stroke(); } });
+  asphT.wrapS = asphT.wrapT = THREE.RepeatWrapping; asphT.repeat.set(160, 160);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ map: asphT, roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; ground.userData.keep = true; g.add(ground);
+  const paveT = canvasTex(128, 128, (x) => { x.fillStyle = ZOM ? '#77746c' : '#c9c0b0'; x.fillRect(0, 0, 128, 128); x.strokeStyle = ZOM ? '#5e5b54' : '#ada392'; x.lineWidth = 3; for (let i = 0; i <= 128; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 128); x.stroke(); x.beginPath(); x.moveTo(0, i); x.lineTo(128, i); x.stroke(); } if (ZOM) for (let i = 0; i < 30; i++) { x.fillStyle = `rgba(30,25,20,${R() * .3})`; x.beginPath(); x.arc(R() * 128, R() * 128, 3 + R() * 10, 0, 7); x.fill(); } });
+  paveT.wrapS = paveT.wrapT = THREE.RepeatWrapping;
+  const paveM = new THREE.MeshStandardMaterial({ map: paveT, roughness: 0.95 });
+  const lineY = toon(ZOM ? '#8a7a3a' : '#e8c432'), lineW = toon(ZOM ? '#8f8c84' : '#e8e6e0'), curbM = toon(ZOM ? '#6a6862' : '#b9b3a8');
+  // ทางเท้ารอบบล็อก + เส้นถนน
+  for (const [bx0, bx1] of CBX) for (const [bz0, bz1] of CBZ) {
+    const pl = new THREE.Mesh(new THREE.PlaneGeometry(bx1 - bx0 + 4.4, bz1 - bz0 + 4.4), paveM); pl.material.map.repeat.set(1, 1);
+    pl.rotation.x = -Math.PI / 2; pl.position.set((bx0 + bx1) / 2, 0.02, (bz0 + bz1) / 2); pl.receiveShadow = true; g.add(pl);
+    for (const [a, b, c, d] of [[bx0 - 2.3, bx1 + 2.3, bz0 - 2.3, bz0 - 2.1], [bx0 - 2.3, bx1 + 2.3, bz1 + 2.1, bz1 + 2.3], [bx0 - 2.3, bx0 - 2.1, bz0 - 2.3, bz1 + 2.3], [bx1 + 2.1, bx1 + 2.3, bz0 - 2.3, bz1 + 2.3]]) box(a, b, 0.0, 0.1, c, d, curbM, false);
+  }
+  paveT.repeat.set(6, 6);
+  const NS = [-36.5, 2.5, 41.5], EW = [-36.5, 0, 36.5];
+  for (const x of NS) for (let z = -70; z < 70; z += 6) if (!(EW.some(e => Math.abs(z + 1.5 - e) < 8))) box(x - 0.1, x + 0.1, 0.02, 0.04, z, z + 3, lineY, false);
+  for (const z of EW) for (let x = -70; x < 70; x += 6) if (!(NS.some(e => Math.abs(x + 1.5 - e) < 10))) box(x, x + 3, 0.02, 0.04, z - 0.1, z + 0.1, lineY, false);
+  for (const x of NS) for (const z of EW) for (let k = -4; k <= 4; k++) { box(x - 5 + k * 0.01, x + 5, 0.02, 0.035, z + 7 + k * 0.9, z + 7.45 + k * 0.9, lineW, false); }
+  // ---------- ป้ายร้าน (กรุงเทพ) ----------
+  const SIGNS = ['ข้าวมันไก่', 'ก๋วยเตี๋ยวเรือ', 'ร้านทอง', 'ร้านขายยา', 'ชาไทย', 'ผัดไทย', 'กาแฟโบราณ', 'มินิมาร์ท 24 ชม.', 'ส้มตำ', 'ร้านตัดผม', 'นวดแผนไทย', 'ซ่อมมือถือ'];
+  const SIGNC = [['#c62828', '#ffffff'], ['#f9c80e', '#7f1d1d'], ['#1565c0', '#ffffff'], ['#2e7d32', '#ffffff'], ['#ffffff', '#b91c1c'], ['#111827', '#facc15']];
+  const signMs = (ZOM ? ['HELP', 'NO ENTRY', 'RUN!', 'อย่าเข้าไป', 'SURVIVORS →', 'เขตกักกัน'] : SIGNS).map((t, i) => {
+    const [bg, fg] = ZOM ? [['#2a2826', '#c0392b'], ['#3a3632', '#e5e7eb'], ['#2b2b28', '#d4ac0d']][i % 3] : SIGNC[i % SIGNC.length];
+    const tx = canvasTex(256, 64, (x, w, h) => { x.fillStyle = bg; x.fillRect(0, 0, w, h); x.strokeStyle = fg; x.lineWidth = 3; x.strokeRect(5, 5, w - 10, h - 10); x.fillStyle = fg; x.font = '800 32px Kanit, Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, w / 2, h / 2 + 2, w - 24); if (ZOM) for (let k = 0; k < 120; k++) { x.fillStyle = `rgba(0,0,0,${R() * .3})`; x.fillRect(R() * w, R() * h, 3, 3); } });
+    const mt = new THREE.MeshStandardMaterial({ map: tx, emissiveMap: tx, emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.8 }); world.nightMats.push({ m: mt, on: ZOM ? 0.1 : 0.6 }); return mt;
+  });
+  const AWN = (ZOM ? ['#5a4a3a', '#4a4f4a', '#5d3a2e'] : ['#dc2626', '#2563eb', '#16a34a', '#f59e0b', '#db2777', '#0d9488']).map(c => toon(c));
+  const acM = toon('#d9d9d4'), darkM = toon('#2b2d30'), poleM = toon(ZOM ? '#4a4a46' : '#6b6f75'), crateM = toon(ZOM ? '#6b5236' : '#8a6a42'), binM = toon(ZOM ? '#3d4a3a' : '#2f7a4a');
+  let hi = 0;
+  const shopHouse = (x0, x1, z0, z1, front) => {
+    const f = ZOM ? 1 + ((R() * 2.4) | 0) : 1 + ((R() * 3) | 0), wm = wallMs[hi++ % wallMs.length], cx = (x0 + x1) / 2;
+    const top = cityHouse(box, floors, { x0, x1, z0, z1, f, wm, fm: floorM, sm: stairM, doors: ['n', 's'], front, shop: !ZOM && R() < 0.6 });
+    ((world.cityHouses = world.cityHouses || {})[m] = world.cityHouses[m] || []).push({ x0, x1, z0, z1, f, front });
+    const zf = front === 's' ? z0 : z1, out = front === 's' ? -1 : 1;
+    // ป้าย + กันสาด + แอร์
+    const sm2 = signMs[hi % signMs.length]; box(x0 + 0.5, x1 - 0.5, 2.95, 3.55, Math.min(zf, zf + out * 0.12), Math.max(zf, zf + out * 0.12), sm2, false);
+    if (!ZOM || R() < .5) { const aw = box(x0 + 0.6, x1 - 0.6, 2.75, 2.85, Math.min(zf + out * 0.12, zf + out * 1.4), Math.max(zf + out * 0.12, zf + out * 1.4), AWN[hi % AWN.length], false); if (aw) aw.rotation.x = out * 0.18; }
+    for (let k = 1; k < f; k++) if (R() < .6) box(cx + rnd(-2, 1.5), cx + rnd(-2, 1.5) + 0.9, k * 3.6 + 0.3, k * 3.6 + 0.9, Math.min(zf, zf + out * 0.5), Math.max(zf, zf + out * 0.5), acM, false);
+    if (ZOM && R() < .5) box(cx - 1.4, cx + 1.4, 1.0, 1.25, Math.min(zf, zf + out * 0.08), Math.max(zf, zf + out * 0.08), toon('#5a4128'), false);
+    return top;
+  };
+  // ---------- ของประกอบ / ที่กำบัง ----------
+  const wheelG = new THREE.CylinderGeometry(0.34, 0.34, 0.24, 12).rotateZ(Math.PI / 2);
+  const CARC = ZOM ? ['#6b3b26', '#4f5a5e', '#5d4a3a', '#3e4448', '#7a6a4a', '#2f3a33'] : ['#ff4fa3', '#f6d32b', '#1d4ed8', '#f97316', '#e5e7eb', '#16a34a', '#b91c1c'];
+  const car = (x, z, ax, ci, flip = false) => {
+    const L2 = 2.1, W2 = 0.95, c = toon(CARC[ci % CARC.length]), y0 = flip ? 0.2 : 0;
+    if (ax === 'x') { box(x - L2, x + L2, y0 + 0.3, y0 + 1.1, z - W2, z + W2, c); box(x - 1.0, x + 1.1, y0 + 1.1, y0 + 1.7, z - 0.85, z + 0.85, ZOM ? darkM : toon('#1e293b')); }
+    else { box(x - W2, x + W2, y0 + 0.3, y0 + 1.1, z - L2, z + L2, c); box(x - 0.85, x + 0.85, y0 + 1.1, y0 + 1.7, z - 1.0, z + 1.1, ZOM ? darkM : toon('#1e293b')); }
+    if (!flip) for (const a of [-1.35, 1.35]) for (const b of [-0.9, 0.9]) { const w = new THREE.Mesh(wheelG, darkM); if (ax === 'x') { w.rotation.y = Math.PI / 2; w.position.set(x + a, 0.34, z + b); } else w.position.set(x + b, 0.34, z + a); g.add(w); }
+    if (!ZOM && ci % 3 === 0) { const sx = ax === 'x' ? x : x, sz = z; box(sx - 0.35, sx + 0.35, 1.7, 1.95, sz - 0.15, sz + 0.15, toon('#fde047'), false); }
+  };
+  const tuk = (x, z, ax, ci) => {
+    const c = toon(['#1e88e5', '#43a047', '#e53935', '#8e24aa'][ci % 4]), cn = toon(['#ffd600', '#e53935', '#1e88e5', '#ffd600'][ci % 4]);
+    if (ax === 'x') { box(x - 1.3, x + 1.0, 0.25, 1.05, z - 0.75, z + 0.75, c); box(x - 1.5, x + 1.3, 2.1, 2.25, z - 0.82, z + 0.82, cn, false); for (const px of [-1.4, 1.2]) for (const pz of [-0.7, 0.7]) box(px + x - 0.03, px + x + 0.03, 1.05, 2.1, z + pz - 0.03, z + pz + 0.03, poleM, false); box(x + 0.9, x + 1.4, 0.25, 1.5, z - 0.4, z + 0.4, c); }
+    else { box(x - 0.75, x + 0.75, 0.25, 1.05, z - 1.3, z + 1.0, c); box(x - 0.82, x + 0.82, 2.1, 2.25, z - 1.5, z + 1.3, cn, false); for (const pz of [-1.4, 1.2]) for (const px of [-0.7, 0.7]) box(x + px - 0.03, x + px + 0.03, 1.05, 2.1, z + pz - 0.03, z + pz + 0.03, poleM, false); box(x - 0.4, x + 0.4, 0.25, 1.5, z + 0.9, z + 1.4, c); }
+  };
+  const crates = (x, z) => { box(x - 0.7, x + 0.7, 0, 1.4, z - 0.7, z + 0.7, crateM); if (R() < .5) box(x + 0.8, x + 2.0, 0, 1.2, z - 0.6, z + 0.6, crateM); if (R() < .4) box(x - 0.5, x + 0.5, 1.4, 2.3, z - 0.5, z + 0.5, crateM); };
+  const bin = (x, z) => box(x - 0.9, x + 0.9, 0, 1.3, z - 0.55, z + 0.55, binM);
+  const sandM = toon('#8a7b5a');
+  const sandbags = (x, z, ax, len) => { const h = 1.15; if (ax === 'x') box(x - len / 2, x + len / 2, 0, h, z - 0.45, z + 0.45, sandM); else box(x - 0.45, x + 0.45, 0, h, z - len / 2, z + len / 2, sandM); };
+  const jersey = (x, z, ax) => { const cm = toon('#9a968e'); if (ax === 'x') { box(x - 1.6, x + 1.6, 0, 0.45, z - 0.38, z + 0.38, cm); box(x - 1.6, x + 1.6, 0.45, 1.05, z - 0.18, z + 0.18, cm); } else { box(x - 0.38, x + 0.38, 0, 0.45, z - 1.6, z + 1.6, cm); box(x - 0.18, x + 0.18, 0.45, 1.05, z - 1.6, z + 1.6, cm); } };
+  world.fires = world.fires || []; world.fireLights = world.fireLights || [];
+  const fireMat = new THREE.MeshBasicMaterial({ color: '#ff8a2a', transparent: true, opacity: 0.9, depthWrite: false }), fireMat2 = new THREE.MeshBasicMaterial({ color: '#ffd36b', transparent: true, opacity: 0.85, depthWrite: false });
+  const fireBarrel = (x, z) => { cyl(x, z, 0.42, 1.1, toon('#5a3a22')); const f1 = new THREE.Mesh(new THREE.ConeGeometry(0.38, 1.2, 8), fireMat); f1.position.set(x, 1.6, z); f1.userData.keep = true; g.add(f1); const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.8, 8), fireMat2); f2.position.set(x, 1.45, z); f2.userData.keep = true; g.add(f2); world.fires.push({ f1, f2, ph: R() * 6 }); };
+  const trees = [];
+  const planterTree = (x, z) => { box(x - 0.8, x + 0.8, 0, 0.6, z - 0.8, z + 0.8, curbM); trees.push([x, 0.6, z, 0.75 + R() * 0.25, R() * 6]); cols.push({ x0: x - 0.25, x1: x + 0.25, z0: z - 0.25, z1: z + 0.25, y0: 0.6, y1: 3.4 }); };
+  // ---------- บล็อกเมือง ----------
+  const D = 8.4;
+  CBX.forEach(([bx0, bx1], ix) => CBZ.forEach(([bz0, bz1], iz) => {
+    if (CITY_SITE[m].includes(ix + ',' + iz)) { // ไซต์ก่อสร้าง (ตึกโครงคอนกรีตวางทีหลัง)
+      for (let k = 0; k < 3; k++) crates(rnd(bx0 + 2, bx1 - 3), R() < .5 ? bz0 + 1.5 : bz1 - 1.5);
+      return;
+    }
+    const t = R(), w = bx1 - bx0, rows = t < (ZOM ? 0.5 : 0.55) ? ['s', 'n'] : t < 0.8 ? [R() < .5 ? 's' : 'n'] : [];
+    for (const side of rows) {
+      const z0 = side === 's' ? bz0 : bz1 - D, z1 = side === 's' ? bz0 + D : bz1;
+      const gap = R() < 0.65, hw = gap ? (w - 2.6) / 2 : w / 2;
+      shopHouse(bx0, bx0 + hw, z0, z1, side); shopHouse(bx1 - hw, bx1, z0, z1, side);
+    }
+    const mx = (bx0 + bx1) / 2;
+    if (rows.length === 2) { // ตรอกหลังบ้าน
+      const az = (bz0 + bz1) / 2; if (R() < .7) bin(mx + rnd(-5, 5), az); if (R() < .6) crates(bx0 + rnd(2, 5), az - 0.2);
+    } else if (rows.length === 1) { // ลานบ้าน / ลานจอดรถ
+      const yz0 = rows[0] === 's' ? bz0 + D + 1.5 : bz0 + 1.5, yz1 = rows[0] === 's' ? bz1 - 1.5 : bz1 - D - 1.5, yc = (yz0 + yz1) / 2;
+      car(mx - 4.5, yc, 'z', (ix + iz) | 0, ZOM && R() < .3); if (ZOM) fireBarrel(mx + 1.5, yc + rnd(-2, 2)); else tuk(mx + 1.0, yc, 'z', ix + iz);
+      crates(bx1 - 3.5, yz0 + 1); if (!ZOM) { planterTree(bx0 + 2.5, yz1 - 1.2); box(mx + 4.4, mx + 5.2, 0, 1.4, yc - 0.4, yc + 0.4, toon('#c9a227'), true); box(mx + 4.2, mx + 5.4, 1.4, 2.1, yc - 0.6, yc + 0.6, toon('#c62828'), false); } else sandbags(mx + 5, yc, 'z', 3.5);
+    } else if (!ZOM) { // ตลาดนัด: แผงขายของ + ร่ม
+      const UM = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#ec4899'];
+      for (let x = bx0 + 3; x < bx1 - 2; x += 4.6) for (let z = bz0 + 3; z < bz1 - 2; z += 5.5) { if (R() < .2) continue; box(x - 1.2, x + 1.2, 0, 0.95, z - 0.7, z + 0.7, toon('#cbd5e1')); box(x - 1.1, x + 1.1, 0.95, 1.2, z - 0.6, z + 0.6, toon(['#f97316', '#84cc16', '#facc15', '#ef4444'][(x + z) & 3]), false); const um = new THREE.Mesh(new THREE.ConeGeometry(1.7, 0.6, 10), toon(UM[((x * 3 + z) | 0) % 5 < 0 ? 0 : ((x * 3 + z) | 0) % 5])); um.position.set(x, 2.6, z); um.castShadow = true; g.add(um); cyl(x, z, 0.04, 2.4, poleM, 0, false, 5); }
+      trees.push([bx0 + 1.5, 0, bz0 + 1.5, 1, R() * 6], [bx1 - 1.5, 0, bz1 - 1.5, 1, R() * 6]);
+    } else { // ค่ายทหาร: กระสอบทราย เต็นท์
+      const tentM = toon('#4f5a3a');
+      for (let k = 0; k < 2; k++) { const tx = bx0 + 4 + k * (w - 8), tz = (bz0 + bz1) / 2 + (k ? 3 : -3); box(tx - 2.2, tx + 2.2, 0, 2.2, tz - 1.6, tz + 1.6, tentM); const rf = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 4.4, 3, 1, false), tentM); rf.rotation.z = Math.PI / 2; rf.position.set(tx, 2.2, tz); rf.scale.set(1, 1, 1); g.add(rf); }
+      sandbags(mx, bz0 + 3, 'x', 6); sandbags(mx, bz1 - 3, 'x', 6); sandbags(bx0 + 2.5, (bz0 + bz1) / 2, 'z', 5); fireBarrel(mx, (bz0 + bz1) / 2); crates(bx1 - 3, bz0 + 4);
+    }
+  }));
+  // ---------- ถนน: รถจอด เสาไฟ เสาไฟฟ้า ----------
+  const lampM = new THREE.MeshStandardMaterial({ color: '#fff3d6', emissive: '#ffd59a', emissiveIntensity: 0 }); world.nightMats.push({ m: lampM, on: ZOM ? 1.2 : 3 });
+  const roads = [];
+  for (const x of [-70, ...NS, 70]) roads.push(['z', x]); for (const z of [-70, ...EW, 70]) roads.push(['x', z]);
+  let ci = 0;
+  for (const [ax, c] of roads) for (let u = -62; u <= 62; u += rnd(14, 22)) {
+    const lane = (R() < .5 ? -1 : 1) * (c === 2.5 || c === 0 ? rnd(4, 7) : 2.3), x = ax === 'z' ? c + lane : u, z = ax === 'z' ? u : c + lane;
+    if (cityClear(x, z, 3) || Math.abs(x) > 72 || Math.abs(z) > 72) continue;
+    if ([...(ax === 'z' ? EW : NS), -70, 70].some(n => Math.abs((ax === 'z' ? z : x) - n) < 9)) continue;
+    const r = R();
+    if (ZOM) { if (r < .75) car(x, z, ax, ci++, R() < .15); else fireBarrel(x, z); }
+    else if (r < .5) car(x, z, ax, ci++); else if (r < .85) tuk(x, z, ax, ci++); else jersey(x, z, ax);
+  }
+  // เสาไฟถนน / เสาไฟฟ้า + สายไฟ (กรุงเทพ)
+  const wires = [];
+  for (const [bx0, bx1] of CBX) for (const [bz0, bz1] of CBZ) for (const [px, pz] of [[bx0 - 1.4, bz0 - 1.4], [bx1 + 1.4, bz1 + 1.4], [bx1 + 1.4, bz0 - 1.4], [bx0 - 1.4, bz1 + 1.4]]) {
+    if (cityClear(px, pz, 1)) continue;
+    if (!ZOM) { cyl(px, pz, 0.17, 8.5, toon('#9a958c')); box(px - 0.9, px + 0.9, 7.6, 7.75, pz - 0.08, pz + 0.08, darkM, false); }
+    else cyl(px, pz, 0.12, 6.5, poleM);
+    box(px - 0.25, px + 0.25, ZOM ? 6.3 : 8.5, ZOM ? 6.55 : 8.75, pz - 0.25, pz + 0.25, lampM, false);
+  }
+  if (!ZOM) { // สายไฟฟ้าระโยงระยาง
+    const pts = []; for (const [bx0, bx1] of CBX) for (const [bz0, bz1] of CBZ) { const a = [[bx0 - 1.4, bz0 - 1.4], [bx1 + 1.4, bz0 - 1.4], [bx1 + 1.4, bz1 + 1.4], [bx0 - 1.4, bz1 + 1.4]]; for (let k = 0; k < 4; k++) { const [x1, z1] = a[k], [x2, z2] = a[(k + 1) % 4]; if (cityClear(x1, z1, 1) || cityClear(x2, z2, 1)) continue; for (let wv = 0; wv < 3; wv++) { const y = 7.2 + wv * 0.25; for (let q = 0; q < 6; q++) { const t0 = q / 6, t1 = (q + 1) / 6, sag = (tt) => -Math.sin(tt * Math.PI) * 0.9; pts.push(x1 + (x2 - x1) * t0, y + sag(t0), z1 + (z2 - z1) * t0, x1 + (x2 - x1) * t1, y + sag(t1), z1 + (z2 - z1) * t1); } } } }
+    const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); const wl = new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: '#1b1b1b' })); wl.userData.keep = true; g.add(wl);
+    for (const x of [-30.5, -9, 14, 35.5]) for (const z of [-60, -48, -25, 18, 25, 50, 60]) if (!cityClear(x, z, 1)) planterTree(x + (x < 0 ? -0.0 : 0), z);
+    // รถไฟฟ้ายกระดับ เหนือถนนสายหลัก
+    const vm = toon('#d1d5db');
+    box(-90, 90, 8.6, 9.7, -2.2, 2.2, vm, false); box(-90, 90, 9.7, 10.2, -2.2, -1.95, toon('#9ca3af'), false); box(-90, 90, 9.7, 10.2, 1.95, 2.2, toon('#9ca3af'), false);
+    for (const x of [-60, -40, -22, 25, 45, 64]) { box(x - 0.9, x + 0.9, 0, 8.6, -0.9, 0.9, vm); box(x - 1.6, x + 1.6, 7.9, 8.6, -2.3, 2.3, vm, false); }
+    const trainTex = canvasTex(256, 64, (x, w, h) => { x.fillStyle = '#f8fafc'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 44, w, 10); x.fillStyle = '#1d4ed8'; x.fillRect(0, 54, w, 5); x.fillStyle = '#1e293b'; for (let k = 0; k < 6; k++) x.fillRect(10 + k * 42, 12, 30, 22); });
+    const train = new THREE.Group(); train.userData.keep = true; g.add(train); world.train = train;
+    const tm = new THREE.MeshLambertMaterial({ map: trainTex }), tm2 = toon('#e2e8f0');
+    for (let k = 0; k < 4; k++) { const c = new THREE.Mesh(new THREE.BoxGeometry(10.5, 3, 2.9), [tm, tm, tm2, tm2, tm, tm]); c.position.set(k * 11, 11.7, 0.8); c.castShadow = true; c.userData.keep = true; train.add(c); }
+  } else { // เมืองซอมบี้: ด่านตรวจ รถบัสไหม้ หอสังเกตการณ์
+    for (const x of [-26, 30]) { sandbags(x, -6, 'z', 5); sandbags(x, 6, 'z', 5); jersey(x + 3, 0, 'z'); }
+    const busM = toon('#6e5a2c'); box(-4, 9, 0.3, 3.2, -52, -49.4, busM); box(-4, 9, 1.8, 2.7, -52.05, -49.35, toon('#121212'), false); fireBarrel(11, -47);
+    const tower = new THREE.Group(); tower.position.set(-70, 0, -70); g.add(tower); tower.userData.keep = true;
+    for (const [sx, sz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) { const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 12, 6), poleM); p2.position.set(sx, 6, sz); tower.add(p2); }
+    const pf = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.3, 4.4), poleM); pf.position.y = 12; tower.add(pf);
+    const beamMat = new THREE.MeshBasicMaterial({ color: '#f7f3d0', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    const beam = new THREE.Mesh(new THREE.ConeGeometry(5, 45, 24, 1, true).translate(0, -22.5, 0), beamMat); const piv = new THREE.Group(); piv.position.set(0, 13.5, 0); tower.add(piv); beam.rotation.x = -1.25; piv.add(beam);
+    world.searchlight = piv; world.beamMat = beamMat; piv.rotation.y = 0.8;
+    for (const [x, z] of [[-36.5, -20], [41.5, 20], [-20, 36.5]]) { const pl = new THREE.PointLight(0xff8a3a, 0, 22, 1.6); pl.position.set(x, 2.2, z); g.add(pl); world.fireLights.push(pl); fireBarrel(x, z); }
+  }
+  plantInstances(g, 'tree' + (ZOM ? 2 : 1), trees);
+  // ---------- ขอบเมือง / ฉากหลัง ----------
+  const back = (x, z, w, d, h, mt) => box(x - w / 2, x + w / 2, 0, h, z - d / 2, z + d / 2, mt, false);
+  for (let side = 0; side < 4; side++) for (let t = -88; t < 88;) {
+    const w = 7 + R() * 6, h = 8 + R() * (ZOM ? 10 : 14), mid = t + w / 2, dist = 80, [x, z] = side === 0 ? [mid, -dist] : side === 1 ? [mid, dist] : side === 2 ? [-dist, mid] : [dist, mid];
+    back(x, z, side < 2 ? w - 0.3 : 9, side < 2 ? 9 : w - 0.3, h, wallMs[(((t | 0) & 3) + 1) % wallMs.length]); t += w;
+  }
+  const glass = canvasTex(64, 128, (x) => { x.fillStyle = ZOM ? '#2b3236' : '#1f3b57'; x.fillRect(0, 0, 64, 128); for (let r = 0; r < 16; r++) for (let c = 0; c < 4; c++) { x.fillStyle = ZOM ? (R() < .15 ? '#0a0a0a' : '#3a4246') : (R() < 0.25 ? '#ffe9a8' : (R() < .5 ? '#5f8fb8' : '#45739c')); x.fillRect(c * 16 + 2, r * 8 + 2, 12, 5); } });
+  glass.wrapS = glass.wrapT = THREE.RepeatWrapping; glass.repeat.set(2, 6);
+  const gm = new THREE.MeshStandardMaterial({ map: glass, emissiveMap: glass, emissive: '#ffe2a0', emissiveIntensity: 0, roughness: 0.35, metalness: 0.4 }); world.nightMats.push({ m: gm, on: ZOM ? 0.05 : 0.5 });
+  for (let i = 0; i < 40; i++) { const a = i / 40 * Math.PI * 2 + R() * 0.1, d = 110 + R() * 90, w = 12 + R() * 12, h = 30 + R() * (ZOM ? 50 : 100); const tw = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), gm); tw.position.set(Math.cos(a) * d, h / 2, Math.sin(a) * d); tw.rotation.y = R() * 3; if (ZOM && i % 5 === 0) tw.rotation.z = 0.06; g.add(tw); }
+  if (ZOM) { // รั้วกั้นเขตกักกัน + ซอมบี้ด้านนอก
+    const fenceTex = canvasTex(64, 64, (x) => { x.clearRect(0, 0, 64, 64); x.strokeStyle = '#9aa0a6'; x.lineWidth = 2; for (let k = -64; k < 128; k += 12) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 64, 64); x.stroke(); x.beginPath(); x.moveTo(k + 64, 0); x.lineTo(k, 64); x.stroke(); } });
+    fenceTex.wrapS = fenceTex.wrapT = THREE.RepeatWrapping; fenceTex.repeat.set(40, 1.5);
+    const fm = new THREE.MeshStandardMaterial({ map: fenceTex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.3, metalness: 0.6, roughness: 0.5 });
+    for (let k = 0; k < 4; k++) { const f = new THREE.Mesh(new THREE.PlaneGeometry(150, 3.2), fm); f.position.set(k < 2 ? 0 : (k === 2 ? -74.6 : 74.6), 1.6, k < 2 ? (k ? 74.6 : -74.6) : 0); if (k >= 2) f.rotation.y = Math.PI / 2; f.userData.keep = true; g.add(f); }
+    for (let k = -74; k <= 74; k += 6) for (const [x, z] of [[k, -74.6], [k, 74.6], [-74.6, k], [74.6, k]]) cyl(x, z, 0.07, 3.3, poleM, 0, false, 6);
+  }
+  world.citySpots = world.citySpots || {};
+  mergeStatic(g);
+  return g;
+}
+function buildBangkok() { world.cars = []; world.bkkFlags = []; world.bkk = buildCity(1); }
+function buildZombie() {
+  world.zom = buildCity(2);
+  // ซอมบี้เดินเตร่อยู่นอกรั้ว
+  world.zombies = [];
+  const g = world.zom, rnd = (a, b) => a + Math.random() * (b - a);
+  const ZC = [['#7d8f6a', '#4a4f3e', '#3b3a36'], ['#8a957a', '#5b4636', '#2e3036'], ['#6f8269', '#3f4b5a', '#3a3328'], ['#8b9883', '#6b5a48', '#262626']];
+  const zG = { leg: new THREE.CapsuleGeometry(0.12, 0.62, 4, 8), arm: new THREE.CapsuleGeometry(0.09, 0.5, 4, 8), torso: new THREE.CapsuleGeometry(0.26, 0.45, 4, 10), head: new THREE.SphereGeometry(0.2, 14, 12), eye: new THREE.SphereGeometry(0.03, 6, 6) };
+  const eyeMat = new THREE.MeshStandardMaterial({ color: '#d8e05a', emissive: '#d8e05a', emissiveIntensity: 0 }); world.nightMats.push({ m: eyeMat, on: 2.5 });
+  for (let i = 0; i < 30; i++) {
+    const [skin, shirt, pants] = ZC[i % 4], z = new THREE.Group(), body = new THREE.Group(); z.add(body);
+    const add = (p, geo, c, x, y, zz) => { const mm = new THREE.Mesh(geo, typeof c === 'string' ? toon(c) : c); mm.position.set(x, y, zz); mm.castShadow = true; p.add(mm); return mm; };
+    const legs = [], arms = [];
+    for (const sd of [-1, 1]) { const hip = new THREE.Group(); hip.position.set(sd * 0.14, 1.15, 0); body.add(hip); add(hip, zG.leg, pants, 0, -0.5, 0); legs.push(hip); const sh = new THREE.Group(); sh.position.set(sd * 0.36, 1.95, 0); body.add(sh); add(sh, zG.arm, i % 3 ? skin : shirt, 0, -0.34, 0); arms.push(sh); }
+    add(body, zG.torso, shirt, 0, 1.62, 0).scale.set(1.08, 1, 0.72);
+    const head = new THREE.Group(); head.position.set(0, 2.28, 0.05); body.add(head); add(head, zG.head, skin, 0, 0, 0).scale.set(0.95, 1.12, 1); for (const sd of [-1, 1]) add(head, zG.eye, eyeMat, sd * 0.07, 0.03, 0.18);
+    head.rotation.set(0.25, 0, rnd(-0.4, 0.4)); body.rotation.x = 0.18;
+    const side = i % 4, t = rnd(-68, 68), d = rnd(76, 80), x = side < 2 ? t : (side === 2 ? -d : d), zz = side < 2 ? (side ? d : -d) : t;
+    z.position.set(x, 0, zz); z.rotation.y = Math.atan2(-x, -zz); z.scale.setScalar(rnd(0.9, 1.05)); g.add(z);
+    world.zombies.push({ g: z, legs, arms, body, bx: x, bz: zz, ph: Math.random() * 6, v: rnd(0.5, 1), side });
+  }
+}
 const MAPS = [
   { name: 'สนามกีฬา', track: '#a3452f', sub: 'ลู่วิ่ง ลานกว้าง' },
-  { name: 'ถนนกรุงเทพ', track: '#35393f', sub: 'ถนนในเมือง' },
-  { name: 'เมืองซอมบี้', track: '#34373a', sub: 'บรรยากาศหลอน' },
+  { name: 'ถนนกรุงเทพ', track: '#35393f', sub: 'ตึกแถว ตรอกซอย รถไฟฟ้า' },
+  { name: 'เมืองซอมบี้', track: '#34373a', sub: 'เมืองร้าง เขตกักกัน' },
   { name: 'เมืองยามเย็น', track: '#34373a', shootOnly: true, sub: 'เขาวงกต ต่างระดับ' },
   { name: 'ท่าเรือ', track: '#34373a', shootOnly: true, sub: 'ตู้คอนเทนเนอร์ · เรือสินค้า' },
 ];
@@ -1100,7 +1129,7 @@ function applyMap(m, tod = 0) {
   m = Math.max(0, Math.min(MAPS.length - 1, m | 0)); tod = tod ? 1 : 0;
   const key = m + '-' + tod; if (key === curEnv || !world.bkk) return; curEnv = key;
   const e = ENV[m][tod];
-  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2; if (world.town) world.town.visible = m === 3; if (world.harbor) world.harbor.visible = m === 4; world.trackG.visible = m < 3;
+  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2; if (world.town) world.town.visible = m === 3; if (world.harbor) world.harbor.visible = m === 4; world.trackG.visible = m === 0;
   world.trackMat.color.set(MAPS[m].track);
   skyMat.uniforms.top.value.set(e.top); skyMat.uniforms.bot.value.set(e.bot);
   scene.fog.color.set(e.fog); scene.fog.near = e.fn; scene.fog.far = e.ff;
@@ -1117,205 +1146,16 @@ function applyMap(m, tod = 0) {
   world.nightMats.forEach(({ m: mt, on }) => { mt.emissiveIntensity = tod ? on * 0.6 : 0; });
   (world.fireLights || []).forEach(l => { l.userData.base = m === 2 ? (tod ? 30 : 6) : 0; l.intensity = l.userData.base; });
   if (world.beamMat) world.beamMat.opacity = tod ? 0.12 : 0;
-  (world.bannerMats || []).forEach(mt => { mt.map = m === 1 ? world.bkkBanner : m === 2 ? world.zomBanner : world.bannerTex; mt.needsUpdate = true; });
-}
-/* ---------- ฉากเมืองซอมบี้ ---------- */
-function buildZombie() {
-  const g = new THREE.Group(); g.visible = false; scene.add(g); world.zom = g;
-  const box = (w, h, d, mat, x, y, z, parent = g) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
-  const cyl = (rt, rb, h, mat, x, y, z, parent = g, seg = 10) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); parent.add(m); return m; };
-  const rnd = (a, b) => a + Math.random() * (b - a);
-  const nightMat = (c, on, extra = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0, roughness: 0.6, ...extra }); world.nightMats.push({ m, on }); return m; };
-
-  // พื้นยางมะตอยแตกร้าว
-  const crack = canvasTex(256, 256, (x) => {
-    x.fillStyle = '#4a4a46'; x.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${Math.random() < .5 ? 0 : 255},${Math.random() < .5 ? 0 : 255},0,${Math.random() * 0.04})`; x.fillRect(Math.random() * 256, Math.random() * 256, 3, 3); }
-    x.strokeStyle = 'rgba(15,15,14,.7)'; x.lineWidth = 2;
-    for (let k = 0; k < 7; k++) { x.beginPath(); let px = Math.random() * 256, py = Math.random() * 256; x.moveTo(px, py); for (let j = 0; j < 8; j++) { px += rnd(-30, 30); py += rnd(-30, 30); x.lineTo(px, py); } x.stroke(); }
-    x.fillStyle = 'rgba(60,70,40,.35)'; for (let k = 0; k < 6; k++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, rnd(6, 20), 0, 7); x.fill(); }
-  });
-  crack.wrapS = crack.wrapT = THREE.RepeatWrapping; crack.repeat.set(70, 70);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ map: crack, roughness: 0.95 }));
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
-  const shape = new THREE.Shape(); const n = 40;
-  for (let i = 0; i < 4 * n; i++) { const p = segPt(i / n, RIN - 0.7); i ? shape.lineTo(p[0], -p[1]) : shape.moveTo(p[0], -p[1]); }
-  const dirt = canvasTex(128, 128, (x) => { x.fillStyle = '#4d4a3a'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 500; i++) { x.fillStyle = `rgba(${rnd(40, 90) | 0},${rnd(50, 80) | 0},${rnd(30, 50) | 0},.5)`; x.fillRect(Math.random() * 128, Math.random() * 128, 4, 4); } });
-  dirt.wrapS = dirt.wrapT = THREE.RepeatWrapping; dirt.repeat.set(1 / 8, 1 / 8);
-  const inf = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ map: dirt, roughness: 1 }));
-  inf.geometry.rotateX(-Math.PI / 2); inf.position.y = 0.02; inf.receiveShadow = true; g.add(inf);
-
-  // ตึกร้าง
-  const winTex = (seed, lit) => canvasTex(128, 256, (x, w, h) => {
-    x.fillStyle = ['#5d5a52', '#4f5552', '#6a6158', '#545049'][seed % 4]; x.fillRect(0, 0, w, h);
-    for (let i = 0; i < 300; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .12})`; x.fillRect(Math.random() * w, Math.random() * h, rnd(2, 10), rnd(2, 14)); }
-    for (let r = 0; r < 8; r++) for (let c = 0; c < 3; c++) {
-      const px = 12 + c * 40, py = 12 + r * 31, k = Math.random();
-      x.fillStyle = lit ? (k < 0.12 ? '#ffb85c' : '#000') : (k < 0.3 ? '#0c0d0e' : k < 0.45 ? '#7a5a3a' : '#2b3236');
-      x.fillRect(px, py, 26, 20);
-      if (!lit && k >= 0.3 && k < 0.45) { x.fillStyle = '#5a4128'; for (let p = 0; p < 3; p++) x.fillRect(px - 2, py + 3 + p * 6, 30, 3); }
-    }
-    if (!lit && seed % 3 === 0) { x.fillStyle = 'rgba(0,0,0,.55)'; x.beginPath(); x.moveTo(0, 0); x.lineTo(w * 0.6, 0); x.lineTo(w * 0.2, h * 0.3); x.fill(); }
-  });
-  const ruinMats = [0, 1, 2, 3, 4, 5].map(i => { const t = winTex(i, false), e = winTex(i, true); const m = new THREE.MeshStandardMaterial({ map: t, emissiveMap: e, emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.92 }); world.nightMats.push({ m, on: 0.8 }); return m; });
-  const graffiti = ['SURVIVORS →', 'HELP', 'เขตกักกัน', 'NO ENTRY', 'RUN!', 'อย่าเข้าไป'];
-  function ruin(x, z, w, h, tx, tz, i) {
-    const grp = new THREE.Group(); grp.position.set(x, 0, z); g.add(grp);
-    const m = ruinMats[i % ruinMats.length];
-    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 9), m); b.position.y = h / 2; grp.add(b);
-    if (i % 3 === 0) { const c = box(w * 0.55, 2.5, 7, m, w * 0.2, h + 0.4, 0, grp); c.rotation.z = 0.35; }
-    if (i % 4 === 1) for (let k = 0; k < 3; k++) box(rnd(1, 2.5), rnd(0.6, 1.4), rnd(1, 2), '#5a5750', rnd(-w / 2, w / 2), 0.5, 5.5 + rnd(0, 1.5), grp).rotation.set(rnd(0, 1), rnd(0, 3), rnd(0, 1));
-    if (i % 5 === 2) {
-      const gt = canvasTex(256, 64, (c, cw, ch) => { c.clearRect(0, 0, cw, ch); c.font = '700 42px Oswald, Kanit, sans-serif'; c.fillStyle = ['#c0392b', '#e5e7eb', '#d4ac0d'][i % 3]; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(graffiti[i % graffiti.length], cw / 2, ch / 2); });
-      const p = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.8, w * 0.2), new THREE.MeshStandardMaterial({ map: gt, transparent: true, roughness: 1 })); p.position.set(0, 2.2, 4.52); grp.add(p);
-    }
-    grp.lookAt(tx, 0, tz); grp.rotation.z += rnd(-0.03, 0.03);
-  }
-  let bi = 0;
-  for (const sd of [1, -1]) for (let x = -L / 2; x < L / 2 - 2;) { const w = rnd(7, 11); ruin(x + w / 2, sd * (ROUT + 20), w - 0.3, rnd(9, 22), x + w / 2, 0, bi++); x += w; }
-  for (const [k, cx] of [[1, L / 2], [3, -L / 2]]) { const R2 = ROUT + 20, cnt = Math.round(Math.PI * R2 / 8.5); for (let i = 1; i < cnt; i++) { const [x, z] = segPt(k + i / cnt, R2); ruin(x, z, 8, rnd(9, 24), cx, 0, bi++); } }
-  for (let i = 0; i < 30; i++) {
-    const a = i / 30 * Math.PI * 2, d = ROUT + rnd(45, 110), x = Math.cos(a) * (d + L / 2 * Math.abs(Math.cos(a))), z = Math.sin(a) * d, w = rnd(10, 18), h = rnd(25, 70);
-    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), ruinMats[i % 6]); t.position.set(x, h / 2, z); t.rotation.set(0, rnd(0, 3), i % 6 === 0 ? 0.08 : 0); g.add(t);
-    if (i % 4 === 0) { const top = box(w * 0.7, h * 0.15, w * 0.6, ruinMats[(i + 1) % 6], x, h + h * 0.04, z); top.rotation.set(0.25, rnd(0, 3), 0.15); }
-  }
-
-  // รถพังทิ้งไว้
-  const rust = ['#6b3b26', '#4f5a5e', '#5d4a3a', '#3e4448', '#7a6a4a', '#2f3a33'];
-  function wreck(x, z, ry, flip, c) {
-    const t = new THREE.Group(); t.position.set(x, 0, z); t.rotation.y = ry; g.add(t);
-    box(1.9, 0.75, 4.2, c, 0, 0.7, 0, t); box(1.7, 0.6, 2.1, c, 0, 1.35, -0.2, t);
-    box(1.72, 0.45, 2.0, '#111315', 0, 1.35, -0.2, t).scale.set(1.01, 0.85, 0.92);
-    for (const wx of [-0.9, 0.9]) for (const wz of [-1.35, 1.35]) { const w = cyl(0.34, 0.34, 0.24, '#151515', wx, 0.34, wz, t, 10); w.rotation.z = Math.PI / 2; }
-    if (flip) { t.rotation.z = Math.PI; t.position.y = 1.75; }
-    t.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  }
-  for (let i = 0; i < 18; i++) { const [x, z] = posAt(i / 18 + rnd(0, 0.03), ROUT + rnd(7, 12)); wreck(x, z, rnd(0, 6.3), i % 5 === 0, rust[i % 6]); }
-  for (const [x, z, r] of [[-22, 14, 0.4], [20, -16, 2.2], [-28, -12, 1.2], [26, 12, 3.6]]) wreck(x, z, r, false, rust[(x | 0) & 3]);
-  // รถบัสไหม้
-  const bus = new THREE.Group(); bus.position.set(-10, 0, -ROUT - 9); bus.rotation.y = 0.25; g.add(bus);
-  box(2.6, 2.8, 11, '#6e5a2c', 0, 1.8, 0, bus); box(2.62, 0.9, 10.6, '#121212', 0, 2.4, 0, bus);
-  for (const wz of [-3.8, 3.8]) for (const wx of [-1.2, 1.2]) { const w = cyl(0.5, 0.5, 0.3, '#151515', wx, 0.5, wz, bus, 12); w.rotation.z = Math.PI / 2; }
-
-  // แบริเออร์ กระสอบทราย รั้ว
-  const jShape = new THREE.Shape([new THREE.Vector2(-0.4, 0), new THREE.Vector2(0.4, 0), new THREE.Vector2(0.18, 0.35), new THREE.Vector2(0.14, 0.9), new THREE.Vector2(-0.14, 0.9), new THREE.Vector2(-0.18, 0.35)]);
-  const jGeo = new THREE.ExtrudeGeometry(jShape, { depth: 2.4, bevelEnabled: false }); jGeo.translate(0, 0, -1.2);
-  const jMat = toon('#8d8a82');
-  for (let i = 0; i < 40; i++) {
-    const r = i % 2 ? ROUT + 2.6 : RIN - 2.8, [x, z] = posAt(i / 40 + rnd(-0.004, 0.004), r), [x2, z2] = posAt(i / 40 + 0.002, r);
-    const j = new THREE.Mesh(jGeo, jMat); j.position.set(x, 0, z); j.rotation.y = Math.atan2(x2 - x, z2 - z) + rnd(-0.15, 0.15); j.castShadow = true; g.add(j);
-  }
-  const sandG = new THREE.CapsuleGeometry(0.28, 0.5, 4, 8); sandG.rotateZ(Math.PI / 2);
-  for (const [cx, cz] of [[-14, -6], [14, 6], [-6, 15], [8, -16]]) for (let row = 0; row < 3; row++) for (let k = 0; k < 5 - row; k++) { const s = new THREE.Mesh(sandG, toon('#8a7b5a')); s.position.set(cx + (k - 2 + row / 2) * 1.05, 0.25 + row * 0.45, cz); s.scale.set(1, 0.75, 1); s.castShadow = true; g.add(s); }
-  const fenceTex = canvasTex(64, 64, (x) => { x.clearRect(0, 0, 64, 64); x.strokeStyle = '#9aa0a6'; x.lineWidth = 2; for (let k = -64; k < 128; k += 12) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 64, 64); x.stroke(); x.beginPath(); x.moveTo(k + 64, 0); x.lineTo(k, 64); x.stroke(); } });
-  fenceTex.wrapS = fenceTex.wrapT = THREE.RepeatWrapping; fenceTex.repeat.set(6, 2);
-  const fenceMat = new THREE.MeshStandardMaterial({ map: fenceTex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.3, metalness: 0.6, roughness: 0.5 });
-  for (let i = 0; i < 16; i++) {
-    const r = ROUT + 14.5, [x, z] = posAt(i / 16, r), [x2, z2] = posAt(i / 16 + 0.04, r);
-    const len = Math.hypot(x2 - x, z2 - z), f = new THREE.Mesh(new THREE.PlaneGeometry(len, 3), fenceMat);
-    f.position.set((x + x2) / 2, 1.5, (z + z2) / 2); f.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; f.rotation.z = rnd(-0.06, 0.06); g.add(f);
-    cyl(0.06, 0.06, 3.2, '#6b6f75', x, 1.6, z, g, 6);
-  }
-  // เทปกั้น
-  const tape = canvasTex(256, 32, (x, w, h) => { x.fillStyle = '#f2c230'; x.fillRect(0, 0, w, h); x.fillStyle = '#111'; x.font = '700 22px Oswald, sans-serif'; x.textBaseline = 'middle'; for (let k = 0; k < 2; k++) x.fillText('DO NOT CROSS', 8 + k * 128, h / 2 + 1); });
-  tape.wrapS = THREE.RepeatWrapping;
-  for (let i = 0; i < 10; i++) {
-    const r = RIN - 1.6, [x, z] = posAt(i / 10 + 0.02, r), [x2, z2] = posAt(i / 10 + 0.06, r), len = Math.hypot(x2 - x, z2 - z);
-    const tm = new THREE.MeshBasicMaterial({ map: tape.clone(), side: THREE.DoubleSide }); tm.map.repeat.set(len / 6, 1); tm.map.needsUpdate = true;
-    const tp = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.18), tm); tp.position.set((x + x2) / 2, 1.0, (z + z2) / 2); tp.rotation.y = Math.atan2(x2 - x, z2 - z) - Math.PI / 2; g.add(tp);
-    cyl(0.04, 0.04, 1.1, '#2b2b2b', x, 0.55, z, g, 6);
-  }
-  // ถังไฟ
-  world.fires = [];
-  const fireMat = new THREE.MeshBasicMaterial({ color: '#ff8a2a', transparent: true, opacity: 0.9, depthWrite: false });
-  const fireMat2 = new THREE.MeshBasicMaterial({ color: '#ffd36b', transparent: true, opacity: 0.85, depthWrite: false });
-  for (const [x, z] of [[ -18, 18 ], [ 18, -19 ], [ -36, -6 ], [ 36, 8 ], [ 0, 19 ], [ -8, -19 ], [ 45, 30 ], [ -45, -30 ]]) {
-    cyl(0.42, 0.38, 1.1, '#5a3a22', x, 0.55, z, g, 12).castShadow = true;
-    const f1 = new THREE.Mesh(new THREE.ConeGeometry(0.38, 1.2, 8), fireMat); f1.position.set(x, 1.6, z); g.add(f1);
-    const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.8, 8), fireMat2); f2.position.set(x, 1.45, z); g.add(f2);
-    world.fires.push({ f1, f2, ph: Math.random() * 6 });
-  }
-  world.fireLights = [];
-  for (const [x, z] of [[-18, 18], [18, -19], [0, 19]]) { const pl = new THREE.PointLight(0xff8a3a, 0, 22, 1.6); pl.position.set(x, 2.2, z); g.add(pl); world.fireLights.push(pl); }
-  // ป้ายเขตกักกัน
-  const signT = (t1, t2) => canvasTex(512, 256, (x, w, h) => {
-    x.fillStyle = '#e8e4d8'; x.fillRect(0, 0, w, h);
-    for (let k = -h; k < w; k += 40) { x.fillStyle = '#d9a12b'; x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 20, 0); x.lineTo(k + 20 + h * 0.18, h * 0.18); x.lineTo(k + h * 0.18, h * 0.18); x.fill(); }
-    x.fillStyle = '#111'; x.fillRect(0, h * 0.18, w, 4);
-    x.fillStyle = '#9b1c1c'; x.font = '700 70px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.fillText(t1, w / 2, h * 0.55);
-    x.fillStyle = '#1b1b1b'; x.font = '500 40px Kanit, sans-serif'; x.fillText(t2, w / 2, h * 0.82);
-    for (let i = 0; i < 400; i++) { x.fillStyle = `rgba(80,60,40,${Math.random() * .15})`; x.fillRect(Math.random() * w, Math.random() * h, 4, 4); }
-  });
-  for (const [x, z, ry, a, b] of [[-20, ROUT + 4.5, Math.PI, 'QUARANTINE', 'เขตกักกัน ห้ามเข้า'], [22, -ROUT - 4.5, 0, 'DANGER', 'พบผู้ติดเชื้อในพื้นที่'], [L / 2 + 12, 0, -Math.PI / 2, 'EVACUATE', 'อพยพทันที']]) {
-    const sg = new THREE.Group(); sg.position.set(x, 0, z); sg.rotation.y = ry; g.add(sg);
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), new THREE.MeshStandardMaterial({ map: signT(a, b), roughness: 0.9 })); p.position.y = 4.2; sg.add(p);
-    for (const sx of [-2.6, 2.6]) cyl(0.08, 0.08, 4.2, '#4b4f55', sx, 2.1, -0.05, sg, 6);
-  }
-  // หอสังเกตการณ์ + ไฟส่อง
-  const tower = new THREE.Group(); tower.position.set(-L / 2 - 12, 0, 0); g.add(tower);
-  for (const [sx, sz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) cyl(0.15, 0.2, 12, '#3d4146', sx, 6, sz, tower, 6);
-  box(4.4, 0.3, 4.4, '#3d4146', 0, 12, 0, tower); box(4.4, 2.2, 0.1, '#4b4a3c', 0, 13.2, 2.2, tower); box(4.4, 2.2, 0.1, '#4b4a3c', 0, 13.2, -2.2, tower);
-  const beamMat = new THREE.MeshBasicMaterial({ color: '#f7f3d0', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
-  const beam = new THREE.Mesh(new THREE.ConeGeometry(5, 45, 24, 1, true).translate(0, -22.5, 0), beamMat);
-  const piv = new THREE.Group(); piv.position.set(0, 13.5, 0); tower.add(piv); beam.rotation.x = -1.25; piv.add(beam);
-  world.searchlight = piv; world.beamMat = beamMat;
-  // ต้นไม้แห้ง
-  for (let i = 0; i < 22; i++) {
-    const a = rnd(0, 6.3), d = i < 8 ? rnd(8, 18) : ROUT + rnd(30, 40), x = Math.cos(a) * (d + (i < 8 ? 6 : L / 2 * Math.abs(Math.cos(a)))), z = Math.sin(a) * d * (i < 8 ? 0.8 : 1);
-    if (Math.hypot(x, z) < 8) continue;
-    const tr = new THREE.Group(); tr.position.set(x, 0, z); g.add(tr);
-    cyl(0.18, 0.3, 5, '#2f2a24', 0, 2.5, 0, tr, 6).castShadow = true;
-    for (let k = 0; k < 5; k++) { const br = cyl(0.04, 0.1, rnd(1.5, 2.6), '#2f2a24', 0, 3 + k * 0.4, 0, tr, 5); br.rotation.set(rnd(-1, 1), rnd(0, 6), rnd(0.6, 1.1)); br.geometry.translate(0, 0.9, 0); br.castShadow = true; }
-  }
-  // ขยะ ยาง ถุง
-  const tireG = new THREE.TorusGeometry(0.34, 0.14, 8, 14), bagG = new THREE.SphereGeometry(0.4, 10, 8);
-  for (let i = 0; i < 60; i++) {
-    const [x, z] = posAt(Math.random(), Math.random() < .5 ? ROUT + rnd(3, 6) : RIN - rnd(3, 8));
-    const k = i % 3, m = new THREE.Mesh(k === 0 ? tireG : k === 1 ? bagG : new THREE.BoxGeometry(rnd(0.4, 1.2), rnd(0.2, 0.6), rnd(0.4, 1.2)), toon(k === 0 ? '#151515' : k === 1 ? '#1d2024' : '#6a5f50'));
-    m.position.set(x, k === 0 ? 0.12 : 0.2, z); m.rotation.set(k === 0 ? Math.PI / 2 : rnd(0, 1), rnd(0, 6), 0); if (k === 1) m.scale.set(1, 0.7, 1); m.castShadow = true; g.add(m);
-  }
-
-  // ซอมบี้เดินเตร่
-  world.zombies = [];
-  const ZC = [['#7d8f6a', '#4a4f3e', '#3b3a36'], ['#8a957a', '#5b4636', '#2e3036'], ['#6f8269', '#3f4b5a', '#3a3328'], ['#8b9883', '#6b5a48', '#262626']];
-  const zG = { leg: new THREE.CapsuleGeometry(0.13, 0.62, 4, 8), arm: new THREE.CapsuleGeometry(0.1, 0.5, 4, 8), torso: new THREE.CapsuleGeometry(0.28, 0.45, 4, 10), head: new THREE.SphereGeometry(0.27, 14, 12), eye: new THREE.SphereGeometry(0.035, 6, 6) };
-  const eyeMat = new THREE.MeshStandardMaterial({ color: '#d8e05a', emissive: '#d8e05a', emissiveIntensity: 0 }); world.nightMats.push({ m: eyeMat, on: 2.5 });
-  for (let i = 0; i < 22; i++) {
-    const [skin, shirt, pants] = ZC[i % 4];
-    const z = new THREE.Group(), body = new THREE.Group(); z.add(body);
-    const add = (p, geo, c, x, y, zz) => { const m = new THREE.Mesh(geo, typeof c === 'string' ? toon(c) : c); m.position.set(x, y, zz); m.castShadow = true; p.add(m); return m; };
-    const legs = [], arms = [];
-    for (const sd of [-1, 1]) {
-      const hip = new THREE.Group(); hip.position.set(sd * 0.15, 1.15, 0); body.add(hip); add(hip, zG.leg, pants, 0, -0.5, 0); legs.push(hip);
-      const sh = new THREE.Group(); sh.position.set(sd * 0.38, 1.95, 0); body.add(sh); add(sh, zG.arm, i % 3 ? skin : shirt, 0, -0.34, 0); arms.push(sh);
-    }
-    const t = add(body, zG.torso, shirt, 0, 1.65, 0); t.scale.set(1.08, 1, 0.75);
-    const head = new THREE.Group(); head.position.set(0, 2.32, 0.05); body.add(head);
-    add(head, zG.head, skin, 0, 0, 0).scale.set(0.95, 1.1, 1);
-    for (const sd of [-1, 1]) add(head, zG.eye, eyeMat, sd * 0.09, 0.03, 0.24);
-    head.rotation.z = rnd(-0.4, 0.4); head.rotation.x = 0.25;
-    body.rotation.x = 0.18;
-    const zr = rnd(0, 1) < 0.65 ? ROUT + rnd(3, 13) : RIN - rnd(4, 10);
-    const zz = { g: z, legs, arms, body, u: Math.random(), r: zr, dir: Math.random() < .5 ? 1 : -1, v: rnd(0.4, 0.9), ph: Math.random() * 6, wob: rnd(0.5, 1.5) };
-    z.scale.setScalar(rnd(0.9, 1.05)); g.add(z); world.zombies.push(zz);
-  }
-
-  world.zomBanner = canvasTex(1024, 160, (x, w, h) => {
-    x.fillStyle = '#1b1b18'; x.fillRect(0, 0, w, h);
-    for (let k = -h; k < w; k += 60) { x.fillStyle = '#d9a12b'; x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 30, 0); x.lineTo(k + 30 + 24, 24); x.lineTo(k + 24, 24); x.fill(); x.beginPath(); x.moveTo(k, h - 24); x.lineTo(k + 30, h - 24); x.lineTo(k + 54, h); x.lineTo(k + 24, h); x.fill(); }
-    x.font = '700 76px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#e8e2d2'; x.fillText('QUARANTINE ZONE · H-RUNNER', w / 2, h / 2 + 3);
-  });
+  
 }
 function updateZombie(dt, t) {
   if (!world.zom || !world.zom.visible) return;
   for (const z of world.zombies) {
-    const P = 2 * L + 2 * Math.PI * z.r; z.u += z.dir * z.v * dt / P; z.ph += dt * z.v * 3.2;
-    const [x, y] = posAt(z.u, z.r), [x2, y2] = posAt(z.u + z.dir * 0.002, z.r);
-    z.g.position.set(x + Math.sin(z.ph * 0.3) * z.wob, 0.02, y); z.g.rotation.y = Math.atan2(x2 - x, y2 - y) + Math.sin(z.ph * 0.5) * 0.25;
-    const s = Math.sin(z.ph);
-    z.legs[0].rotation.x = s * 0.35; z.legs[1].rotation.x = -s * 0.35;
-    z.arms[0].rotation.x = -1.35 + Math.sin(z.ph * 0.7) * 0.15; z.arms[1].rotation.x = -1.2 + Math.cos(z.ph * 0.6) * 0.2;
-    z.body.position.y = Math.abs(Math.cos(z.ph)) * 0.05; z.body.rotation.z = Math.sin(z.ph) * 0.08;
+    z.ph += dt * z.v * 3.2; const s = Math.sin(z.ph), drift = Math.sin(z.ph * 0.15) * 2.5;
+    z.g.position.set(z.bx + (z.side < 2 ? drift : 0), 0.02, z.bz + (z.side < 2 ? 0 : drift));
+    z.legs[0].rotation.x = s * 0.25; z.legs[1].rotation.x = -s * 0.25;
+    z.arms[0].rotation.x = -1.5 + Math.sin(z.ph * 0.7) * 0.25; z.arms[1].rotation.x = -1.35 + Math.cos(z.ph * 0.6) * 0.3;
+    z.body.position.y = Math.abs(Math.cos(z.ph)) * 0.04; z.body.rotation.z = Math.sin(z.ph) * 0.1;
   }
   for (const f of world.fires) { const k = 0.85 + Math.sin(t * 13 + f.ph) * 0.1 + Math.sin(t * 7.3 + f.ph * 2) * 0.08; f.f1.scale.set(1, k, 1); f.f2.scale.set(1, 2 - k, 1); f.f1.rotation.y = t * 2; }
   if (world.searchlight) world.searchlight.rotation.y = Math.sin(t * 0.35) * 1.6;
@@ -1343,9 +1183,9 @@ const toonDS = c => dsCache[c] || (dsCache[c] = pbr(c, { side: THREE.DoubleSide 
 function nameSprite(name, isMe) {
   const tex = canvasTex(384, 112, (x, w) => {
     x.font = '600 42px Oswald, Kanit, sans-serif'; const tw = Math.min(w - 16, x.measureText(name).width + 40);
-    x.fillStyle = isMe ? '#ff4f5e' : 'rgba(15,22,32,.8)'; x.beginPath(); x.roundRect ? x.roundRect((w - tw) / 2, 10, tw, 58, 6) : x.rect((w - tw) / 2, 10, tw, 58); x.fill();
+    x.fillStyle = isMe ? '#7be22b' : 'rgba(12,16,12,.82)'; x.beginPath(); x.roundRect ? x.roundRect((w - tw) / 2, 10, tw, 58, 6) : x.rect((w - tw) / 2, 10, tw, 58); x.fill();
     if (isMe) { x.beginPath(); x.moveTo(w / 2 - 12, 68); x.lineTo(w / 2 + 12, 68); x.lineTo(w / 2, 86); x.fill(); }
-    x.fillStyle = isMe ? '#ffffff' : '#ece8e1'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(name, w / 2, 41);
+    x.fillStyle = isMe ? '#08130a' : '#eef2ec'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(name, w / 2, 41);
   });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
   sp.scale.set(3.1, 0.9, 1); sp.position.y = 3.4; sp.renderOrder = 10; return sp;
@@ -1357,7 +1197,6 @@ const HB = {
   thigh: lathe([[0.001, 0.02], [0.14, 0], [0.145, -0.12], [0.12, -0.4], [0.095, -0.56], [0.001, -0.6]], 12),
   shin: lathe([[0.001, 0.02], [0.095, 0], [0.1, -0.12], [0.08, -0.36], [0.06, -0.5], [0.001, -0.53]], 12),
   shoe: new THREE.CapsuleGeometry(0.075, 0.2, 4, 10).rotateX(Math.PI / 2).scale(1.15, 0.9, 1),
-  sole: new THREE.BoxGeometry(0.19, 0.045, 0.36),
   upper: lathe([[0.001, 0.03], [0.085, 0.01], [0.09, -0.08], [0.075, -0.28], [0.06, -0.35], [0.001, -0.37]], 10),
   fore: lathe([[0.001, 0.02], [0.062, 0], [0.065, -0.08], [0.05, -0.26], [0.042, -0.31], [0.001, -0.33]], 10),
   hand: new THREE.CapsuleGeometry(0.045, 0.08, 3, 8).scale(1.1, 1, 0.65),
@@ -1365,33 +1204,59 @@ const HB = {
   head: new THREE.SphereGeometry(0.42, 28, 20),
   jaw: new THREE.SphereGeometry(0.33, 18, 12, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.4),
   white: new THREE.SphereGeometry(0.06, 10, 8), iris: new THREE.SphereGeometry(0.032, 8, 6),
-  collarV: new THREE.TorusGeometry(0.12, 0.03, 6, 14), kneePad: new THREE.SphereGeometry(0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2).rotateX(Math.PI / 2).scale(1, 1.15, 0.6),
+  collarV: new THREE.TorusGeometry(0.12, 0.03, 6, 14), shortHem: new THREE.TorusGeometry(0.13, 0.011, 6, 16).rotateX(Math.PI / 2), sock: new THREE.CylinderGeometry(0.068, 0.062, 0.14, 12),
+  sole: new THREE.BoxGeometry(0.16, 0.035, 0.34), wrist: new THREE.CylinderGeometry(0.055, 0.055, 0.06, 10), strapS: new THREE.BoxGeometry(0.07, 0.2, 0.3), bib: new THREE.PlaneGeometry(0.26, 0.2), sideStripe: new THREE.BoxGeometry(0.02, 0.5, 0.06), kneePad: new THREE.SphereGeometry(0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2).rotateX(Math.PI / 2).scale(1, 1.15, 0.6),
 };
-function makeRunner(lookIdx, name, isMe, parent = scene) {
-  const lk = LOOKS[lookIdx % LOOKS.length];
+// ชุดกีฬาสำหรับโหมดวิ่ง (เสื้อกล้าม กางเกงขาสั้น รองเท้าวิ่ง เบอร์ติดอก)
+const SPORT = [
+  { top: '#15191a', trim: '#7be22b', pants: '#15191a', boots: '#7be22b', band: '#7be22b' },
+  { top: '#2f9e44', trim: '#ffffff', pants: '#f2f2ee', boots: '#ffffff' },
+  { top: '#c0392b', trim: '#ffffff', pants: '#1d1f22', boots: '#e9e7e1', band: '#ffffff' },
+  { top: '#f2b632', trim: '#1b2a4a', pants: '#1b2a4a', boots: '#1b2a4a' },
+  { top: '#6c2fd6', trim: '#c8ff6a', pants: '#121214', boots: '#c8ff6a' },
+  { top: '#f4f4f0', trim: '#e84393', pants: '#e84393', boots: '#f4f4f0', band: '#e84393' },
+  { top: '#1e6fd9', trim: '#ffffff', pants: '#ffffff', boots: '#1e6fd9', band: '#1e6fd9' },
+  { top: '#ff7a1a', trim: '#2b2d31', pants: '#3a3d42', boots: '#ff7a1a' },
+];
+const bibCache = {};
+function bibMat(n) {
+  return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
+}
+function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac') {
+  const base = LOOKS[lookIdx % LOOKS.length], sport = outfit === 'sport';
+  const lk = sport ? { ...base, ...SPORT[lookIdx % SPORT.length], vest: false, pack: false, knee: false, collar: false, mask: null, phones: false, gear: SPORT[lookIdx % SPORT.length].band ? 'band' : null, sport: true } : base;
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   const add = (p, geo, mat, x, y, z, shadow = true) => { const m = new THREE.Mesh(geo, typeof mat === 'string' ? toon(mat) : mat); m.position.set(x, y, z); m.castShadow = shadow; p.add(m); return m; };
   const legs = [], arms = [], knees = [], elbows = [];
   const glove = (lk.vest || lk.gear === 'hood') ? '#1b1c1f' : lk.skin;
   for (const sd of [-1, 1]) {
     const hip = new THREE.Group(); hip.position.set(sd * 0.135, 1.18, 0); body.add(hip);
-    add(hip, HB.thigh, lk.pants, 0, 0, 0).scale.set(1, 1, 0.92);
+    add(hip, HB.thigh, sport ? lk.skin : lk.pants, 0, 0, 0).scale.set(1, 1, 0.92);
+    if (sport) { add(hip, HB.thigh, lk.pants, 0, 0.01, 0).scale.set(1.1, 0.52, 1.02); }
     const knee = new THREE.Group(); knee.position.set(0, -0.56, 0); hip.add(knee);
-    add(knee, HB.shin, lk.pants, 0, 0, 0).scale.set(1, 1, 0.92);
+    add(knee, HB.shin, sport ? lk.skin : lk.pants, 0, 0, 0).scale.set(1, 1, 0.92);
+    if (sport) add(knee, HB.sock, '#f4f4f0', 0, -0.44, 0);
     add(knee, HB.shoe, lk.boots, 0, -0.5, 0.06);
+    if (sport) add(knee, HB.sole, '#f4f4f0', 0, -0.555, 0.06);
     if (lk.knee) add(knee, HB.kneePad, '#1d1f22', 0, -0.02, 0.07);
     if (sd === 1 && (lk.vest || lk.knee)) add(hip, G.holster, '#1b1c1f', 0.13, -0.2, 0).scale.set(0.6, 0.8, 0.8);
     legs.push(hip); knees.push(knee);
     const sh = new THREE.Group(); sh.position.set(sd * 0.38, 2.0, 0); sh.rotation.z = sd * 0.08; body.add(sh);
-    add(sh, HB.upper, lk.top, 0, 0, 0);
+    add(sh, HB.upper, sport ? lk.skin : lk.top, 0, 0, 0);
     const el = new THREE.Group(); el.position.set(0, -0.35, 0); sh.add(el);
-    add(el, HB.fore, lk.vest || lk.gear === 'hood' || lk.collar ? lk.top : lk.skin, 0, 0, 0);
+    add(el, HB.fore, !sport && (lk.vest || lk.gear === 'hood' || lk.collar) ? lk.top : lk.skin, 0, 0, 0);
+    if (sport && sd === -1) add(el, HB.wrist, lk.trim, 0, -0.28, 0);
     add(el, HB.hand, glove, 0, -0.38, 0.01);
     arms.push(sh); elbows.push(el);
   }
   add(body, HB.pelvis, lk.pants, 0, 0, 0).scale.set(1.1, 1, 0.8);
-  add(body, G.belt, '#1a1b1d', 0, 1.36, 0).scale.set(0.85, 1, 0.68); add(body, G.buckle, '#6b6f75', 0, 1.36, 0.225);
+  if (!sport) { add(body, G.belt, '#1a1b1d', 0, 1.36, 0).scale.set(0.85, 1, 0.68); add(body, G.buckle, '#6b6f75', 0, 1.36, 0.225); }
+  else add(body, G.belt, lk.trim, 0, 1.37, 0).scale.set(0.82, 0.6, 0.66);
   const torso = add(body, HB.torso, lk.top, 0, 0, 0); torso.scale.set(1.18, 1, 0.7);
+  if (sport) {
+    for (const sd of [-1, 1]) add(body, HB.strapS, lk.top, sd * 0.2, 2.02, 0).scale.set(1, 1, 0.7); // สายเสื้อกล้าม
+    const bib = add(body, HB.bib, bibMat(7 + lookIdx * 13 % 90), 0, 1.7, 0.222, false); bib.rotation.x = -0.06;
+  }
   // คอเสื้อ + กล้ามอกเล็กน้อย
   add(body, HB.collarV, lk.trim || lk.top, 0, 2.11, 0.02).rotation.x = Math.PI / 2 - 0.2;
   if (lk.vest) {
@@ -1433,6 +1298,7 @@ function makeRunner(lookIdx, name, isMe, parent = scene) {
     const b = add(head, G.brim, lk.cap, 0, 0.2, lk.gear === 'cap' ? 0.3 : -0.3); b.rotation.x = lk.gear === 'cap' ? 0.12 : -0.12; if (lk.gear === 'capback') b.rotation.y = Math.PI;
   }
   if (lk.gear === 'beanie') { const c = add(head, G.beanie, lk.cap, 0, 0.08, -0.02); c.rotation.x = -0.18; const f = add(head, G.fold, lk.cap, 0, 0.12, -0.02); f.rotation.x = Math.PI / 2 - 0.18; }
+  if (lk.gear === 'band') { const b = add(head, G.fold, lk.band, 0, 0.14, -0.01); b.rotation.x = Math.PI / 2 - 0.22; b.scale.set(0.84, 0.86, 0.45); }
   if (lk.phones) { for (const sd of [-1, 1]) { const p = add(head, G.phone, '#1b1c1f', sd * 0.43, 0, 0); p.rotation.z = Math.PI / 2; } const b = add(head, G.band, '#1b1c1f', 0, 0.02, 0); b.rotation.y = Math.PI / 2; }
   if (lk.build) body.scale.set(lk.build * 0.92 + 0.08, 1.02, lk.build * 0.88 + 0.12);
   root.scale.setScalar(0.95);
@@ -1442,7 +1308,7 @@ function makeRunner(lookIdx, name, isMe, parent = scene) {
   parent.add(root);
   const aura = [];
   if (name) for (let k = 0; k < 14; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
-  return { root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
+  return { outfit, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
 }
 function flutter() {}
 // งอเข่า/ศอกตามท่าขา (ให้ท่าวิ่งเหมือนคน)
@@ -1470,8 +1336,8 @@ function removeRunner(r) { if (r.aura) r.aura.forEach(p => { p.m.parent && p.m.p
 const FH = 4.4;
 const BLD = [
   [{ x: -22, z: 11, f: 2, w: 10, d: 12 }, { x: 22, z: -13, f: 3, w: 12, d: 13 }],
-  [{ x: -21, z: -13, f: 2, w: 10, d: 12 }, { x: 22, z: -12, f: 3, w: 12, d: 13 }],
-  [{ x: -24, z: 4, f: 2, w: 10, d: 12 }, { x: 24, z: -4, f: 3, w: 12, d: 13 }],
+  [{ x: -54, z: 21, f: 3, w: 12, d: 13 }, { x: 56.5, z: -21, f: 2, w: 10, d: 12 }],
+  [{ x: 24.75, z: 54, f: 3, w: 12, d: 13 }, { x: -19.75, z: -54, f: 2, w: 10, d: 12 }],
 ];
 world.bcols = [[], [], [], [], []]; world.bRects = [[], [], [], [], []]; world.bFloors = [[], [], [], [], []]; world.bGroups = new Set();
 function buildBuildings() {
@@ -1783,7 +1649,7 @@ function buildHarbor() {
   const apronM = new THREE.MeshStandardMaterial({ map: noiseT('#9a968e', 1200, 0.06, 20), roughness: 0.95 });
   const lineM = toon('#d9b23a'), whiteLineM = toon('#e8e6e0');
   const CC = ['#a8382c', '#2f5f8f', '#3d7a4f', '#d0782c', '#7d8790', '#c9a332', '#d8d8d2', '#2f7f7f', '#6b3a6b', '#8a4a2a'];
-  const LBL = ['H-LINE', 'OCEANIX', 'SEAWAY', '', 'TRANSCO', 'NORDA', '', 'MARIS', 'H-LINE', ''];
+  const LBL = ['HAXY LINE', 'OCEANIX', 'SEAWAY', '', 'TRANSCO', 'NORDA', '', 'MARIS', 'HAXY LINE', ''];
   const cMats = CC.map((c, i) => new THREE.MeshStandardMaterial({ map: corr(c, LBL[i]), roughness: 0.7, metalness: 0.2 }));
   const shedM = new THREE.MeshStandardMaterial({ map: corr('#aab4bb', '', 256), roughness: 0.6, metalness: 0.3 });
   const shedM2 = new THREE.MeshStandardMaterial({ map: corr('#c7c2b4', '', 256), roughness: 0.6, metalness: 0.3 });
@@ -1993,11 +1859,10 @@ function buildThumbs() {
     ts.add(new THREE.HemisphereLight(0xdfe6ee, 0x3a3530, 1.4)); const rim = new THREE.DirectionalLight(0xffc48a, 2.2); rim.position.set(-4, 3, -3); ts.add(rim);
     const dl = new THREE.DirectionalLight(0xffffff, 2.6); dl.position.set(3, 4, 5); ts.add(dl);
     const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.position.set(0.32, 2.32, 1.95); cam.lookAt(0, 2.17, 0);
-    LOOKS.forEach((_, i) => {
-      const r = makeRunner(i, null, false, ts);
-      r.root.rotation.y = -0.35; r.head.rotation.y = 0.12;
-      flutter(r, 0, 0);
-      tr.render(ts, cam); THUMBS[i] = tr.domElement.toDataURL('image/png'); ts.remove(r.root);
+    for (const of of ['tac', 'sport']) LOOKS.forEach((_, i) => {
+      const r = makeRunner(i, null, false, ts, of);
+      r.root.rotation.y = -0.35; r.head.rotation.y = 0.12; limbs(r, -0.15);
+      tr.render(ts, cam); THUMBS[of][i] = tr.domElement.toDataURL('image/png'); ts.remove(r.root);
     });
     tr.dispose(); tr.forceContextLoss && tr.forceContextLoss();
   } catch (e) { console.warn('thumbs', e); }
@@ -2024,13 +1889,13 @@ function buildPodium() {
   for (const x of [-5.6, 5.6]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 7, 10), toon('#e5e7eb')); p.position.set(x, 3.5, -2.2); g.add(p); }
   // พลุกระดาษ
   const n = 400, cf = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.22, 0.12), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), n);
-  const cc = ['#d9a441', '#e7e5e0', '#c9a227', '#b8b2a7', '#d9a441', '#8a8f96'], col = new THREE.Color();
+  const cc = ['#7be22b', '#e7e5e0', '#c8ff6a', '#b8bec2', '#3fae10', '#8a8f96'], col = new THREE.Color();
   world.conf = []; for (let i = 0; i < n; i++) { cf.setColorAt(i, col.set(cc[i % cc.length])); world.conf.push({ x: (Math.random() - .5) * 16, y: Math.random() * 14, z: (Math.random() - .5) * 8 + 1, r: Math.random() * 6, s: 0.6 + Math.random() }); }
   cf.visible = false; scene.add(cf); world.confMesh = cf;
 }
 function scoreSprite(text, gold) {
   const tex = canvasTex(420, 96, (x, w) => {
-    x.fillStyle = gold ? '#d9a441' : 'rgba(14,17,22,.85)'; x.beginPath(); x.roundRect ? x.roundRect(20, 12, w - 40, 70, 35) : x.rect(20, 12, w - 40, 70); x.fill();
+    x.fillStyle = gold ? '#7be22b' : 'rgba(12,16,12,.85)'; x.beginPath(); x.roundRect ? x.roundRect(20, 12, w - 40, 70, 35) : x.rect(20, 12, w - 40, 70); x.fill();
     x.font = '600 44px Oswald, Kanit, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = gold ? '#15120c' : '#f4f1ea'; x.fillText(text, w / 2, 49);
   });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
@@ -2038,7 +1903,8 @@ function scoreSprite(text, gold) {
 }
 function posePodium(r, slot, dt, t, pts, hs) {
   let x, y, z = 0;
-  if (slot < 3) { [x, y] = PODIUM[slot]; } else { const k = slot - 3; x = (k - 2) * 1.9 + (k % 2 ? 0.4 : 0); y = 0; z = 3.4 + (k > 4 ? 1.8 : 0); }
+  if (S && S.mode === 'shoot') { x = slot === 0 ? 0 : (slot % 2 ? -1 : 1) * Math.ceil(slot / 2) * 1.7; y = 0; z = slot === 0 ? 1.2 : -0.3 - Math.ceil(slot / 2) * 0.35; }
+  else if (slot < 3) { [x, y] = PODIUM[slot]; } else { const k = slot - 3; x = (k - 2) * 1.9 + (k % 2 ? 0.4 : 0); y = 0; z = 3.4 + (k > 4 ? 1.8 : 0); }
   r.u = 0; r.root.position.set(x, y + 0.02, z); r.root.rotation.y = 0; flutter(r, dt, 2); r.speed = 0; updateAura(r, dt);
   const label = S && S.mode === 'shoot' ? `${pts} KILLS · ${hs || 0} HS` : `${pts} คะแนน`;
   if (!r.scoreSp || r.scoreLabel !== label) { if (r.scoreSp) r.root.remove(r.scoreSp); r.scoreSp = scoreSprite(label, slot === 0); r.scoreLabel = label; r.root.add(r.scoreSp); }
@@ -2330,7 +2196,7 @@ function handleAction(a) {
       H.diff = Math.max(0, Math.min(3, a.diff | 0)); H.qTime = LV(H.cat, H.diff).time; break;
     case 'setMap':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      { const nm = Math.max(0, Math.min(MAPS.length - 1, a.map | 0)); if (H.mode !== 'shoot' && nm !== 0) return; H.map = nm; } break;
+      { const nm = Math.max(0, Math.min(MAPS.length - 1, a.map | 0)); if ((H.mode !== 'shoot') !== (nm === 0)) return; H.map = nm; } break;
     case 'setTod':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       H.tod = a.tod ? 1 : 0; break;
@@ -2347,7 +2213,7 @@ function handleAction(a) {
       p.ready = !!a.ready; break;
     case 'setMode':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      H.mode = a.mode === 'shoot' ? 'shoot' : 'race'; if (H.mode !== 'shoot') H.map = 0; break;
+      H.mode = a.mode === 'shoot' ? 'shoot' : 'race'; H.map = H.mode === 'shoot' ? (H.map || 4) : 0; break;
     case 'hit':
       if (!p) return; applyHit(a.id, String(a.target), a.dmg, a.w, a.hs); return;
     case 'pick':
@@ -2431,7 +2297,7 @@ function freePickupSpot() {
 function startBattle() {
   clearTimers();
   H.feed = []; H.pickups = []; H.bots.clear();
-  for (let i = 0; i < (H.map >= 3 ? 15 : 9); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
+  for (let i = 0; i < (H.map >= 1 ? 15 : 9); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const k of ['inf', 'god']) { const s = freePickupSpot(); H.pickups.push({ id: 'p' + k, k, x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const [id, p] of H.players) initBattlePlayer(id, p);
   H.state = 'countdown'; H.endsAt = Date.now() + 3200;
@@ -2648,7 +2514,7 @@ $('#looks').onclick = e => {
   const el = e.target.closest('.look'); if (!el) return;
   myLook = +el.dataset.i; localStorage.hrLook = myLook;
   document.querySelectorAll('.look').forEach(x => x.classList.toggle('sel', x === el));
-  showcaseLook(myLook);
+  showcaseLook(myLook); pvSetLook(myLook, true);
 };
 $('#createBtn').onclick = () => createRoom();
 $('#joinBtn').onclick = joinRoom;
@@ -2666,6 +2532,8 @@ function setHomeMode(mm) {
   $('#modeTag').textContent = mm === 'shoot' ? '🎯 หมวดยิงปืน' : mm === 'race' ? '🏁 หมวดวิ่งแข่ง' : '';
   $('#createBtn').textContent = mm === 'shoot' ? 'สร้างห้องยิงปืน' : 'สร้างห้องวิ่งแข่ง';
   if (mm) localStorage.hrMode = mm;
+  if (THUMBS.tac.length) buildLookPicker();
+  if (typeof pvSetLook === 'function') pvSetLook(myLook, false);
 }
 $('#modePick').onclick = e => { const b = e.target.closest('.modeCard'); if (b) { Music.sfx('click'); setHomeMode(b.dataset.mode); } };
 $('#backMode').onclick = () => setHomeMode(null);
@@ -2731,6 +2599,7 @@ function render() {
   show('#roundResult', st === 'reveal');
   show('#final', st === 'finished');
   applyMap(inRoom ? S.map : 0, inRoom ? S.tod : 0);
+  if (world.podiumG) world.podiumG.visible = !(inRoom && S.mode === 'shoot');
   if (!inRoom) { Music.play('lobby'); syncRunners([]); return; }
   syncRunners(S.players);
 
@@ -2750,7 +2619,7 @@ function render() {
     $('#modeLbl').textContent = shootMode ? '🎯 ยิงปืน' : '🏁 วิ่งแข่ง · สนามกีฬา';
     show('#mapsBox', shootMode);
     show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
-    if (shootMode) $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0${i === MAPS.length - 1 && MAPS.length % 2 ? ';grid-column:1/-1' : ''}">${m.name}<small style="display:block;font-size:10px;opacity:.7">${m.sub || ''}</small></button>`).join('');
+    if (shootMode) $('#maps').innerHTML = MAPS.map((m, i) => i === 0 ? '' : `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${m.name}<small style="display:block;font-size:10px;opacity:.7">${m.sub || ''}</small></button>`).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
     $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.name}</button>`).join('');
@@ -2833,22 +2702,22 @@ function renderQuestion() {
 /* ======================================================================
    โหมดยิงกันเอง: สนาม ที่กำบัง การชน และการยิงเรย์
    ====================================================================== */
-const ARENA = [ROUT + 4.4, ROUT + 12.6, ROUT + 13.2, TOWN_B, 80];
-const inArena = (m, x, z, pad = 0) => m === 4 ? inHarbor(x, z, pad) : m === 3 ? Math.abs(x) <= TOWN_B + pad && Math.abs(z) <= TOWN_B + pad : stadiumDist(x, z) <= ARENA[m] + pad;
+const ARENA = [ROUT + 4.4, CITY_B, CITY_B, TOWN_B, 80];
+const inArena = (m, x, z, pad = 0) => m === 4 ? inHarbor(x, z, pad) : (m === 1 || m === 2) ? Math.abs(x) <= CITY_B + pad && Math.abs(z) <= CITY_B + pad : m === 3 ? Math.abs(x) <= TOWN_B + pad && Math.abs(z) <= TOWN_B + pad : stadiumDist(x, z) <= ARENA[m] + pad;
 function seeded(seed) { let x = (seed * 9301 + 49297) % 2147483647; if (x <= 0) x += 2147483646; return () => (x = x * 16807 % 2147483647) / 2147483647; }
 const COVERS = {}, COLS = {};
 function coverMats(m) {
   if (coverMats[m]) return coverMats[m];
   const crate = canvasTex(128, 128, (x) => { x.fillStyle = '#7a5a36'; x.fillRect(0, 0, 128, 128); x.fillStyle = '#6a4c2c'; for (let i = 0; i < 4; i++) x.fillRect(0, i * 32 + 28, 128, 4); x.strokeStyle = '#4f3820'; x.lineWidth = 10; x.strokeRect(5, 5, 118, 118); x.beginPath(); x.moveTo(8, 8); x.lineTo(120, 120); x.stroke(); });
   const concrete = canvasTex(128, 128, (x) => { x.fillStyle = '#9b9890'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 400; i++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .1})`; x.fillRect(Math.random() * 128, Math.random() * 128, 3, 3); } x.fillStyle = '#d9a12b'; for (let k = -128; k < 128; k += 32) { x.beginPath(); x.moveTo(k, 128); x.lineTo(k + 16, 128); x.lineTo(k + 40, 104); x.lineTo(k + 24, 104); x.fill(); } });
-  const padded = canvasTex(128, 128, (x) => { x.fillStyle = '#2e4a6a'; x.fillRect(0, 0, 128, 128); x.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 4; i++) x.fillRect(i * 32 + 2, 4, 28, 120); x.fillStyle = '#e8e5df'; x.font = '700 22px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('H-RUNNER', 64, 70); });
+  const padded = canvasTex(128, 128, (x) => { x.fillStyle = '#2e4a6a'; x.fillRect(0, 0, 128, 128); x.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 4; i++) x.fillRect(i * 32 + 2, 4, 28, 120); x.fillStyle = '#e8e5df'; x.font = '700 22px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('HAXY', 64, 70); });
   const container = canvasTex(128, 128, (x) => { x.fillStyle = '#7a3f28'; x.fillRect(0, 0, 128, 128); for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.05)'; x.fillRect(i * 8, 0, 8, 128); } for (let i = 0; i < 60; i++) { x.fillStyle = `rgba(60,30,10,${Math.random() * .35})`; x.beginPath(); x.arc(Math.random() * 128, Math.random() * 128, Math.random() * 8, 0, 7); x.fill(); } });
   const mk = (t) => new THREE.MeshStandardMaterial({ map: t, roughness: 0.85 });
   return (coverMats[m] = { crate: mk(crate), wall: mk(m === 0 ? padded : m === 1 ? concrete : container) });
 }
 function buildCovers(m) {
   if (COVERS[m]) return COVERS[m];
-  if (m >= 3) { const g0 = new THREE.Group(); g0.visible = false; scene.add(g0); return (COVERS[m] = { g: g0, cols: [] }); }
+  if (m >= 1) { const g0 = new THREE.Group(); g0.visible = false; scene.add(g0); return (COVERS[m] = { g: g0, cols: [] }); }
   const g = new THREE.Group(); g.visible = false; scene.add(g);
   const cols = [], R = seeded(1000 + m * 77), mats = coverMats(m);
   const add = (x, z, w, d, h, mat) => {
@@ -2875,7 +2744,7 @@ function collidersFor(m) {
   scene.updateMatrixWorld(true);
   const out = [], bx = new THREE.Box3(), bound = ARENA[m] + 3;
   const skip = new Set(); (world.cars || []).forEach(c => skip.add(c.m)); (world.zombies || []).forEach(z => skip.add(z.g)); if (world.train) skip.add(world.train); if (world.searchlight) skip.add(world.searchlight); (world.bGroups || []).forEach(g => skip.add(g));
-  for (const root of m >= 3 ? [world.podiumG] : [m === 0 ? world.stad : m === 1 ? world.bkk : world.zom, world.podiumG, world.gate]) {
+  for (const root of m >= 1 ? [] : [world.stad, world.gate]) {
     if (!root) continue;
     root.traverse(o => {
       if (!o.isMesh || o.isInstancedMesh) return;
@@ -2915,6 +2784,10 @@ const SPOTS = {}, PSPOTS = {};
 function arenaSpots(m) {
   if (SPOTS[m]) return SPOTS[m];
   const c = [];
+  if (m === 1 || m === 2) {
+    for (let x = -71; x <= 71; x += 5.5) for (let z = -71; z <= 71; z += 5.5) c.push({ x, z, y: 0 });
+    return (SPOTS[m] = c.filter(s => !cityClear(s.x, s.z, -2) && !insideAny(s.x, s.z, 1.0, m, s.y) && groundAt(s.x, s.z, s.y + 0.3, m) < 0.7).concat(world.bFloors[m].map(f => ({ x: f.x, z: f.z, y: f.y }))));
+  }
   if (m === 4) {
     for (let x = -73; x <= 73; x += 6.5) for (let z = -66; z <= 41; z += 6.5) c.push({ x, z, y: 0 });
     for (let x = -36; x <= 14; x += 5) for (const z of [50.3, 62.1]) c.push({ x, z, y: HARB.deck });
@@ -2931,6 +2804,10 @@ function arenaSpots(m) {
 function pickupSpots(m) {
   if (PSPOTS[m]) return PSPOTS[m];
   const c = [];
+  if (m === 1 || m === 2) {
+    for (let x = -68; x <= 68; x += 9) for (let z = -68; z <= 68; z += 9) c.push({ x: x + 1.3, z: z - 0.9, y: 0 });
+    return (PSPOTS[m] = c.filter(s => !cityClear(s.x, s.z, -2) && !insideAny(s.x, s.z, 1.2, m, s.y) && groundAt(s.x, s.z, s.y + 0.3, m) < 0.7).concat(world.bFloors[m].map(f => ({ x: f.x, z: f.z, y: f.y }))));
+  }
   if (m === 4) {
     for (let x = -70; x <= 70; x += 11) for (let z = -63; z <= 38; z += 11) c.push({ x: x + 2.3, z: z + 1.7, y: 0 });
     for (const x of [-30, -12, 4]) c.push({ x, z: 50.4, y: HARB.deck });
@@ -3033,8 +2910,9 @@ function syncRunners(list) {
   for (const [id, r] of runners) if (!ids.has(id)) { removeRunner(r); runners.delete(id); }
   for (const p of list) {
     let r = runners.get(p.id);
-    if (r && (r.look !== p.look || r.name !== p.name)) { removeRunner(r); runners.delete(p.id); r = null; }
-    if (!r) { r = makeRunner(p.look, p.name, p.id === myId); runners.set(p.id, r); }
+    const of = S && S.mode === 'shoot' ? 'tac' : 'sport';
+    if (r && (r.look !== p.look || r.name !== p.name || r.outfit !== of)) { removeRunner(r); runners.delete(p.id); r = null; }
+    if (!r) { r = makeRunner(p.look, p.name, p.id === myId, scene, of); runners.set(p.id, r); }
     r.lane = p.lane; r.target = Math.min(p.points, GOAL) / GOAL;
     if (r.target < r.u - 0.001) r.u = r.target; // รีเซ็ตเกม
   }
@@ -3042,9 +2920,115 @@ function syncRunners(list) {
   demo.forEach(d => d.root.visible = !inGame);
 }
 function buildDemo() {
-  demo = LOOKS.map((_, i) => { const r = makeRunner(i, null, false); r.lane = i; r.u = Math.random() * 0.2; r.v = 0.022 + Math.random() * 0.008; return r; });
+  demo = LOOKS.map((_, i) => { const r = makeRunner(i, null, false, scene, 'sport'); r.lane = i; r.u = Math.random() * 0.2; r.v = 0.022 + Math.random() * 0.008; return r; });
 }
 function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i ? 1.25 : 0.95)); }
+
+/* ---------- พรีวิวตัวละครเต็มตัว + ท่าแอคติ้ง ---------- */
+const EMOTE_T = 3.4, BLEND_T = 0.5;
+const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0 }; }
+function pvPose(name, t) {
+  const P = pvBase(), sd = [-1, 1], br = Math.sin(t * 2.1);
+  P.by = br * 0.012; P.hx = -0.02;
+  switch (name) {
+    case 'idle':
+      P.bz = Math.sin(t * 0.8) * 0.035; P.hy = Math.sin(t * 0.55) * 0.4; P.l = [0.03, -0.06]; P.k = [0.1, 0.16];
+      P.a = sd.map((s, i) => [Math.sin(t * 0.8 + i * 2) * 0.06, s * (0.12 + br * 0.02)]); break;
+    case 'idle2': // เท้าเอว มองไปรอบๆ
+      P.bz = -0.05; P.hy = Math.sin(t * 0.7) * 0.5; P.hx = -0.08; P.l = [0.0, -0.1]; P.k = [0.05, 0.22];
+      P.a = sd.map(s => [-0.25, s * 0.6]); P.e = sd.map(s => [-0.35, -s * 1.5]); break;
+    case 'flex': { // เบ่งกล้าม
+      const p = 0.5 + 0.5 * Math.sin(t * 5);
+      P.bx = -0.06; P.by += p * 0.02; P.hy = Math.sin(t * 1.3) * 0.25; P.hx = -0.12; P.l = [0.08, -0.08]; P.k = [0.18, 0.18];
+      P.a = sd.map(s => [-0.15, s * (1.45 + p * 0.08)]); P.e = sd.map(s => [-0.2, s * (1.35 + p * 0.3)]); break; }
+    case 'pump': { // ชูกำปั้น กระโดดดีใจ
+      const j = Math.max(0, Math.sin(t * 7));
+      P.by = j * 0.18; P.k = [0.2 + (1 - j) * 0.35, 0.2 + (1 - j) * 0.35]; P.l = [-(1 - j) * 0.15, -(1 - j) * 0.15]; P.hx = -0.2;
+      P.a = [[-2.75 + j * 0.2, -0.25], [-0.3, 0.6]]; P.e = [[-0.25 - (1 - j) * 0.6, 0], [-0.35, -1.5]]; break; }
+    case 'stretch': // วอร์มอัพยืดตัว
+      P.bz = Math.sin(t * 1.6) * 0.2; P.hz = P.bz * 0.5; P.l = [0.0, 0.0]; P.k = [0.06, 0.06];
+      P.a = sd.map(s => [-2.95, -s * 0.12]); P.e = sd.map(() => [-0.25, 0]); break;
+    case 'lunge': { // ยืดขา
+      const d = 0.5 + 0.5 * Math.sin(t * 2.4);
+      P.by = -0.18 - d * 0.12; P.l = [-0.9 - d * 0.2, 0.55]; P.k = [1.05 + d * 0.3, 0.2]; P.bx = 0.12;
+      P.a = sd.map(s => [-0.5, s * 0.2]); P.e = sd.map(() => [-1.2, 0]); break; }
+    case 'cross': // กอดอก มั่นใจ
+      P.hx = -0.15; P.hy = Math.sin(t * 0.5) * 0.15; P.l = [0.06, -0.12]; P.k = [0.08, 0.2]; P.bz = 0.04;
+      P.a = sd.map(s => [-0.62, -s * 0.28]); P.e = sd.map(s => [-1.75, -s * 0.85]); break;
+    case 'aim': { // เล็งปืนกวาดซ้ายขวา
+      P.ry = 0.75 + Math.sin(t * 0.9) * 0.35; P.hy = -0.35; P.l = [-0.22, 0.28]; P.k = [0.35, 0.25]; P.by = -0.06; P.bx = 0.06;
+      P.a = [[-1.55, -0.04], [-1.36, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; break; }
+    case 'scan': // ถือปืนลง มองระวังภัย
+      P.hy = Math.sin(t * 1.4) * 0.65; P.l = [-0.1, 0.12]; P.k = [0.2, 0.2];
+      P.a = [[-0.75, -0.04], [-0.65, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; break;
+    case 'salute': // วันทยหัตถ์
+      P.hx = -0.05; P.l = [0, 0]; P.k = [0.04, 0.04];
+      P.a = [[-0.55, -1.15], [0, 0.06]]; P.e = [[0, -2.65], [-0.05, 0]]; P.ry = 0.15; break;
+  }
+  return P;
+}
+function pvLerp(A, B, k) {
+  const m = (a, b) => typeof a === 'number' ? a + (b - a) * k : a.map((v, i) => m(v, b[i]));
+  const o = {}; for (const key in A) o[key] = m(A[key], B[key]); return o;
+}
+function pvApply(r, P) {
+  r.root.rotation.y = P.ry + PV.yaw + (PV.spin || 0); r.body.position.y = P.by; r.body.rotation.set(P.bx, 0, P.bz);
+  r.head.rotation.set(P.hx, P.hy, P.hz);
+  r.legs.forEach((l, i) => l.rotation.set(P.l[i], 0, 0)); r.knees.forEach((k, i) => { k.rotation.x = P.k[i]; });
+  r.arms.forEach((a, i) => a.rotation.set(P.a[i][0], 0, P.a[i][1])); r.elbows.forEach((e, i) => e.rotation.set(P.e[i][0], 0, P.e[i][1]));
+  if (r.guns) { r.guns.g.visible = P.gun > 0.5; r.guns.models.forEach((m, j) => { m.visible = j === 1; }); }
+}
+function pvInit() {
+  const cv = $('#pvCanvas'); if (!cv || PV.ready) return;
+  try {
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+    r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
+    const sc = new THREE.Scene();
+    sc.add(new THREE.HemisphereLight(0xe6eee6, 0x1c261a, 1.35));
+    const key = new THREE.DirectionalLight(0xffffff, 2.5); key.position.set(2.5, 4, 4.5); sc.add(key);
+    const rim = new THREE.DirectionalLight(0x8dff4a, 2.6); rim.position.set(-3, 2.5, -3); sc.add(rim);
+    const rim2 = new THREE.DirectionalLight(0xcfe8ff, 1.4); rim2.position.set(3, 1.8, -3); sc.add(rim2);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.25, 0.14, 56), new THREE.MeshStandardMaterial({ color: '#161b16', roughness: 0.35, metalness: 0.7 })); disc.position.y = -0.07; sc.add(disc);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.16, 0.022, 8, 72), new THREE.MeshBasicMaterial({ color: '#7be22b' })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.005; sc.add(ring);
+    const pulse = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.3, 64), new THREE.MeshBasicMaterial({ color: '#7be22b', transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })); pulse.rotation.x = -Math.PI / 2; pulse.position.y = 0.01; sc.add(pulse);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.15, 4.5, 40, 1, true), new THREE.MeshBasicMaterial({ color: '#7be22b', transparent: true, opacity: 0.06, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })); beam.position.y = 2.2; sc.add(beam);
+    const cam = new THREE.PerspectiveCamera(27, 1, 0.1, 50); cam.position.set(0, 1.45, 7.9); cam.lookAt(0, 1.18, 0);
+    Object.assign(PV, { r, sc, cam, pulse, ready: true });
+    cv.addEventListener('pointerdown', e => { PV.drag = e.clientX; PV.lastDrag = performance.now(); cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove', e => { if (PV.drag == null) return; PV.yaw += (e.clientX - PV.drag) * 0.012; PV.drag = e.clientX; PV.lastDrag = performance.now(); });
+    const up = () => { PV.drag = null; }; cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    pvSetLook(myLook, false);
+  } catch (e) { console.warn('preview', e); }
+}
+function pvSetLook(i, intro = true) {
+  if (!PV.ready) return;
+  const of = homeMode === 'shoot' ? 'tac' : 'sport';
+  if (PV.ch) PV.sc.remove(PV.ch.root);
+  const ch = makeRunner(i, null, false, PV.sc, of); PV.ch = ch; ch.root.scale.setScalar(0.92);
+  if (of === 'tac') { ensureGuns(ch); poseArmor(ch, 0, true); ch.guns.vest.visible = false; }
+  PV.seq = of === 'sport' ? ['idle', 'stretch', 'flex', 'idle2', 'lunge', 'pump', 'cross'] : ['idle', 'aim', 'salute', 'idle2', 'scan', 'cross', 'aim'];
+  PV.emote = 0; PV.emT = 0; PV.intro = intro ? 1 : 0; PV.prevPose = null;
+  if (intro) { PV.seq = [of === 'sport' ? 'pump' : 'aim', ...PV.seq]; Music.sfx && Music.sfx('click'); }
+  $('#pvName').textContent = LOOKS[i % LOOKS.length].name; $('#pvTag').textContent = of === 'sport' ? 'ชุดแข่งวิ่ง · RACE KIT' : 'ชุดยิงปืน · COMBAT KIT';
+}
+function pvTick(dt) {
+  if (!PV.ready || !PV.ch) return;
+  const cv = PV.r.domElement, w = cv.clientWidth, h = cv.clientHeight;
+  if (!w || !h) return;
+  if (cv.width !== Math.round(w * PV.r.getPixelRatio()) || cv.height !== Math.round(h * PV.r.getPixelRatio())) { PV.r.setSize(w, h, false); PV.cam.aspect = w / h; PV.cam.updateProjectionMatrix(); }
+  PV.t += dt; PV.emT += dt;
+  const seq = PV.seq, cur = seq[PV.emote % seq.length];
+  if (PV.emT > EMOTE_T) { PV.prevName = cur; PV.emote++; PV.emT = 0; }
+  const name = seq[PV.emote % seq.length];
+  let P = pvPose(name, PV.t);
+  if (PV.prevName && PV.emT < BLEND_T) P = pvLerp(pvPose(PV.prevName, PV.t), P, easeIO(PV.emT / BLEND_T));
+  if (PV.intro > 0) { PV.intro = Math.max(0, PV.intro - dt * 1.25); const k = 1 - PV.intro; PV.spin = (1 - Math.pow(1 - k, 3)) * Math.PI * 2 - Math.PI * 2; P.by += Math.sin(k * Math.PI) * 0.25; } else PV.spin = 0;
+  if (PV.drag == null && performance.now() - PV.lastDrag > 2500) PV.yaw *= Math.pow(0.1, dt);
+  pvApply(PV.ch, P);
+  const pk = (PV.t * 0.6) % 1; PV.pulse.scale.setScalar(1 + pk * 0.6); PV.pulse.material.opacity = 0.5 * (1 - pk);
+  PV.r.render(PV.sc, PV.cam);
+}
 
 const camPos = new THREE.Vector3(80, 40, 80), camLook = new THREE.Vector3(), tmpV = new THREE.Vector3(), tmpL = new THREE.Vector3();
 const clock = new THREE.Clock();
@@ -3058,6 +3042,7 @@ function frame() {
   // ขยับนักวิ่ง
   if (shooting) shooterFrame(dt, t);
   else if (!inRoom) {
+    if (homeMode && !$('#homePanel').classList.contains('hidden')) pvTick(dt);
     for (const d of demo) {
       const P = 2 * L + 2 * Math.PI * laneR(d.lane);
       d.v += (Math.random() - .5) * 0.002; d.v = Math.min(0.034, Math.max(0.02, d.v));
@@ -3565,13 +3550,16 @@ function shooterFrame(dt, t) {
 }
 // ---------- แผนที่ย่อ ----------
 const MINI = {};
-function miniExtent(m) { return m === 4 ? 82 : m === 3 ? TOWN_B + 2 : L / 2 + ARENA[m] + 2; }
+function miniExtent(m) { return m === 4 ? 82 : m === 3 ? TOWN_B + 2 : (m === 1 || m === 2) ? CITY_B + 2 : L / 2 + ARENA[m] + 2; }
 function miniStatic(m) {
   if (MINI[m]) return MINI[m];
   const S2 = 360, cv = document.createElement('canvas'); cv.width = cv.height = S2;
   const x = cv.getContext('2d'), E = miniExtent(m), k = S2 / (2 * E), tx = v => (v + E) * k;
   x.fillStyle = '#1b1d22'; x.fillRect(0, 0, S2, S2);
-  if (m === 4) {
+  if (m === 1 || m === 2) {
+    x.fillStyle = '#2c2e31'; x.fillRect(0, 0, S2, S2);
+    for (const [a, b] of CBX) for (const [c, d] of CBZ) { x.fillStyle = '#4a4740'; x.fillRect(tx(a - 2.2), tx(c - 2.2), (b - a + 4.4) * k, (d - c + 4.4) * k); }
+  } else if (m === 4) {
     x.fillStyle = '#1f4558'; x.fillRect(0, tx(HARB.z1), S2, S2);
     x.fillStyle = '#4a4843'; x.fillRect(tx(-HARB.x), tx(HARB.z0), 2 * HARB.x * k, (HARB.z1 - HARB.z0) * k);
     const sh = HARB.ship; x.fillStyle = '#34495e'; x.fillRect(tx(sh[0]), tx(sh[2]), (sh[1] - sh[0]) * k, (sh[3] - sh[2]) * k);
@@ -3609,8 +3597,8 @@ function drawMinimap(dt) {
     const px = tx(isMe ? me.x : src.rx), pz = tx(isMe ? me.z : src.rz), yaw = isMe ? me.yaw : src.ryaw || 0;
     if (isMe) {
       x.save(); x.translate(px, pz); x.rotate(-yaw);
-      x.fillStyle = 'rgba(255,214,120,.18)'; x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, 26, Math.PI / 2 - 0.5, Math.PI / 2 + 0.5); x.closePath(); x.fill();
-      x.fillStyle = '#ffd166'; x.strokeStyle = '#1b1d22'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, 8); x.lineTo(5.5, -5); x.lineTo(0, -2.5); x.lineTo(-5.5, -5); x.closePath(); x.fill(); x.stroke();
+      x.fillStyle = 'rgba(123,226,43,.2)'; x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, 26, Math.PI / 2 - 0.5, Math.PI / 2 + 0.5); x.closePath(); x.fill();
+      x.fillStyle = '#9dff4a'; x.strokeStyle = '#0b100b'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, 8); x.lineTo(5.5, -5); x.lineTo(0, -2.5); x.lineTo(-5.5, -5); x.closePath(); x.fill(); x.stroke();
       x.restore();
     } else {
       const god = (p.godU || 0) > hostNow();
@@ -3658,7 +3646,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } stylizeTree(scene); setupComposer(); resize(); applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
+resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); buildHarbor(); Math.random = _r; } stylizeTree(scene); setupComposer(); resize(); applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); pvInit(); frame();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
