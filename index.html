@@ -269,7 +269,7 @@
       <div class="lobbyHead"><b>โหมดเกม</b></div>
       <div id="modes" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div class="lobbyHead"><b>ฉากแข่งขัน</b></div>
-      <div id="maps" class="diffs" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div id="maps" class="diffs" style="grid-template-columns:repeat(2,1fr)"></div>
       <div class="lobbyHead"><b>ช่วงเวลา</b></div>
       <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · ปืนสั้น 30 นัด / ปืนกล 60 นัด / สไนเปอร์ 20 นัด · ยิงหัวแรง ×2 · เล็งซูม กระโดด นั่ง · มีตึก 2 ชั้นและ 3 ชั้นขึ้นได้<br>กล่องแดง +50 เลือด · กล่องเขียว เติมกระสุนเต็มทุกกระบอก · กล่องฟ้า +50 เกราะ (สะสมได้ไม่จำกัด) · กล่องส้ม ∞ กระสุนไม่จำกัด 10 วิ · กล่องทอง ★ อมตะ 10 วิ · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
@@ -344,6 +344,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 /* ======================================================================
    ค่าตั้งต้นของเกม
@@ -478,6 +479,7 @@ function stripeTex(c1, c2) {
 }
 
 function buildWorld() {
+  world.trackG = new THREE.Group(); scene.add(world.trackG);
   const stad = new THREE.Group(); scene.add(stad); world.stad = stad;
   // พื้นหญ้า
   const gt = stripeTex('#4e6f3a', '#486836'); gt.repeat.set(60, 60);
@@ -493,9 +495,9 @@ function buildWorld() {
 
   // ลู่วิ่ง
   const track = new THREE.Mesh(ringGeo(RIN - 0.7, ROUT + 0.7), flat('#56688c', { side: THREE.DoubleSide }));
-  track.position.y = 0.03; track.receiveShadow = true; scene.add(track); world.trackMat = track.material;
+  track.position.y = 0.03; track.receiveShadow = true; world.trackG.add(track); world.trackMat = track.material;
   const white = flat('#ffffff', { side: THREE.DoubleSide });
-  for (let i = 0; i <= LANES; i++) { const r = RIN + i * LW, m = new THREE.Mesh(ringGeo(r - 0.06, r + 0.06), white); m.position.y = 0.05; scene.add(m); }
+  for (let i = 0; i <= LANES; i++) { const r = RIN + i * LW, m = new THREE.Mesh(ringGeo(r - 0.06, r + 0.06), white); m.position.y = 0.05; world.trackG.add(m); }
   for (const [a, b, c] of [[RIN - 1.4, RIN - 0.7, '#b9b6ae'], [ROUT + 0.7, ROUT + 1.4, '#b9b6ae']]) {
     const m = new THREE.Mesh(ringGeo(a, b), flat(c, { side: THREE.DoubleSide })); m.position.y = 0.04; stad.add(m);
   }
@@ -504,10 +506,10 @@ function buildWorld() {
   const ck = canvasTex(32, 256, (x) => { for (let i = 0; i < 2; i++) for (let j = 0; j < 16; j++) { x.fillStyle = (i + j) % 2 ? '#111' : '#fff'; x.fillRect(i * 16, j * 16, 16, 16); } });
   ck.magFilter = THREE.NearestFilter;
   const line = new THREE.Mesh(new THREE.PlaneGeometry(1.3, ROUT - RIN), new THREE.MeshLambertMaterial({ map: ck }));
-  line.rotation.x = -Math.PI / 2; line.position.set(0, 0.07, (RIN + ROUT) / 2); scene.add(line);
+  line.rotation.x = -Math.PI / 2; line.position.set(0, 0.07, (RIN + ROUT) / 2); world.trackG.add(line);
 
   // ซุ้มเส้นชัย
-  const gate = new THREE.Group(); scene.add(gate); world.gate = gate;
+  const gate = new THREE.Group(); world.trackG.add(gate); world.gate = gate;
   const pillarTex = canvasTex(64, 256, (x) => { for (let j = 0; j < 8; j++) { x.fillStyle = j % 2 ? '#2b2f36' : '#3a3f47'; x.fillRect(0, j * 32, 64, 32); } });
   for (const z of [RIN - 2, ROUT + 2]) {
     const p = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 9, 16), new THREE.MeshStandardMaterial({ map: pillarTex, roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 }));
@@ -853,6 +855,7 @@ const MAPS = [
   { name: 'สนามกีฬา', track: '#8a3e2f' },
   { name: 'ถนนกรุงเทพ', track: '#35393f' },
   { name: 'เมืองซอมบี้', track: '#34373a' },
+  { name: 'เมืองยามเย็น', track: '#34373a', shootOnly: true },
 ];
 const TODS = ['กลางวัน', 'กลางคืน'];
 // ค่าแสง/ท้องฟ้า แยกตามฉาก × เวลา
@@ -863,14 +866,16 @@ const ENV = [
    { top: '#05070e', bot: '#2a1f30', fog: 0x1a1522, fn: 100, ff: 380, sky: 0x7a7aa8, gnd: 0x0d0c0c, hemi: 0.6, sun: 0xa8b8e8, sunI: 1.2, exp: 1.2, sp: [-35, 70, 30], cloud: '#241f2c' }],
   [{ top: '#5e6763', bot: '#a8ad9b', fog: 0x8f9483, fn: 45, ff: 240, sky: 0xb7bcad, gnd: 0x34342c, hemi: 1.0, sun: 0xece9da, sunI: 1.6, exp: 1.0, sp: [30, 80, 40], cloud: '#80857a' },
    { top: '#020403', bot: '#15221b', fog: 0x101a14, fn: 28, ff: 170, sky: 0x58806a, gnd: 0x060606, hemi: 0.5, sun: 0xa8d8b8, sunI: 0.8, exp: 1.25, sp: [-30, 70, 30], cloud: '#121a15' }],
+  [{ top: '#6d82c6', bot: '#f6c29c', fog: 0xe8c2a8, fn: 170, ff: 560, sky: 0xf6dccb, gnd: 0x6b5a4a, hemi: 1.15, sun: 0xffd2a0, sunI: 3.0, exp: 1.0, sp: [-60, 55, 40], cloud: '#f8ddd2' },
+   { top: '#060818', bot: '#2c2444', fog: 0x1c1a2c, fn: 100, ff: 420, sky: 0x8a90c0, gnd: 0x101010, hemi: 0.65, sun: 0xb8c4f0, sunI: 1.3, exp: 1.2, sp: [-40, 70, 30], cloud: '#2a2638' }],
 ];
 const sunOff = new THREE.Vector3(40, 90, 30);
 let curEnv = '';
 function applyMap(m, tod = 0) {
-  m = Math.max(0, Math.min(2, m | 0)); tod = tod ? 1 : 0;
+  m = Math.max(0, Math.min(3, m | 0)); tod = tod ? 1 : 0;
   const key = m + '-' + tod; if (key === curEnv || !world.bkk) return; curEnv = key;
   const e = ENV[m][tod];
-  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2;
+  world.stad.visible = m === 0; world.bkk.visible = m === 1; world.zom.visible = m === 2; if (world.town) world.town.visible = m === 3; world.trackG.visible = m !== 3;
   world.trackMat.color.set(MAPS[m].track);
   skyMat.uniforms.top.value.set(e.top); skyMat.uniforms.bot.value.set(e.bot);
   scene.fog.color.set(e.fog); scene.fog.near = e.fn; scene.fog.far = e.ff;
@@ -1205,7 +1210,7 @@ const BLD = [
   [{ x: -21, z: -13, f: 2, w: 10, d: 12 }, { x: 22, z: -12, f: 3, w: 12, d: 13 }],
   [{ x: -24, z: 4, f: 2, w: 10, d: 12 }, { x: 24, z: -4, f: 3, w: 12, d: 13 }],
 ];
-world.bcols = [[], [], []]; world.bRects = [[], [], []]; world.bFloors = [[], [], []]; world.bGroups = new Set();
+world.bcols = [[], [], [], []]; world.bRects = [[], [], [], []]; world.bFloors = [[], [], [], []]; world.bGroups = new Set();
 function buildBuildings() {
   const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
   const TINT = ['#a9a69f', '#b3aa98', '#8d8a83'];
@@ -1276,6 +1281,201 @@ function buildBuildings() {
       if (world.bRects[m].some(r => bb.max.x > r.x0 && bb.min.x < r.x1 && bb.max.z > r.z0 && bb.min.z < r.z1)) root.remove(o);
     }
   }
+}
+
+/* ---------- ด่านเมืองยามเย็น (เฉพาะโหมดยิง) ---------- */
+const TOWN_B = 88, TFH = 4.0;
+const TOWN_HOUSES = [
+  { x: -30, z: -30, w: 16, d: 12, f: 2, roof: 'tile', doors: ['s', 'e'], c: 0 },
+  { x: -30, z: 0, w: 12, d: 12, f: 1, roof: 'flat', doors: ['e', 'w'], c: 1 },
+  { x: -30, z: 32, w: 14, d: 12, f: 2, roof: 'tile', doors: ['e', 'n'], c: 2 },
+  { x: 31, z: -30, w: 14, d: 12, f: 2, roof: 'flat', doors: ['w', 's'], c: 3 },
+  { x: 31, z: 0, w: 12, d: 12, f: 1, roof: 'tile', doors: ['w', 'e'], c: 4 },
+  { x: 31, z: 32, w: 16, d: 12, f: 2, roof: 'tile', doors: ['w', 'n'], c: 5 },
+  { x: -62, z: -58, w: 16, d: 14, f: 2, roof: 'flat', doors: ['n', 'e'], c: 2 },
+  { x: -62, z: -18, w: 14, d: 12, f: 1, roof: 'tile', doors: ['e', 'w'], c: 0 },
+  { x: -62, z: 22, w: 12, d: 14, f: 2, roof: 'tile', doors: ['e', 's'], c: 4 },
+  { x: -62, z: 62, w: 16, d: 12, f: 2, roof: 'flat', doors: ['e', 's'], c: 1 },
+  { x: 62, z: -60, w: 16, d: 12, f: 2, roof: 'tile', doors: ['w', 'n'], c: 5 },
+  { x: 62, z: -20, w: 12, d: 14, f: 1, roof: 'flat', doors: ['w', 'e'], c: 3 },
+  { x: 62, z: 22, w: 14, d: 12, f: 2, roof: 'tile', doors: ['w', 'n'], c: 0 },
+  { x: 62, z: 62, w: 16, d: 14, f: 2, roof: 'flat', doors: ['w', 's'], c: 2 },
+  { x: -22, z: -66, w: 14, d: 12, f: 2, roof: 'tile', doors: ['n', 's'], c: 1 },
+  { x: 24, z: -66, w: 12, d: 12, f: 1, roof: 'flat', doors: ['n', 'e'], c: 4 },
+  { x: 26, z: 66, w: 14, d: 12, f: 2, roof: 'tile', doors: ['s', 'n'], c: 3 },
+  { x: -22, z: 64, w: 8, d: 10, f: 3, roof: 'tower', doors: ['s', 'e'], c: 2 },
+];
+function buildTown() {
+  const g = new THREE.Group(); g.visible = false; scene.add(g); world.town = g;
+  const cols = world.bcols[3], rects = world.bRects[3], floors = world.bFloors[3];
+  const R = Math.random;
+  const noiseTex = (base, n = 500, a = 0.06) => { const t = canvasTex(128, 128, (x) => { x.fillStyle = base; x.fillRect(0, 0, 128, 128); for (let i = 0; i < n; i++) { x.fillStyle = `rgba(${R() < .5 ? 0 : 255},${R() < .5 ? 0 : 255},${R() < .5 ? 0 : 200},${R() * a})`; x.fillRect(R() * 128, R() * 128, 3, 3); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  const STU = ['#f1dcc1', '#efc6a4', '#eee3cb', '#e7b596', '#f2d59e', '#e3c7b5'].map(c => new THREE.MeshStandardMaterial({ map: noiseTex(c), roughness: 0.95 }));
+  const tileT = canvasTex(128, 128, (x) => { x.fillStyle = '#a8432a'; x.fillRect(0, 0, 128, 128); for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { x.fillStyle = `hsl(${12 + R() * 8},${55 + R() * 10}%,${38 + R() * 10}%)`; x.beginPath(); x.arc(c * 16 + 8 + (r % 2) * 8, r * 16 + 12, 8, Math.PI, 0); x.fill(); } x.fillStyle = 'rgba(0,0,0,.25)'; for (let r = 0; r < 8; r++) x.fillRect(0, r * 16 + 14, 128, 2); });
+  tileT.wrapS = tileT.wrapT = THREE.RepeatWrapping; tileT.repeat.set(3, 3);
+  const tileM = new THREE.MeshStandardMaterial({ map: tileT, roughness: 0.8 });
+  const paveT = canvasTex(128, 128, (x) => { x.fillStyle = '#cdb595'; x.fillRect(0, 0, 128, 128); for (let r = 0; r < 8; r++) for (let c = 0; c < 4; c++) { x.fillStyle = `hsl(32,${25 + R() * 12}%,${62 + R() * 10}%)`; x.fillRect(c * 32 + (r % 2) * 16 + 1, r * 16 + 1, 30, 14); } });
+  paveT.wrapS = paveT.wrapT = THREE.RepeatWrapping; paveT.repeat.set(120, 120);
+  const trimM = toon('#d8c4a4'), woodM = toon('#6b4426'), floorM = toon('#b89a7a'), stairM = toon('#9c8468'), stoneM = toon('#bfae94'), darkM = toon('#3a3430');
+  const SHUT = ['#2f6b5a', '#2d5577', '#6b2f2f', '#5a6b2f'].map(c => toon(c));
+  const box = (x0, x1, y0, y1, z0, z1, mat, col = true, par = g) => {
+    if (x1 - x0 < 0.01 || y1 - y0 < 0.01 || z1 - z0 < 0.01) return null;
+    const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    o.castShadow = o.receiveShadow = true; par.add(o);
+    if (col) cols.push({ x0, x1, y0, y1, z0, z1 });
+    return o;
+  };
+  const cylC = (x, z, r, h, mat, y = 0, col = true) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 12), mat); o.position.set(x, y + h / 2, z); o.castShadow = true; g.add(o); if (col) cols.push({ x0: x - r, x1: x + r, z0: z - r, z1: z + r, y0: y, y1: y + h }); return o; };
+  // พื้นปูหิน + ลานกลาง
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(700, 700), new THREE.MeshStandardMaterial({ map: paveT, roughness: 0.95 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
+  const plazaT = canvasTex(256, 256, (x) => { x.fillStyle = '#d9c3a0'; x.fillRect(0, 0, 256, 256); x.strokeStyle = '#a8865e'; x.lineWidth = 4; for (let r = 20; r < 128; r += 18) { x.beginPath(); x.arc(128, 128, r, 0, 7); x.stroke(); } for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2; x.beginPath(); x.moveTo(128, 128); x.lineTo(128 + Math.cos(a) * 128, 128 + Math.sin(a) * 128); x.stroke(); } });
+  const plaza = new THREE.Mesh(new THREE.CircleGeometry(16, 48), new THREE.MeshStandardMaterial({ map: plazaT, roughness: 0.9 })); plaza.rotation.x = -Math.PI / 2; plaza.position.y = 0.02; g.add(plaza);
+  // ---------- บ้านทุกหลังเดินเข้าได้ ----------
+  const opensFor = (a0, a1, yb, door) => {
+    const o = [], len = a1 - a0;
+    if (door != null) o.push({ a: door - 1.2, b: door + 1.2, y0: yb, y1: yb + 3.2 });
+    const n = Math.max(1, Math.floor((len - 1) / 4.2));
+    for (let k = 0; k < n; k++) { const c = a0 + len * (k + 0.5) / n; if (door != null && Math.abs(c - door) < 2.5) continue; if (c - 0.7 < a0 + 0.5 || c + 0.7 > a1 - 0.5) continue; o.push({ a: c - 0.7, b: c + 0.7, y0: yb + 1.2, y1: yb + 2.8, win: true }); }
+    return o;
+  };
+  for (const hs of TOWN_HOUSES) {
+    const hg = new THREE.Group(); g.add(hg);
+    const { x: cx, z: cz, w, d, f } = hs, x0 = cx - w / 2, x1 = cx + w / 2, z0 = cz - d / 2, z1 = cz + d / 2, T = 0.35, wm = STU[hs.c % STU.length], sh = SHUT[hs.c % SHUT.length];
+    rects.push({ x0: x0 - 2.5, x1: x1 + 2.5, z0: z0 - 2.5, z1: z1 + 2.5 });
+    const wall = (side, yb, yt, ground) => {
+      const axis = side === 'n' || side === 's' ? 'x' : 'z';
+      const fixed = side === 'n' ? z1 - T / 2 : side === 's' ? z0 + T / 2 : side === 'e' ? x1 - T / 2 : x0 + T / 2;
+      const a0 = axis === 'x' ? x0 : z0 + T, a1 = axis === 'x' ? x1 : z1 - T;
+      const door = ground && hs.doors.includes(side) ? (axis === 'x' ? cx : z1 - 2.8) : null;
+      const opens = opensFor(a0, a1, yb, door).sort((p, q) => p.a - q.a);
+      const put = (p0, p1, y0, y1) => axis === 'x' ? box(p0, p1, y0, y1, fixed - T / 2, fixed + T / 2, wm, true, hg) : box(fixed - T / 2, fixed + T / 2, y0, y1, p0, p1, wm, true, hg);
+      let cur = a0;
+      for (const o of opens) {
+        put(cur, o.a, yb, yt); put(o.a, o.b, yb, o.y0); put(o.a, o.b, o.y1, yt); cur = o.b;
+        // บานเกล็ดข้างหน้าต่าง (ตกแต่ง)
+        if (o.win) for (const sx of [o.a - 0.28, o.b + 0.28]) { const out = (side === 'n' || side === 'e') ? 1 : -1; const p = axis === 'x' ? [sx - 0.25, sx + 0.25, fixed + out * 0.2 - 0.04, fixed + out * 0.2 + 0.04] : [fixed + out * 0.2 - 0.04, fixed + out * 0.2 + 0.04, sx - 0.25, sx + 0.25]; box(p[0], p[1], o.y0, o.y1, p[2], p[3], sh, false, hg); }
+      }
+      put(cur, a1, yb, yt);
+    };
+    for (let i = 0; i < f; i++) {
+      const yb = i * TFH, yt = yb + TFH;
+      for (const sd of ['n', 's', 'e', 'w']) wall(sd, yb, yt, i === 0);
+      box(x0 - 0.12, x1 + 0.12, yt - 0.25, yt, z0 - 0.12, z0 + 0.05, trimM, false, hg); box(x0 - 0.12, x1 + 0.12, yt - 0.25, yt, z1 - 0.05, z1 + 0.12, trimM, false, hg);
+      const needStairs = i < f - 1 || hs.roof === 'flat';
+      if (needStairs) {
+        const left = i % 2 === 0, sx0 = left ? x0 + T : x1 - T - 2.2, sx1 = sx0 + 2.2, zs = z0 + T + 1.4, n = 10, dz = 0.42, rise = TFH / n;
+        for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, stairM, true, hg);
+        const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.3;
+        box(x0, hx0, ys, yt, z0, z1, floorM, true, hg); box(hx1, x1, ys, yt, z0, z1, floorM, true, hg); box(hx0, hx1, ys, yt, z0, hz0, floorM, true, hg); box(hx0, hx1, ys, yt, hz1, z1, floorM, true, hg);
+        floors.push({ x: left ? cx + w * 0.22 : cx - w * 0.22, z: z1 - 2.6, y: yt });
+      } else box(x0, x1, yt - 0.3, yt, z0, z1, floorM, true, hg);
+      // ลังไม้ในห้องไว้หลบ
+      if (i === 0) { const lx = (f > 1 || hs.roof === 'flat') ? x1 - T - 1.0 : cx + w * 0.25, lz = z0 + T + 1.0; box(lx - 0.7, lx + 0.7, 0, 1.4, lz - 0.7, lz + 0.7, woodM, true, hg); }
+    }
+    const top = f * TFH;
+    if (hs.roof === 'flat') {
+      for (const [a, b, c2, d2] of [[x0, x1, z0, z0 + T], [x0, x1, z1 - T, z1], [x0, x0 + T, z0, z1], [x1 - T, x1, z0, z1]]) box(a, b, top, top + 1.1, c2, d2, wm, true, hg);
+      box(x0 - 0.1, x1 + 0.1, top + 1.1, top + 1.2, z0 - 0.1, z0 + T + 0.1, trimM, false, hg); box(x0 - 0.1, x1 + 0.1, top + 1.1, top + 1.2, z1 - T - 0.1, z1 + 0.1, trimM, false, hg);
+    } else {
+      const tall = hs.roof === 'tower' ? 6 : 3.2, r = Math.max(w, d) * 0.72;
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(r, tall, 4, 1), tileM); roof.rotation.y = Math.PI / 4; roof.scale.set((w + 1.4) / (r * Math.SQRT2), 1, (d + 1.4) / (r * Math.SQRT2));
+      roof.position.set(cx, top + tall / 2, cz); roof.castShadow = true; hg.add(roof);
+      cols.push({ x0, x1, z0, z1, y0: top, y1: top + tall * 0.5 });
+      if (hs.roof === 'tower') { const bell = new THREE.Mesh(new THREE.SphereGeometry(0.8, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.6), toon('#b08d57')); bell.position.set(cx, top - 1.6, cz + 2); bell.rotation.x = Math.PI; hg.add(bell); }
+    }
+    // กันสาดหน้าประตู
+    for (const sd of hs.doors) {
+      const awnC = toon(['#c0392b', '#2d6a8a', '#3d7a4a', '#c27c2c'][hs.c % 4]);
+      if (sd === 'n' || sd === 's') { const zz = sd === 'n' ? z1 : z0, out = sd === 'n' ? 1 : -1; const a = box(cx - 1.8, cx + 1.8, 3.4, 3.55, Math.min(zz, zz + out * 1.4), Math.max(zz, zz + out * 1.4), awnC, false, hg); if (a) a.rotation.x = out * 0.25; }
+      else { const xx = sd === 'e' ? x1 : x0, out = sd === 'e' ? 1 : -1; const a = box(Math.min(xx, xx + out * 1.4), Math.max(xx, xx + out * 1.4), 3.4, 3.55, z1 - 4.6, z1 - 1.0, awnC, false, hg); if (a) a.rotation.z = -out * 0.25; }
+    }
+  }
+  // ---------- ของประดับ + ที่กำบัง ----------
+  const blocked = (x, z, pad) => Math.hypot(x, z) < 10 || (Math.abs(x) < 9 && z > 17 && z < 47) || rects.some(r => x > r.x0 - pad && x < r.x1 + pad && z > r.z0 - pad && z < r.z1 + pad);
+  const placed = [];
+  const free = (x, z, rr) => !blocked(x, z, rr) && placed.every(p => Math.hypot(p[0] - x, p[1] - z) > p[2] + rr + 1.2);
+  // น้ำพุ
+  { const fx = 0, fz = -42; placed.push([fx, fz, 4]); cylC(fx, fz, 3.2, 0.9, stoneM); cylC(fx, fz, 0.5, 2.4, stoneM, 0.9); const top2 = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 0.6, 0.4, 16), stoneM); top2.position.set(fx, 3.4, fz); g.add(top2);
+    const water = new THREE.Mesh(new THREE.CircleGeometry(2.9, 32), new THREE.MeshStandardMaterial({ color: '#5aa7c7', roughness: 0.1, metalness: 0.2 })); water.rotation.x = -Math.PI / 2; water.position.set(fx, 0.85, fz); g.add(water); }
+  // ต้นปาล์มในกระถาง
+  const frond = new THREE.ConeGeometry(0.3, 3.0, 4).translate(0, 1.5, 0), leafM = toon('#3f7d3a'), leafM2 = toon('#4f9446'), trunkM = toon('#8a6a4a');
+  const palm = (x, z, s = 1, planter = true) => {
+    if (planter) box(x - 1.1, x + 1.1, 0, 0.8, z - 1.1, z + 1.1, stoneM);
+    const by = planter ? 0.8 : 0;
+    for (let k = 0; k < 5; k++) { const t = new THREE.Mesh(new THREE.CylinderGeometry((0.24 - k * 0.02) * s, (0.28 - k * 0.02) * s, 1.5 * s, 7), trunkM); t.position.set(x + Math.sin(k * 0.5) * 0.15, by + (0.75 + k * 1.45) * s, z); t.castShadow = true; g.add(t); }
+    if (!planter) cols.push({ x0: x - 0.3, x1: x + 0.3, z0: z - 0.3, z1: z + 0.3, y0: 0, y1: 7 * s });
+    for (let k = 0; k < 8; k++) { const fr = new THREE.Mesh(frond, k % 2 ? leafM : leafM2); fr.position.set(x + 0.2, by + 7.5 * s, z); fr.rotation.set(0, k / 8 * Math.PI * 2, 1.95); fr.rotation.order = 'YZX'; fr.scale.setScalar(s); fr.castShadow = true; g.add(fr); }
+  };
+  for (let z = -80; z <= 80; z += 16) for (const x of [-11, 11]) if (free(x, z, 1.6)) { placed.push([x, z, 1.6]); palm(x, z, 0.9); }
+  for (const [x, z] of [[-14, 12], [14, -12], [-12, -14], [12, 14]]) { placed.push([x, z, 1.6]); palm(x, z, 1); }
+  // แผงตลาด
+  const STALL = ['#c0392b', '#e0a43a', '#2d6a8a', '#7a9a3a'].map(c => toon(c));
+  const stall = (x, z, i) => { box(x - 1.6, x + 1.6, 0, 1.0, z - 0.8, z + 0.8, woodM); for (const [px, pz] of [[-1.5, -0.7], [1.5, -0.7], [-1.5, 0.7], [1.5, 0.7]]) box(x + px - 0.06, x + px + 0.06, 1.0, 2.8, z + pz - 0.06, z + pz + 0.06, woodM, false); const c2 = box(x - 1.9, x + 1.9, 2.8, 2.95, z - 1.1, z + 1.1, STALL[i % 4], false); for (let k = 0; k < 4; k++) box(x - 1.3 + k * 0.85, x - 0.9 + k * 0.85, 1.0, 1.35, z - 0.3, z + 0.3, toon(['#d35400', '#f1c40f', '#27ae60', '#c0392b'][k]), false); };
+  [[-19, -19], [19, 19], [19, -20], [-20, 19], [0, 55], [-44, 44], [44, -44]].forEach(([x, z], i) => { if (free(x, z, 2)) { placed.push([x, z, 2]); stall(x, z, i); } });
+  // รถจอด
+  const CAR = ['#c0392b', '#2c3e50', '#ecf0f1', '#16a085', '#f39c12', '#7f8c8d'].map(c => toon(c));
+  const car = (x, z, along, i) => {
+    const [hw, hd] = along ? [1.0, 2.2] : [2.2, 1.0];
+    box(x - hw, x + hw, 0.3, 1.2, z - hd, z + hd, CAR[i % 6]); box(x - hw * 0.85, x + hw * 0.85, 1.2, 1.85, z - hd * 0.55, z + hd * 0.55, CAR[i % 6]);
+    box(x - hw * 0.86, x + hw * 0.86, 1.25, 1.75, z - hd * 0.5, z + hd * 0.5, darkM, false);
+    for (const [wx, wz] of along ? [[-1, -1.4], [1, -1.4], [-1, 1.4], [1, 1.4]] : [[-1.4, -1], [1.4, -1], [-1.4, 1], [1.4, 1]]) { const wh = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.25, 12), darkM); wh.position.set(x + wx * (along ? 0.95 : 1), 0.34, z + wz * (along ? 1 : 0.95)); wh.rotation[along ? 'z' : 'x'] = Math.PI / 2; g.add(wh); }
+  };
+  // กำบังแบบสุ่ม (ลัง กำแพงหินเตี้ย ถังน้ำมัน รถ)
+  const crateM = toon('#8a6a42'), barrelM = toon('#4f6a7a');
+  let placedN = 0;
+  for (let i = 0; i < 260 && placedN < 75; i++) {
+    const x = (R() * 2 - 1) * 84, z = (R() * 2 - 1) * 84, t = R();
+    if (t < 0.3) { if (!free(x, z, 1.4)) continue; placed.push([x, z, 1.4]); box(x - 0.8, x + 0.8, 0, 1.6, z - 0.8, z + 0.8, crateM); if (R() < .5) box(x + 0.9, x + 2.3, 0, 1.4, z - 0.7, z + 0.7, crateM); }
+    else if (t < 0.6) { const along = R() < .5, hw = along ? 0.35 : 3, hd = along ? 3 : 0.35; if (!free(x, z, 3)) continue; placed.push([x, z, 3]); box(x - hw, x + hw, 0, 1.25, z - hd, z + hd, stoneM); }
+    else if (t < 0.78) { if (!free(x, z, 1.2)) continue; placed.push([x, z, 1.2]); cylC(x, z, 0.5, 1.2, barrelM); cylC(x + 1.1, z + 0.2, 0.5, 1.2, barrelM); }
+    else { if (!free(x, z, 2.6)) continue; placed.push([x, z, 2.6]); car(x, z, R() < .5, i); }
+    placedN++;
+  }
+  // เสาไฟถนน (กลางคืนติดไฟ)
+  const lampM = new THREE.MeshStandardMaterial({ color: '#fff1d6', emissive: '#ffcf8a', emissiveIntensity: 0 }); world.nightMats.push({ m: lampM, on: 3 });
+  for (let z = -76; z <= 76; z += 19) for (const x of [-7, 7]) { if (blocked(x, z, 0.5)) continue; box(x - 0.12, x + 0.12, 0, 5.2, z - 0.12, z + 0.12, darkM); box(x - 0.3, x + 0.3, 5.0, 5.5, z - 0.3, z + 0.3, lampM, false); }
+  // ---------- ฉากหลัง (นอกเขตเดิน) ----------
+  const wallM = STU[0];
+  for (const [a, b, c2, d2] of [[-89, 89, -89.6, -88.6], [-89, 89, 88.6, 89.6], [-89.6, -88.6, -89, 89], [88.6, 89.6, -89, 89]]) box(a, b, 0, 2.6, c2, d2, wallM, false);
+  for (let side = 0; side < 4; side++) for (let t = -110; t < 110;) {
+    const w = 10 + R() * 8, h = 5 + R() * 12, dist = 98 + R() * 8, mid = t + w / 2;
+    const [x, z] = side === 0 ? [mid, -dist] : side === 1 ? [mid, dist] : side === 2 ? [-dist, mid] : [dist, mid];
+    const bw = side < 2 ? w : 12, bd = side < 2 ? 12 : w;
+    box(x - bw / 2, x + bw / 2, 0, h, z - bd / 2, z + bd / 2, STU[(t | 0) & 3 % 6] || STU[1], false);
+    const rr = Math.max(bw, bd) * 0.72, rf = new THREE.Mesh(new THREE.ConeGeometry(rr, 3, 4, 1), tileM); rf.rotation.y = Math.PI / 4; rf.scale.set((bw + 1) / (rr * Math.SQRT2), 1, (bd + 1) / (rr * Math.SQRT2)); rf.position.set(x, h + 1.5, z); g.add(rf);
+    t += w + 0.5;
+  }
+  // ทางด่วนยกระดับ
+  const hwZ = -150; box(-320, 320, 11, 12.2, hwZ - 9, hwZ + 9, toon('#a39c92'), false); box(-320, 320, 12.2, 13.2, hwZ - 9, hwZ - 8.6, toon('#c9c2b6'), false); box(-320, 320, 12.2, 13.2, hwZ + 8.6, hwZ + 9, toon('#c9c2b6'), false);
+  for (let x = -300; x <= 300; x += 30) box(x - 1.5, x + 1.5, 0, 11, hwZ - 3, hwZ + 3, toon('#a39c92'), false);
+  for (let i = 0; i < 34; i++) { const x = -300 + R() * 600, z = hwZ + (R() < .5 ? -4.5 : 4.5); box(x - 2.2, x + 2.2, 12.2, 13.6, z - 1, z + 1, CAR[i % 6], false); }
+  // ตึกสูงไกลๆ + ภูเขา
+  for (let i = 0; i < 26; i++) { const x = -260 + R() * 520, z = -220 - R() * 120, w = 14 + R() * 20, h = 30 + R() * 110; box(x - w / 2, x + w / 2, 0, h, z - w / 2, z + w / 2, toon(['#c9b8b0', '#b8b4c4', '#d6c8b6', '#a9a3b5'][i % 4]), false); }
+  const mtM = toon('#8d7593'), mtM2 = toon('#a28aa0');
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + R() * 0.2, d = 380 + R() * 80, r = 70 + R() * 70, h = 60 + R() * 90; const mt = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7), i % 2 ? mtM : mtM2); mt.position.set(Math.cos(a) * d, h / 2 - 2, Math.sin(a) * d); g.add(mt); const cap = new THREE.Mesh(new THREE.ConeGeometry(r * 0.22, h * 0.22, 7), toon('#f2e6ef')); cap.position.set(mt.position.x, h - 2 - h * 0.11, mt.position.z); g.add(cap); }
+  for (let i = 0; i < 40; i++) { const a = R() * Math.PI * 2, d = 125 + R() * 70; palm(Math.cos(a) * d, Math.sin(a) * d, 0.9 + R() * 0.4, false); }
+  cols.splice(0, cols.length, ...cols.filter(c => c.x1 > -TOWN_B - 3 && c.x0 < TOWN_B + 3 && c.z1 > -TOWN_B - 3 && c.z0 < TOWN_B + 3));
+  mergeStatic(g);
+}
+// รวมเมชคงที่ตามวัสดุ เพื่อให้มือถือวาดได้เร็ว
+function mergeStatic(root) {
+  root.updateMatrixWorld(true);
+  const groups = new Map(), victims = [];
+  root.traverse(o => {
+    if (!o.isMesh || o.isInstancedMesh || o.userData.keep || Array.isArray(o.material)) return;
+    let gr = groups.get(o.material); if (!gr) groups.set(o.material, gr = []);
+    const geo = o.geometry.clone(); geo.applyMatrix4(o.matrixWorld); gr.push(geo); victims.push(o);
+  });
+  const merged = [];
+  for (const [mat, geos] of groups) {
+    let mg = null; try { mg = mergeGeometries(geos, false); } catch {}
+    if (!mg) { geos.forEach(gm => gm.dispose()); continue; }
+    const mm = new THREE.Mesh(mg, mat); mm.castShadow = true; mm.receiveShadow = true; merged.push(mm);
+    for (const v of victims) if (v.material === mat) v.userData.merged = true;
+  }
+  for (const v of victims) if (v.userData.merged) v.parent.remove(v);
+  merged.forEach(mm => root.add(mm));
 }
 
 // ภาพหน้าตาตัวละคร (เรนเดอร์ 3D จริงเป็นรูป)
@@ -1623,7 +1823,7 @@ function handleAction(a) {
       H.diff = Math.max(0, Math.min(3, a.diff | 0)); H.qTime = LV(H.cat, H.diff).time; break;
     case 'setMap':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      H.map = Math.max(0, Math.min(2, a.map | 0)); break;
+      { const nm = Math.max(0, Math.min(3, a.map | 0)); if (MAPS[nm].shootOnly && H.mode !== 'shoot') return; H.map = nm; } break;
     case 'setTod':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       H.tod = a.tod ? 1 : 0; break;
@@ -1640,7 +1840,7 @@ function handleAction(a) {
       p.ready = !!a.ready; break;
     case 'setMode':
       if (a.id !== 'host' || H.state !== 'lobby') return;
-      H.mode = a.mode === 'shoot' ? 'shoot' : 'race'; break;
+      H.mode = a.mode === 'shoot' ? 'shoot' : 'race'; if (H.mode !== 'shoot' && MAPS[H.map].shootOnly) H.map = 0; break;
     case 'hit':
       if (!p) return; applyHit(a.id, String(a.target), a.dmg, a.w, a.hs); return;
     case 'pick':
@@ -1724,7 +1924,7 @@ function freePickupSpot() {
 function startBattle() {
   clearTimers();
   H.feed = []; H.pickups = []; H.bots.clear();
-  for (let i = 0; i < 9; i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
+  for (let i = 0; i < (H.map === 3 ? 15 : 9); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const k of ['inf', 'god']) { const s = freePickupSpot(); H.pickups.push({ id: 'p' + k, k, x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const [id, p] of H.players) initBattlePlayer(id, p);
   H.state = 'countdown'; H.endsAt = Date.now() + 3200;
@@ -2027,7 +2227,7 @@ function render() {
     if (isHost && !$('#roomNet').textContent) setNet(!!(client && client.connected));
     $('#modes').innerHTML = [['race', 'ตอบคำถามแข่งวิ่ง'], ['shoot', 'ยิงกันเอง']].map(([k, n]) => `<button class="diff${(S.mode || 'race') === k ? ' sel' : ''}" data-mode="${k}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:10px 0">${n}</button>`).join('');
     show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
-    $('#maps').innerHTML = MAPS.map((m, i) => `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${m.name}</button>`).join('');
+    $('#maps').innerHTML = MAPS.map((m, i) => { const lockd = m.shootOnly && !shootMode; return `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost && !lockd ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${m.name}${m.shootOnly ? `<small style="display:block;font-size:10px;opacity:.7">${lockd ? 'เฉพาะโหมดยิง' : 'ด่านยิงใหญ่ ×2'}</small>` : ''}</button>`; }).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
     $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.name}</button>`).join('');
@@ -2110,7 +2310,8 @@ function renderQuestion() {
 /* ======================================================================
    โหมดยิงกันเอง: สนาม ที่กำบัง การชน และการยิงเรย์
    ====================================================================== */
-const ARENA = [ROUT + 4.4, ROUT + 12.6, ROUT + 13.2];
+const ARENA = [ROUT + 4.4, ROUT + 12.6, ROUT + 13.2, TOWN_B];
+const inArena = (m, x, z, pad = 0) => m === 3 ? Math.abs(x) <= TOWN_B + pad && Math.abs(z) <= TOWN_B + pad : stadiumDist(x, z) <= ARENA[m] + pad;
 function seeded(seed) { let x = (seed * 9301 + 49297) % 2147483647; if (x <= 0) x += 2147483646; return () => (x = x * 16807 % 2147483647) / 2147483647; }
 const COVERS = {}, COLS = {};
 function coverMats(m) {
@@ -2124,6 +2325,7 @@ function coverMats(m) {
 }
 function buildCovers(m) {
   if (COVERS[m]) return COVERS[m];
+  if (m === 3) { const g0 = new THREE.Group(); g0.visible = false; scene.add(g0); return (COVERS[m] = { g: g0, cols: [] }); }
   const g = new THREE.Group(); g.visible = false; scene.add(g);
   const cols = [], R = seeded(1000 + m * 77), mats = coverMats(m);
   const add = (x, z, w, d, h, mat) => {
@@ -2150,7 +2352,7 @@ function collidersFor(m) {
   scene.updateMatrixWorld(true);
   const out = [], bx = new THREE.Box3(), bound = ARENA[m] + 3;
   const skip = new Set(); (world.cars || []).forEach(c => skip.add(c.m)); (world.zombies || []).forEach(z => skip.add(z.g)); if (world.train) skip.add(world.train); if (world.searchlight) skip.add(world.searchlight); (world.bGroups || []).forEach(g => skip.add(g));
-  for (const root of [m === 0 ? world.stad : m === 1 ? world.bkk : world.zom, world.podiumG, world.gate]) {
+  for (const root of m === 3 ? [world.podiumG] : [m === 0 ? world.stad : m === 1 ? world.bkk : world.zom, world.podiumG, world.gate]) {
     if (!root) continue;
     root.traverse(o => {
       if (!o.isMesh || o.isInstancedMesh) return;
@@ -2160,7 +2362,7 @@ function collidersFor(m) {
       const w = bx.max.x - bx.min.x, d = bx.max.z - bx.min.z, h = bx.max.y - bx.min.y;
       if (bx.max.y < 0.4 || bx.min.y > 3.0 || h < 0.25 || Math.max(w, d) > 80 || (w < 0.12 && d < 0.12)) return;
       const cx = (bx.min.x + bx.max.x) / 2, cz = (bx.min.z + bx.max.z) / 2;
-      if (stadiumDist(cx, cz) - Math.hypot(w, d) / 2 > bound) return;
+      if (!inArena(m, cx, cz, Math.hypot(w, d) / 2 + 3)) return;
       out.push({ x0: bx.min.x, x1: bx.max.x, z0: bx.min.z, z1: bx.max.z, y0: bx.min.y, y1: bx.max.y });
     });
   }
@@ -2173,6 +2375,7 @@ const SPOTS = {}, PSPOTS = {};
 function arenaSpots(m) {
   if (SPOTS[m]) return SPOTS[m];
   const c = [];
+  if (m === 3) { for (let x = -80; x <= 80; x += 10) for (let z = -80; z <= 80; z += 10) c.push({ x: x + 2, z: z + 3 }); return (SPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 9 && !insideAny(s.x, s.z, 1.0, m))); }
   for (let k = 0; k < 32; k++) { const [x, z] = posAt(k / 32 + 0.012, laneR(k % 8)); c.push({ x, z }); }
   for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.04, RIN - 5 - (k % 3) * 4); c.push({ x, z }); }
   if (m > 0) for (let k = 0; k < 12; k++) { const [x, z] = posAt(k / 12 + 0.02, ROUT + 4); c.push({ x, z }); }
@@ -2181,6 +2384,7 @@ function arenaSpots(m) {
 function pickupSpots(m) {
   if (PSPOTS[m]) return PSPOTS[m];
   const c = [];
+  if (m === 3) { for (let x = -78; x <= 78; x += 13) for (let z = -78; z <= 78; z += 13) c.push({ x: x + 5, z: z - 4 }); return (PSPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 9 && !insideAny(s.x, s.z, 1.2, m)).concat(world.bFloors[m].map(f => ({ x: f.x, z: f.z, y: f.y })))); }
   for (let k = 0; k < 24; k++) { const [x, z] = posAt(k / 24 + 0.03, laneR((k * 3) % 8)); c.push({ x, z }); }
   for (let k = 0; k < 8; k++) { const [x, z] = posAt(k / 8 + 0.08, RIN - 10); c.push({ x, z }); }
   return (PSPOTS[m] = c.filter(s => Math.hypot(s.x, s.z) > 7 && !insideAny(s.x, s.z, 1.2, m)).concat(world.bFloors[m].map(f => ({ x: f.x, z: f.z, y: f.y }))));
@@ -2197,7 +2401,7 @@ function moveCollide(px, pz, nx, nz, y = 0) {
       else { const l = x - c.x0, r = c.x1 - x, f = z - c.z0, b = c.z1 - z, mn = Math.min(l, r, f, b); if (mn === l) x = c.x0 - PR; else if (mn === r) x = c.x1 + PR; else if (mn === f) z = c.z0 - PR; else z = c.z1 + PR; }
     }
   }
-  if (stadiumDist(x, z) > ARENA[m]) { if (stadiumDist(x, pz) <= ARENA[m]) z = pz; else if (stadiumDist(px, z) <= ARENA[m]) x = px; else { x = px; z = pz; } }
+  if (!inArena(m, x, z)) { if (inArena(m, x, pz)) z = pz; else if (inArena(m, px, z)) x = px; else { x = px; z = pz; } }
   return { x, z };
 }
 // ความสูงพื้นใต้เท้า (ยืนบนพื้นตึก/บันได/ลังได้)
@@ -2840,7 +3044,7 @@ addEventListener('resize', resize);
 await Promise.race([Promise.all([document.fonts.load('700 40px Oswald'), document.fonts.load('400 20px Kanit')]), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
 Music.play('lobby');
 $('#grain').style.backgroundImage = `url(${(() => { const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), d = x.createImageData(160, 160); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL(); })()})`;
-resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); Math.random = _r; } applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
+resize(); { const _r = Math.random; Math.random = seeded(20261112); buildWorld(); buildBangkok(); buildZombie(); buildPodium(); buildBuildings(); buildTown(); Math.random = _r; } applyMap(0, 0); buildThumbs(); buildGunIcons(); buildLookPicker(); buildDemo(); showcaseLook(myLook); frame();
 if (typeof mqtt === 'undefined') status('โหลดระบบเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรช');
 </script>
 </body>
