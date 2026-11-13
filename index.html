@@ -428,8 +428,8 @@
         <div id="looks" class="looks"></div>
         <div class="secT">ชุด</div>
         <div id="kits" class="kits"><button data-kit="tac" class="on">COMBAT KIT</button><button data-kit="sport">RACE KIT</button></div>
-        <div class="secT">SKIN ชุดรบ</div>
-        <div id="skins" class="skins"></div>
+        <div class="secT" style="display:none">SKIN ชุดรบ</div>
+        <div id="skins" class="skins" style="display:none"></div>
         <button id="equipBtn" class="btn start"><span>EQUIP</span></button>
       </div>
       <div class="tab hidden" id="tabLoad">
@@ -444,7 +444,7 @@
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
         <div class="secT">เครดิต</div>
-        <div class="small" style="text-align:left;line-height:1.7">ตัวละครหญิง (VIPER · RAVEN · NOVA · ECHO) ดัดแปลงจากโมเดล <a href="https://sketchfab.com/3d-models/dark-haired-anime-heroine-png-to-stl-supavoxel-9fa3023365ec4ce288c70c797dbedee5" target="_blank" rel="noopener" style="color:#39FF14">"Dark-Haired Anime Heroine"</a> โดย <a href="https://sketchfab.com/nhaddad8" target="_blank" rel="noopener" style="color:#39FF14">Niko Haddad</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" style="color:#39FF14">CC BY 4.0</a> — ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก เปลี่ยนสีผม/ชุด และเพิ่มเสื้อผ้า<br>ตัวละครชาย: Soldier / Xbot จากตัวอย่างของ three.js (Mixamo)</div>
+        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์</div>
       </div>
     </div>
   </section>
@@ -560,14 +560,8 @@ const POINTS = [16, 13, 11, 9, 8, 7, 6, 5]; // ระยะที่ได้ต
 const MAX_PLAYERS = 8;
 const SKIN = '#ffd9b8';
 const LOOKS = [
-  { name: 'GHOST', skin: '#c99a7a', hair: '#1c1a18', hairStyle: 'short', top: '#4a4d52', pants: '#26282c', boots: '#1a1b1e', trim: '#1f2125', gear: 'hood', mask: '#121315', vest: false, pack: true, glow: '#7d776d' },
-  { name: 'VIPER', skin: '#e0b796', hair: '#17130f', hairStyle: 'pony', top: '#3d4a33', pants: '#4f5141', boots: '#2a241e', trim: '#2d3527', gear: null, vest: false, knee: true, glow: '#7d776d' },
-  { name: 'TITAN', skin: '#8f6248', hair: '#1b1612', hairStyle: 'buzz', top: '#1d1f22', pants: '#8a7a5e', boots: '#3a2f24', trim: '#4f4a3a', gear: null, vest: '#5c5644', beard: true, build: 1.22, glow: '#7d776d' },
-  { name: 'FALCON', skin: '#d2a582', hair: '#2b2118', hairStyle: 'buzz', top: '#7d6e55', pants: '#6c6049', boots: '#3a2f24', trim: '#5a5040', gear: 'helmet', helmet: '#5f5a49', vest: '#6b6450', knee: true, glow: '#7d776d' },
-  { name: 'RAVEN', skin: '#e8c3a6', hair: '#0f0f12', hairStyle: 'bob', top: '#1a1a1c', pants: '#22252b', boots: '#111113', trim: '#6b2620', gear: null, vest: false, collar: true, glow: '#7d776d' },
-  { name: 'NOVA', skin: '#b98868', hair: '#141210', hairStyle: 'short', top: '#d9d6cf', pants: '#2b2d31', boots: '#e3e1dc', trim: '#c4602f', gear: 'capback', cap: '#2a2c30', phones: true, glow: '#7d776d' },
-  { name: 'KILO', skin: '#d8ad8a', hair: '#3a2c21', hairStyle: 'short', top: '#243246', pants: '#55585c', boots: '#2b2620', trim: '#18202c', gear: 'beanie', cap: '#3b3d40', beard: true, pack: true, glow: '#7d776d' },
-  { name: 'ECHO', skin: '#e3bb9b', hair: '#4a3121', hairStyle: 'long', top: '#5d6168', pants: '#4b4f3c', boots: '#2a241e', trim: '#3a3d33', gear: 'cap', cap: '#3c4030', vest: '#3e4134', glow: '#7d776d' },
+  { name: 'VANGUARD', skin: '#c99a7a', hair: '#1c1a18', hairStyle: 'short', top: '#3b3f36', pants: '#26282c', boots: '#1a1b1e', trim: '#1f2125', gear: 'helmet', helmet: '#2b2e30', vest: '#3e4134', glow: '#7d776d' },
+  { name: 'TITAN', skin: '#8f6248', hair: '#1b1612', hairStyle: 'buzz', top: '#2a2c2e', pants: '#2e3029', boots: '#1a1b1e', trim: '#6b2620', gear: 'helmet', helmet: '#1d1f22', vest: '#3a3d33', mask: '#121315', glow: '#ff3b3b' },
 ].map(l => ({ ...l, shirt: l.top }));
 const DIFFS = [
   { name: 'ง่าย', icon: '🟢', time: 8000, acc: 0.88, desc: 'เช่น 7 + 5, 3 × 4' },
@@ -1450,6 +1444,68 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
+const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]}};
+/* ---------- ตัวละครหลัก 2 ตัว (โมเดลจริง) ผูกกับโครงกระดูกของเกม + การขยับแบบมีชีวิต ---------- */
+function heroPrep(scene) {
+  const prims = []; scene.traverse(o => { if (o.isMesh && o.geometry.attributes.skinIndex) prims.push(o); });
+  return prims.map(o => {
+    const g = o.geometry, m = o.material;
+    if (g.attributes.skinWeight.normalized || !(g.attributes.skinWeight.array instanceof Float32Array)) { const a = g.attributes.skinWeight, f = new Float32Array(a.count * 4); for (let i = 0; i < a.count; i++) for (let c = 0; c < 4; c++) f[i * 4 + c] = a.getComponent(i, c); g.setAttribute('skinWeight', new THREE.BufferAttribute(f, 4)); }
+    if (!(g.attributes.skinIndex.array instanceof Uint16Array)) g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(Uint16Array.from(g.attributes.skinIndex.array), 4));
+    m.color.setScalar(1.45); m.envMapIntensity = 1.3; m.side = THREE.FrontSide;
+    if (m.emissiveMap) { m.emissive.setRGB(1, 1, 1); m.emissiveIntensity = 1.6; }
+    if (m.normalScale) m.normalScale.set(1.1, 1.1);
+    return { geo: g, mat: m };
+  });
+}
+function heroDyn(r, chest) { // ลำตัวท่อนบน: หายใจ + ตามแรงเหวี่ยงแบบสปริง (ไม่แข็งทื่อ)
+  const st = { t: Math.random() * 9, last: 0, yaw: null, sw: 0, sv: 0, lean: 0, lv: 0, bo: 0, bv: 0 };
+  const base = THREE.Object3D.prototype.updateMatrixWorld;
+  chest.updateMatrixWorld = function (force) {
+    const now = performance.now() / 1000, dt = st.last ? Math.min(0.05, now - st.last) : 0; st.last = now;
+    if (dt > 0.0005) {
+      st.t += dt; const yaw = r.root.rotation.y; if (st.yaw == null) st.yaw = yaw;
+      const dy = Math.atan2(Math.sin(yaw - st.yaw), Math.cos(yaw - st.yaw)); st.yaw = yaw;
+      const tw = Math.max(-0.22, Math.min(0.22, -dy / dt * 0.03));
+      st.sv += ((tw - st.sw) * 70 - st.sv * 10) * dt; st.sw += st.sv * dt;
+      const p = r.root.position; if (st.px == null) { st.px = p.x; st.pz = p.z; }
+      const sp = Math.min(14, Math.hypot(p.x - st.px, p.z - st.pz) / dt); st.px = p.x; st.pz = p.z;
+      st.lv += ((sp * 0.011 - st.lean) * 45 - st.lv * 9) * dt; st.lean += st.lv * dt;
+      const by = r.body.position.y; if (st.by == null) st.by = by; const vy = (by - st.by) / dt; st.by = by;
+      st.bv += ((-Math.max(-4, Math.min(4, vy)) * 0.03 - st.bo) * 90 - st.bv * 11) * dt; st.bo += st.bv * dt;
+    }
+    const br = Math.sin(st.t * 1.85), br2 = Math.sin(st.t * 0.93 + 1);
+    chest.rotation.set(-0.015 + br * 0.02 + st.lean + st.bo, st.sw + br2 * 0.012, br2 * 0.014);
+    chest.scale.set(1 + br * 0.007, 1 + br * 0.005, 1 + br * 0.012);
+    return base.call(this, force);
+  };
+}
+function attachHero(r, kind) {
+  const K = CHAR.kinds[kind], J = HERO_J[kind], V = a => new THREE.Vector3(a[0], a[1], a[2]), down = new THREE.Vector3(0, -1, 0);
+  r.body.traverse(o => { if (o.isMesh) o.visible = false; });
+  r.body.scale.set(1, 1, 1);
+  const sp = V(J.spine), chest = new THREE.Group(); chest.position.copy(sp); r.body.add(chest);
+  chest.add(r.head); r.head.position.copy(V(J.neck)).sub(sp); r.head.rotation.set(0, 0, 0);
+  const gA = [], ext = [['RArm', 'RFore', 'RHand'], ['LArm', 'LFore', 'LHand']];
+  let hand = null;
+  r.arms.forEach((a, i) => {
+    const [sA, sF, sH] = ext[i], u = V(J[sF]).sub(V(J[sA])), L = u.length(); u.normalize();
+    chest.add(a); a.position.copy(V(J[sA])).sub(sp);
+    const Qu = new THREE.Quaternion().setFromUnitVectors(down, u), g = new THREE.Group();
+    g.quaternion.copy(a.quaternion).invert().multiply(Qu); a.add(g); gA.push(g);
+    const e = r.elbows[i]; g.add(e); e.position.set(0, -L, 0); e.rotation.set(0, 0, 0);
+    if (i === 0) { const qi = Qu.clone().invert(); hand = new THREE.Group(); hand.position.copy(V(J[sH]).sub(V(J[sF])).applyQuaternion(qi)).add(new THREE.Vector3(0, -0.08, 0)); hand.quaternion.copy(qi); e.add(hand); }
+  });
+  r.legs.forEach((l, i) => { const up = V(J[i ? 'LUp' : 'RUp']), kn = V(J[i ? 'LLeg' : 'RLeg']); l.position.copy(up); l.rotation.set(0, 0, 0); r.knees[i].position.copy(kn).sub(up); r.knees[i].rotation.set(0, 0, 0); });
+  const bone = p => { const b = new THREE.Bone(); p.add(b); return b; };
+  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1]), bone(r.knees[0]), bone(r.knees[1]), bone(chest)];
+  r.root.updateMatrixWorld(true);
+  const skel = new THREE.Skeleton(bones), meshes = K.prims.map(p => { const m = new THREE.SkinnedMesh(p.geo, p.mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); return m; });
+  r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand };
+  r.girl = { meshes, base: meshes, skel, hero: kind };
+  r.chest = chest; heroDyn(r, chest);
+}
+
 /* ---------- ตัวละครหญิง (โมเดลจริง CC-BY: Niko Haddad) ผูกกับโครงกระดูกของเกม ---------- */
 // VIPER=ทหาร, RAVEN=นักรบ, NOVA=สปอร์ต, ECHO=ชุดว่ายน้ำ
 const GIRL_VAR = { 1: 'mil', 4: 'war', 5: 'sport', 7: 'swim' };
@@ -1582,8 +1638,8 @@ function attachGirl(r, lookIdx, outfit, SK) {
 
 /* ---------- ตัวละครโมเดล 3D จริง (GLB มีโครงกระดูก + แอนิเมชัน) ---------- */
 const CHAR = { ready: false, kinds: {} };
-const CH_FILES = { soldier: 'models/Soldier.glb', xbot: 'models/Xbot.glb', girl: 'models/girl.glb' };
-const FEMALE = new Set([1, 4, 5, 7]);
+const CH_FILES = { ca: 'models/vanguard.glb', cb: 'models/titan.glb' };
+const FEMALE = new Set();
 const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
 function loadChars() {
@@ -1591,6 +1647,7 @@ function loadChars() {
   Promise.all(Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
+      if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene) }; continue; }
       if (k === 'girl') { let gm = null; g.scene.traverse(o => { if (!gm && o.isMesh) gm = o; }); if (gm && gm.geometry.attributes.skinIndex) CHAR.kinds.girl = { girl: true, ...girlPrep(gm.geometry, gm.material.map) }; continue; }
       g.scene.updateMatrixWorld(true);
       const bw = n => { for (const nn of BN(n)) { const b = g.scene.getObjectByName(nn); if (b) return b.getWorldPosition(new THREE.Vector3()).y; } return null; };
@@ -1610,9 +1667,10 @@ function loadChars() {
     CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
   });
 }
-function charKind(lookIdx, outfit) { if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
+function charKind(lookIdx, outfit) { const hk = ['ca', 'cb'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
 function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
   if (kind === 'girl') return attachGirl(r, lookIdx, outfit, SK);
+  if (CHAR.kinds[kind] && CHAR.kinds[kind].hero) return attachHero(r, kind);
   const K = CHAR.kinds[kind], m = cloneSkinned(K.scene); m.scale.multiplyScalar(K.scale);
   const neon = SK.neon, ski = SKINS.indexOf(SK);
   m.traverse(o => {
@@ -3175,7 +3233,7 @@ function render() {
       const html = LOOKS.map((l, i) => `<div class="look${i === ml ? ' sel' : ''}" data-i="${i}">${ava(i)}${l.name}</div>`).join('');
       if ($('#roomLooks').dataset.h !== html) { $('#roomLooks').innerHTML = html; $('#roomLooks').dataset.h = html; }
       $('#mySig').textContent = 'ท่าประจำตัว: ' + SIG_NAME[ml % SIG.length];
-      show('#roomSkinsBox', S.mode === 'shoot');
+      show('#roomSkinsBox', false);
       const sh = SKINS.map((k, i) => `<button class="skin${i === msk ? ' sel eq' : ''}" data-i="${i}"><i style="background:linear-gradient(135deg, ${k.armor} 0 45%, ${k.neon} 45% 55%, ${k.top} 55% 80%, ${k.metal} 80%)"></i>${k.name}<small>${i === msk ? 'EQUIPPED' : 'SKIN ' + (i + 1)}</small></button>`).join('');
       if ($('#roomSkins').dataset.h !== sh) { $('#roomSkins').innerHTML = sh; $('#roomSkins').dataset.h = sh; } }
     $('#count').textContent = `${S.players.length}/${MAX_PLAYERS} คน`;
@@ -3204,7 +3262,7 @@ function render() {
     $('#rank').innerHTML = ord(myRank);
     $('#roundInfo').textContent = (st === 'countdown' ? 'เตรียมตัว!' : `ข้อที่ ${S.round}`) + ` · ${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#board').innerHTML = sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}">${ava(p.look)}${esc(p.name)}${st === 'question' && p.answered ? ' <span class="ok">✓</span>' : ''}<span class="pts">${Math.min(p.points, GOAL)}</span></li>`).join('');
-    $('#dots').innerHTML = S.players.map(p => `<div data-id="${p.id}" class="${p.id === myId ? 'me' : ''}" style="background:${LOOKS[p.look].shirt}"></div>`).join('');
+    $('#dots').innerHTML = S.players.map(p => `<div data-id="${p.id}" class="${p.id === myId ? 'me' : ''}" style="background:${LOOKS[p.look % LOOKS.length].shirt}"></div>`).join('');
   }
   if (st === 'question' || st === 'reveal') renderQuestion();
   if (st === 'reveal' && S.results && S.q && sfxRevealQ !== S.q.id) {
@@ -3528,10 +3586,11 @@ function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i
 
 /* ---------- พรีวิวตัวละครเต็มตัว + ท่าแอคติ้ง ---------- */
 const EMOTE_T = 3.4, BLEND_T = 0.5;
+const emoDur = n => n === 'tactical' ? 7.3 : n === 'titan' ? 6.3 : EMOTE_T, emoT = (n, tl, tg) => (n === 'tactical' || n === 'titan') ? tl : tg;
 // ท่าประจำตัวของตัวละครแต่ละตัว (ไม่ซ้ำกัน)
-const SIG = ['salute', 'wave', 'flex', 'point', 'guard', 'stretch', 'pump', 'dance'];
-const SIG_NAME = ['วันทยหัตถ์', 'โบกมือทักทาย', 'เบ่งกล้าม', 'ชี้ท้าทาย', 'ตั้งการ์ดชก', 'ยืดเหยียด', 'ชูกำปั้น', 'เต้นโชว์'];
-const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'scan'];
+const SIG = ['tactical', 'titan'];
+const SIG_NAME = ['สัญญาณยุทธวิธี', 'พลังไททัน'];
+const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'flex'];
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
 function pvPose(name, t) {
@@ -3568,6 +3627,20 @@ function pvPose(name, t) {
     case 'scan': // ถือปืนลง มองระวังภัย
       P.hy = Math.sin(t * 1.4) * 0.65; P.l = [-0.1, 0.12]; P.k = [0.2, 0.2];
       P.a = [[-0.75, -0.04], [-0.65, -0.62]]; P.e = [[0, 0], [0, 0]]; P.gun = 1; break;
+    case 'tactical': { // สัญญาณมือยุทธวิธี: ชูกำปั้น "หยุด" → ชี้สองนิ้วไปข้างหน้า → แตะหูฟังรายงาน
+      const c = t % 7.5, A = heroPh(c, [0, 2.4, 4.9, 7.5]), sw = Math.sin(t * 1.1);
+      const hold = { a0: [-0.12, -1.42], e0: [0.05, -1.62], hy: -0.25, hx: -0.06, bz: 0.03, l: [-0.06, 0.12], k: [0.12, 0.2], ry: -0.18 };
+      const point = { a0: [-1.48, -0.18], e0: [-0.06, 0.05], hy: -0.05, hx: 0.04, bz: -0.02, l: [-0.32, 0.3], k: [0.42, 0.24], ry: -0.42, by: -0.07, bx: 0.1 };
+      const comm = { a0: [-0.5, -0.92], e0: [0, -2.38], hy: 0.32, hx: -0.12, bz: 0.05, l: [0.04, -0.06], k: [0.1, 0.14], ry: 0.1, hz: 0.14 };
+      const Q = heroMix([hold, point, comm], A);
+      P.a = [Q.a0, [-0.12 + sw * 0.03, 0.2]]; P.e = [Q.e0, [-0.32 + sw * 0.04, 0]]; P.hy = Q.hy + Math.sin(t * 0.7) * 0.08; P.hx = Q.hx; P.hz = Q.hz || 0; P.bz = Q.bz; P.bx = Q.bx || 0;
+      P.l = Q.l; P.k = Q.k; P.ry = Q.ry; P.by += Q.by || 0; break; }
+    case 'titan': { // ทุบกำปั้นใส่ฝ่ามือ → ตั้งท่าเบ่งพลังคำราม
+      const c = t % 6.4, A = heroPh(c, [0, 3.2, 6.4]), hit = Math.pow(Math.max(0, Math.sin(t * 6.2)), 6);
+      const pound = { a0: [-1.02, 0.42], e0: [-1.25 - hit * 0.35, 0.1], a1: [-0.98, -0.4], e1: [-1.32, -0.1], bx: 0.06 + hit * 0.03, by: -0.05 - hit * 0.03, hx: 0.08 + hit * 0.05, l: [-0.15, 0.18], k: [0.28, 0.3], ry: 0.12 };
+      const roar = { a0: [-0.35, -0.68], e0: [-1.05, 0.25], a1: [-0.35, 0.68], e1: [-1.05, -0.25], bx: 0.22, by: -0.14, hx: -0.22, l: [-0.32, 0.3], k: [0.55, 0.5], ry: -0.05 };
+      const Q = heroMix([pound, roar], A), sh = Math.sin(t * 22) * 0.012 * A[1];
+      P.a = [Q.a0, Q.a1]; P.e = [Q.e0, Q.e1]; P.bx = Q.bx + sh; P.by += Q.by; P.hx = Q.hx + sh * 2; P.hy = Math.sin(t * 0.8) * 0.1; P.l = Q.l; P.k = Q.k; P.ry = Q.ry; P.bz = Math.sin(t * 0.9) * 0.025; break; }
     case 'salute': // วันทยหัตถ์
       P.hx = -0.05; P.l = [0, 0]; P.k = [0.04, 0.04];
       P.a = [[-0.55, -1.15], [0, 0.06]]; P.e = [[0, -2.65], [-0.05, 0]]; P.ry = 0.15; break;
@@ -3581,6 +3654,12 @@ function pvPose(name, t) {
   if (name === 'lunge') P.run = 1;
   return P;
 }
+function heroPh(c, T) { // น้ำหนักของแต่ละช่วงท่า (ผสมกันนุ่มๆ ช่วงรอยต่อ 0.6 วิ)
+  const n = T.length - 1, w = new Array(n).fill(0), X = 0.6;
+  for (let i = 0; i < n; i++) { const a = T[i], b = T[i + 1]; if (c >= a && c < b) { const into = Math.min(1, (c - a) / X), out = Math.min(1, (b - c) / X), sm = x => x * x * (3 - 2 * x); w[i] = 1; if (out < 1) { const k = sm(1 - out) * 0.5; w[i] -= k; w[(i + 1) % n] += k; } if (into < 1) { const k = sm(1 - into) * 0.5; w[i] -= k; w[(i - 1 + n) % n] += k; } } }
+  return w;
+}
+function heroMix(L, w) { const o = {}; for (const key in L[0]) { const v0 = L[0][key]; o[key] = Array.isArray(v0) ? v0.map((_, j) => L.reduce((s, q, i) => s + (q[key] ?? v0)[j] * w[i], 0)) : L.reduce((s, q, i) => s + (q[key] ?? v0) * w[i], 0); } return o; }
 function pvLerp(A, B, k) {
   const m = (a, b) => typeof a === 'number' ? a + (b - a) * k : Array.isArray(a) ? a.map((v, i) => m(v, b[i])) : b;
   const o = {}; for (const key in A) o[key] = m(A[key], B[key]); return o;
@@ -3621,7 +3700,7 @@ function pvSetLook(i, intro = true) {
   if (PV.ch) PV.sc.remove(PV.ch.root);
   const ch = makeRunner(i, null, false, PV.sc, of, of === 'tac' ? pvSkin : 0); PV.ch = ch; ch.root.scale.setScalar(0.92);
   if (of === 'tac') { ensureGuns(ch); poseArmor(ch, 0, true); ch.guns.vest.visible = false; }
-  const sg = SIG[i % SIG.length]; PV.seq = of === 'sport' ? [sg, 'idle', 'idle2', sg, 'cross', 'idle'] : [sg, 'idle', 'aim', 'idle2', sg, 'scan'];
+  const sg = SIG[i % SIG.length]; PV.seq = of === 'sport' ? [sg, 'idle', sg, 'cross'] : [sg, 'idle', 'aim', sg, 'scan', 'idle2'];
   if (PV.loadout) PV.seq = ['aim', 'scan', 'aim'];
   PV.emote = 0; PV.emT = 0; PV.intro = 0; PV.prevPose = null; PV.prevName = 'idle';
   if (intro && Music.sfx) Music.sfx('click');
@@ -3634,9 +3713,9 @@ function pvTick(dt) {
   if (cv.width !== Math.round(w * PV.r.getPixelRatio()) || cv.height !== Math.round(h * PV.r.getPixelRatio())) { PV.r.setSize(w, h, false); PV.cam.aspect = w / h; PV.cam.updateProjectionMatrix(); }
   PV.t += dt; PV.emT += dt; PV.dt = dt;
   const seq = PV.seq, cur = seq[PV.emote % seq.length];
-  if (PV.emT > EMOTE_T) { PV.prevName = cur; PV.emote++; PV.emT = 0; }
+  if (PV.emT > emoDur(cur)) { PV.prevName = cur; PV.emote++; PV.emT = 0; }
   const name = seq[PV.emote % seq.length];
-  let P = pvPose(name, PV.t);
+  let P = pvPose(name, emoT(name, PV.emT, PV.t));
   if (PV.prevName && PV.emT < BLEND_T) P = pvLerp(pvPose(PV.prevName, PV.t), P, easeIO(PV.emT / BLEND_T));
   if (PV.intro > 0) { PV.intro = Math.max(0, PV.intro - dt * 1.25); const k = 1 - PV.intro; PV.spin = (1 - Math.pow(1 - k, 3)) * Math.PI * 2 - Math.PI * 2; P.by += Math.sin(k * Math.PI) * 0.25; } else PV.spin = 0;
   if (PV.drag == null && performance.now() - PV.lastDrag > 2500) PV.yaw *= Math.pow(0.1, dt);
@@ -3668,9 +3747,9 @@ function frame() {
       if (r.tagSp) { r.tagSp.position.y = 3.15 + (i % 2) * 0.45; r.tagSp.scale.set(2.4, 0.7, 1); } r.u = 0; r.target = 0;
       if (r.scoreSp) clearScore(r);
       const L0 = r.lob || (r.lob = { name: SIG[r.look % SIG.length], t: 0, ph: Math.random() * 10 });
-      L0.t += dt; if (L0.t > EMOTE_T) { L0.prev = L0.name; L0.t = 0; L0.name = L0.name === 'idle' ? (Math.random() < 0.5 ? SIG[r.look % SIG.length] : EM_POOL[(Math.random() * EM_POOL.length) | 0]) : 'idle'; }
+      L0.t += dt; if (L0.t > emoDur(L0.name)) { L0.prev = L0.name; L0.t = 0; L0.name = L0.name === 'idle' ? (Math.random() < 0.5 ? SIG[r.look % SIG.length] : EM_POOL[(Math.random() * EM_POOL.length) | 0]) : 'idle'; }
       if (p.ready && !L0.wasReady) { L0.prev = L0.name; L0.name = 'pump'; L0.t = 0; } L0.wasReady = p.ready;
-      let P = pvPose(L0.name, t + L0.ph); if (L0.prev && L0.t < BLEND_T) P = pvLerp(pvPose(L0.prev, t + L0.ph), P, easeIO(L0.t / BLEND_T));
+      let P = pvPose(L0.name, emoT(L0.name, L0.t, t + L0.ph)); if (L0.prev && L0.t < BLEND_T) P = pvLerp(pvPose(L0.prev, t + L0.ph), P, easeIO(L0.t / BLEND_T));
       if (P.gun && !(S.mode === 'shoot')) { P = pvPose('idle', t + L0.ph); }
       if (S.mode === 'shoot') { ensureGuns(r); poseArmor(r, 0, true); r.guns.vest.visible = false; }
       pvApply(r, P, 0, dt);
@@ -3975,7 +4054,7 @@ function shieldMat(SU, inf, sc) {
 function buildArmorTiers(r) {
   const SU = { uCol: { value: new THREE.Color('#39FF14') }, uT: { value: 0 }, uStr: { value: 0.5 }, uHex: { value: 0 } };
   const src = [];
-  if (r.girl) src.push(r.girl.meshes[0]);
+  if (r.girl) src.push(...(r.girl.base || [r.girl.meshes[0]]));
   else if (r.glb) r.glb.m.traverse(o => { if (o.isSkinnedMesh) src.push(o); });
   else r.body.traverse(o => { if (o.isMesh && o.visible && !(r.guns && isUnder(o, r.guns.g))) src.push(o); });
   r.root.updateMatrixWorld(true); const rs = new THREE.Vector3().setFromMatrixScale(r.root.matrixWorld).x || 1;

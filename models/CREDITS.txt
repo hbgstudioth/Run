@@ -1,8 +1,11 @@
-models/girl.glb
-  Based on "Dark-Haired Anime Heroine" by Niko Haddad (https://sketchfab.com/nhaddad8)
-  Source: https://sketchfab.com/3d-models/dark-haired-anime-heroine-png-to-stl-supavoxel-9fa3023365ec4ce288c70c797dbedee5
-  License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
-  Changes: decimated, re-textured at 1024px, rigged to the game's skeleton, per-vertex masks for hair/outfit recolouring.
+models/vanguard.glb
+  Based on "Bulletstorm - Confederate Soldier" by Barcelo (https://sketchfab.com/Barcelo)
+  Source: https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7
+  License: CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/) - non-commercial use only
 
-models/Soldier.glb, models/Xbot.glb
-  From the three.js examples (Mixamo characters).
+models/titan.glb
+  Based on "Bulletstorm - Heavy Echo Elite Shocktroopers" by Barcelo (https://sketchfab.com/Barcelo)
+  Source: https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1
+  License: CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/) - non-commercial use only
+
+Changes: arms re-posed from A-pose, rescaled, skin weights remapped to the game rig, textures downsized to 1024px.
