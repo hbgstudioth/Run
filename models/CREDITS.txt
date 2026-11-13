@@ -1,0 +1,8 @@
+models/girl.glb
+  Based on "Dark-Haired Anime Heroine" by Niko Haddad (https://sketchfab.com/nhaddad8)
+  Source: https://sketchfab.com/3d-models/dark-haired-anime-heroine-png-to-stl-supavoxel-9fa3023365ec4ce288c70c797dbedee5
+  License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+  Changes: decimated, re-textured at 1024px, rigged to the game's skeleton, per-vertex masks for hair/outfit recolouring.
+
+models/Soldier.glb, models/Xbot.glb
+  From the three.js examples (Mixamo characters).

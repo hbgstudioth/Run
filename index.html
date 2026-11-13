@@ -443,6 +443,8 @@
         <div class="setRow"><span>เสียง</span><div class="seg" id="setSnd"><button data-s="1">เปิด</button><button data-s="0">ปิด</button></div></div>
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
+        <div class="secT">เครดิต</div>
+        <div class="small" style="text-align:left;line-height:1.7">ตัวละครหญิง (VIPER · RAVEN · NOVA · ECHO) ดัดแปลงจากโมเดล <a href="https://sketchfab.com/3d-models/dark-haired-anime-heroine-png-to-stl-supavoxel-9fa3023365ec4ce288c70c797dbedee5" target="_blank" rel="noopener" style="color:#39FF14">"Dark-Haired Anime Heroine"</a> โดย <a href="https://sketchfab.com/nhaddad8" target="_blank" rel="noopener" style="color:#39FF14">Niko Haddad</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" style="color:#39FF14">CC BY 4.0</a> — ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก เปลี่ยนสีผม/ชุด และเพิ่มเสื้อผ้า<br>ตัวละครชาย: Soldier / Xbot จากตัวอย่างของ three.js (Mixamo)</div>
       </div>
     </div>
   </section>
@@ -1448,9 +1450,140 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
+/* ---------- ตัวละครหญิง (โมเดลจริง CC-BY: Niko Haddad) ผูกกับโครงกระดูกของเกม ---------- */
+// VIPER=ทหาร, RAVEN=นักรบ, NOVA=สปอร์ต, ECHO=ชุดว่ายน้ำ
+const GIRL_VAR = { 1: 'mil', 4: 'war', 5: 'sport', 7: 'swim' };
+const GIRL_LOOK = {
+  1: { hair: '#3b2416', skin: '#f2ddd0', suit: '#3f4a30', sleeve: '#2c3322', c1: '#4a5636', c2: '#1d2117', trim: '#39FF14', boot: '#1e2117' },
+  4: { hair: '#e4e8ef', skin: '#fff3ee', suit: '#1a1b1f', sleeve: '#16171b', c1: '#c0c0c0', c2: '#121316', trim: '#39FF14', boot: '#2a2c31' },
+  5: { hair: '#7a2414', skin: '#e7c4ae', suit: '#101214', sleeve: '#39FF14', c1: '#0e1012', c2: '#39FF14', trim: '#39FF14', boot: '#f4f4f0' },
+  7: { hair: null, skin: '#ffffff', suit: null, sleeve: null, c1: '#ffffff', c2: '#c62828', trim: '#39FF14', boot: '#f4f4f0' },
+};
+function girlPrep(geo, map) {
+  // แปลงแอตทริบิวต์เป็นชนิดมาตรฐาน (บาง pass ของ GPU อ่าน uint8-normalized ผิด)
+  const toF = (a, n) => { const o = new Float32Array(a.count * n); for (let i = 0; i < a.count; i++) for (let c = 0; c < n; c++) o[i * n + c] = a.getComponent(i, c); return o; };
+  if (geo.attributes.color) { geo.setAttribute('gflag', new THREE.BufferAttribute(toF(geo.attributes.color, 4), 4)); geo.deleteAttribute('color'); }
+  if (geo.attributes.skinWeight && geo.attributes.skinWeight.normalized) geo.setAttribute('skinWeight', new THREE.BufferAttribute(toF(geo.attributes.skinWeight, 4), 4));
+  if (geo.attributes.skinIndex && !(geo.attributes.skinIndex.array instanceof Uint16Array)) geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(Uint16Array.from(geo.attributes.skinIndex.array), 4));
+  // ค่าเฉลี่ยนอร์มัลต่อจุด (ใช้พองเสื้อผ้าโดยไม่ฉีกตามรอยต่อ UV)
+  const P = geo.attributes.position, N = geo.attributes.normal, n = P.count, key = new Map(), acc = [], id = new Int32Array(n);
+  for (let i = 0; i < n; i++) { const k = Math.round(P.getX(i) * 2000) + ',' + Math.round(P.getY(i) * 2000) + ',' + Math.round(P.getZ(i) * 2000); let j = key.get(k); if (j == null) { j = acc.length; key.set(k, j); acc.push([0, 0, 0]); } id[i] = j; const a = acc[j]; a[0] += N.getX(i); a[1] += N.getY(i); a[2] += N.getZ(i); }
+  const SN = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const a = acc[id[i]], l = Math.hypot(a[0], a[1], a[2]); if (!(l > 1e-6)) { SN[i * 3 + 1] = 1; continue; } SN[i * 3] = a[0] / l; SN[i * 3 + 1] = a[1] / l; SN[i * 3 + 2] = a[2] / l; }
+  for (let i = 0; i < n; i++) { const l = Math.hypot(N.getX(i), N.getY(i), N.getZ(i)); if (!(l > 0.5)) N.setXYZ(i, SN[i * 3], SN[i * 3 + 1], SN[i * 3 + 2]); } // กันนอร์มัลศูนย์ → NaN
+  const SI = geo.attributes.skinIndex, SW = geo.attributes.skinWeight, AW = new Float32Array(n);
+  for (let i = 0; i < n; i++) for (let c = 0; c < 4; c++) { const b = SI.getComponent(i, c); if (b >= 2 && b <= 5) AW[i] += SW.getComponent(i, c); }
+  if (map) { map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 4; }
+  return { geo, map, SN, AW, shells: {} };
+}
+// สร้าง "เปลือก" เสื้อผ้า/เกราะจากผิวของตัวละคร (พองออกตามนอร์มัล ใช้น้ำหนักกระดูกเดียวกัน)
+function girlShell(K, key, pred, off) {
+  if (K.shells[key]) return K.shells[key];
+  const g = K.geo, P = g.attributes.position, F = g.index.array, FL = g.attributes.gflag, SI = g.attributes.skinIndex, SW = g.attributes.skinWeight;
+  const ok = new Uint8Array(P.count); for (let i = 0; i < P.count; i++) ok[i] = pred(P.getX(i), P.getY(i), P.getZ(i), FL ? FL.getX(i) : 0, FL ? FL.getY(i) : 0, K.AW[i]) ? 1 : 0;
+  const map = new Int32Array(P.count).fill(-1), pos = [], nor = [], si = [], sw = [], idx = []; let nv = 0;
+  for (let f = 0; f < F.length; f += 3) {
+    const a = F[f], b = F[f + 1], c = F[f + 2]; if (!(ok[a] && ok[b] && ok[c])) continue;
+    for (const v of [a, b, c]) { if (map[v] < 0) { map[v] = nv++; const sx = K.SN[v * 3], sy = K.SN[v * 3 + 1], sz = K.SN[v * 3 + 2], o = typeof off === 'function' ? off(P.getY(v)) : off;
+      pos.push(P.getX(v) + sx * o, P.getY(v) + sy * o, P.getZ(v) + sz * o); nor.push(sx, sy, sz); for (let c2 = 0; c2 < 4; c2++) { si.push(SI.getComponent(v, c2)); sw.push(SW.getComponent(v, c2)); } } idx.push(map[v]); }
+  }
+  const G2 = new THREE.BufferGeometry(); G2.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); G2.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  G2.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4)); G2.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4)); G2.setIndex(idx);
+  return (K.shells[key] = G2);
+}
+function girlMat(K, o) {
+  const mat = stylize(new THREE.MeshStandardMaterial({ map: K.map, roughness: 0.6, metalness: 0.04, side: THREE.DoubleSide })), base = mat.onBeforeCompile;
+  const C = c => new THREE.Color(c || '#000000');
+  const U = { uHair: { value: C(o.hair) }, uHairOn: { value: o.hair ? 1 : 0 }, uSkin: { value: C(o.skin || '#ffffff') }, uSuit: { value: C(o.suit) }, uSuitOn: { value: o.suit ? 1 : 0 }, uSleeve: { value: C(o.sleeve) }, uSleeveOn: { value: o.sleeve ? 1 : 0 } };
+  mat.onBeforeCompile = sh => {
+    base(sh); Object.assign(sh.uniforms, U);
+    sh.vertexShader = 'attribute vec4 gflag; varying vec4 vFlag;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vFlag = gflag;');
+    sh.fragmentShader = 'varying vec4 vFlag; uniform vec3 uHair; uniform vec3 uSkin; uniform vec3 uSuit; uniform vec3 uSleeve; uniform float uHairOn; uniform float uSuitOn; uniform float uSleeveOn;\n' + sh.fragmentShader.replace('#include <map_fragment>', `#include <map_fragment>
+      { float l = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11));
+        diffuseColor.rgb = mix(diffuseColor.rgb, uHair * (0.32 + l * 3.2), clamp(vFlag.r, 0.0, 1.0) * uHairOn);
+        diffuseColor.rgb *= mix(vec3(1.0), uSkin, clamp(vFlag.g, 0.0, 1.0));
+        diffuseColor.rgb = mix(diffuseColor.rgb, uSuit * (0.55 + l * 0.7), clamp(vFlag.b, 0.0, 1.0) * uSuitOn);
+        diffuseColor.rgb = mix(diffuseColor.rgb, uSleeve * (0.5 + l * 1.6), clamp(vFlag.a, 0.0, 1.0) * uSleeveOn); }`);
+  };
+  mat.customProgramCacheKey = () => 'girl1';
+  return mat;
+}
+function attachGirl(r, lookIdx, outfit, SK) {
+  const K = CHAR.kinds.girl, li = lookIdx % LOOKS.length, v = outfit === 'sport' ? 'sport' : (GIRL_VAR[li] || 'swim'), GL = GIRL_LOOK[li] || GIRL_LOOK[7];
+  const neon = outfit === 'sport' ? GL.trim : SK.neon;
+  r.body.traverse(o => { if (o.isMesh) o.visible = false; });
+  // ย้ายข้อต่อให้ตรงกับสรีระของโมเดล
+  const gA = r.arms.map((a, i) => { const s = i ? 1 : -1, g = new THREE.Group(); a.position.set(s * 0.27, 1.9, -0.01); g.rotation.z = s * 0.2; a.add(g); g.add(r.elbows[i]); r.elbows[i].position.set(0, -0.354, 0); return g; });
+  r.legs.forEach((l, i) => { const s = i ? 1 : -1; l.position.set(s * 0.19, 1.16, 0); r.knees[i].position.set(-s * 0.06, -0.53, 0.07); });
+  const bone = p => { const b = new THREE.Bone(); p.add(b); return b; };
+  const bones = [bone(r.body), bone(r.head), bone(gA[0]), bone(r.elbows[0]), bone(gA[1]), bone(r.elbows[1]), bone(r.legs[0]), bone(r.legs[1])];
+  r.root.updateMatrixWorld(true);
+  const skel = new THREE.Skeleton(bones), meshes = [];
+  const skinned = (geo, mat) => { const m = new THREE.SkinnedMesh(geo, mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); meshes.push(m); return m; };
+  const body = skinned(K.geo, girlMat(K, { ...GL, suit: v === 'swim' ? (outfit === 'sport' ? GL.c1 : null) : (v === 'sport' ? GL.c1 : GL.suit), sleeve: v === 'sport' && li !== 5 ? GL.trim : GL.sleeve, hair: GL.hair, skin: GL.skin }));
+  const cloth = c => stylize(new THREE.MeshStandardMaterial({ color: c, roughness: 0.78, metalness: 0.02 }));
+  const plate = c => stylize(new THREE.MeshStandardMaterial({ color: c, roughness: 0.32, metalness: 0.85, envMapIntensity: 1.2 }));
+  const nm = neonMat(neon), tw = (lo, hi) => (x, y, z, hr, sk, aw) => y > lo && y < hi && hr < 0.5 && aw < 0.3;
+  if (v === 'sport') { // ครอปท็อป + กางเกงขาสั้น + แถบนีออน
+    skinned(girlShell(K, 'crop', tw(1.6, 1.99), 0.011), cloth(GL.c1));
+    skinned(girlShell(K, 'cropHem', tw(1.6, 1.63), 0.016), nm);
+    skinned(girlShell(K, 'shorts', tw(0.84, 1.33), 0.011), cloth(GL.c1));
+    skinned(girlShell(K, 'shortHem', tw(0.84, 0.875), 0.016), nm);
+    skinned(girlShell(K, 'waist', tw(1.3, 1.33), 0.016), nm);
+  } else if (v === 'mil') { // ชุดรัดรูปทหาร + เสื้อเกราะแผ่น + เข็มขัด
+    skinned(girlShell(K, 'suit', tw(0.66, 2.0), 0.01), cloth(GL.c1));
+    skinned(girlShell(K, 'vest', (x, y, z, hr, sk, aw) => y > 1.42 && y < 1.97 && hr < 0.5 && aw < 0.2 && Math.abs(x) < 0.27, 0.042), cloth(GL.c2));
+    skinned(girlShell(K, 'belt', tw(1.26, 1.34), 0.032), cloth('#15170f'));
+    skinned(girlShell(K, 'vestLine', (x, y, z, hr, sk, aw) => y > 1.42 && y < 1.97 && hr < 0.5 && aw < 0.2 && Math.abs(Math.abs(x) - 0.1) < 0.012 && z > 0, 0.05), nm);
+  } else if (v === 'war') { // คอร์เซ็ทเกราะเงิน + กระโปรงเกราะ + แถบนีออน
+    skinned(girlShell(K, 'corset', tw(1.28, 1.95), 0.02), plate(GL.c1));
+    skinned(girlShell(K, 'corsetLine', (x, y, z, hr, sk, aw) => y > 1.3 && y < 1.92 && hr < 0.5 && aw < 0.3 && Math.abs(x) < 0.012 && z > 0, 0.03), nm);
+    skinned(girlShell(K, 'under', tw(0.66, 1.3), 0.008), cloth(GL.c2));
+    skinned(girlShell(K, 'skirt', tw(0.98, 1.3), y => 0.03 + (1.3 - y) * 0.16), plate('#8d939b'));
+    skinned(girlShell(K, 'skirtHem', tw(0.98, 1.01), 0.083), nm);
+  } else { // ชุดว่ายน้ำ: ใช้ลายเดิม + สายนีออนต้นขา
+    skinned(girlShell(K, 'thighBand', tw(0.9, 0.93), 0.012), nm);
+  }
+  // ขาท่อนล่าง + รองเท้าตามชุด
+  const skinC = new THREE.Color('#f2c9b0').multiply(new THREE.Color(GL.skin || '#fff'));
+  const legTop = 0.08, legLen = 0.56;
+  const shinGeo = new THREE.CylinderGeometry(0.128, 0.062, legLen, 16, 3); shinGeo.translate(0, legTop - legLen / 2, 0);
+  const bootTall = v === 'mil' || v === 'war', sockTall = v === 'sport';
+  for (const kn of r.knees) {
+    const sk = new THREE.Mesh(shinGeo, stylize(new THREE.MeshStandardMaterial({ color: bootTall ? (v === 'war' ? '#8d939b' : GL.boot) : sockTall ? '#f4f4f0' : skinC, roughness: bootTall ? 0.4 : 0.6, metalness: v === 'war' ? 0.8 : 0 })));
+    sk.scale.set(1, 1, 1.05); sk.castShadow = true; kn.add(sk);
+    if (bootTall || sockTall) { const cf = new THREE.Mesh(new THREE.TorusGeometry(0.128, 0.014, 6, 20), nm); cf.rotation.x = Math.PI / 2; cf.position.y = legTop - (sockTall ? 0.08 : 0.0); kn.add(cf); }
+    if (v === 'swim') { const ab = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.012, 6, 16), nm); ab.rotation.x = Math.PI / 2; ab.position.y = -0.4; kn.add(ab); }
+    const shoe = new THREE.Mesh(HB.shoe, stylize(new THREE.MeshStandardMaterial({ color: bootTall ? '#17181b' : GL.boot, roughness: 0.55 }))); shoe.position.set(0, -0.5, 0.06); shoe.scale.set(0.8, 0.85, 0.82); shoe.castShadow = true; kn.add(shoe);
+    const sole = new THREE.Mesh(HB.sole, bootTall ? toon('#0d0e10') : nm); sole.position.set(0, -0.555, 0.06); sole.scale.set(0.8, 1, 0.82); kn.add(sole);
+  }
+  // อุปกรณ์บนหัว/ตัว (หน่วยเดียวกับโมเดล)
+  const HA = new THREE.Group(); HA.scale.setScalar(2); HA.position.set(0, 0, 0); r.head.add(HA);
+  const put = (p, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); o.castShadow = true; p.add(o); return o; };
+  if (v === 'sport') put(HA, new THREE.TorusGeometry(0.245, 0.018, 6, 28), nm, 0.035, 0.1, -0.02, Math.PI / 2 - 0.3).scale.set(1, 1.22, 1);
+  if (v === 'war') { put(HA, new THREE.TorusGeometry(0.245, 0.01, 6, 28), metalMat('#c0c0c0'), 0.035, 0.13, -0.02, Math.PI / 2 - 0.25).scale.set(1, 1.22, 1); put(HA, new THREE.OctahedronGeometry(0.03), nm, 0.035, 0.15, 0.27); }
+  if (v === 'mil') { put(HA, HB.ear2, toon('#121417'), 0.31, -0.02, 0.02).scale.setScalar(0.5); put(HA, new THREE.CylinderGeometry(0.008, 0.008, 0.2, 6), toon('#121417'), 0.27, -0.09, 0.12, 1.2, 0, 0.4); put(HA, HB.dot, nm, 0.335, -0.01, 0.04).scale.setScalar(0.5); }
+  if (v === 'swim') { const gl = new THREE.Group(); gl.position.set(0.035, 0.21, 0.13); gl.rotation.x = -0.75; HA.add(gl); for (const s of [-1, 1]) put(gl, new THREE.CircleGeometry(0.06, 16), new THREE.MeshStandardMaterial({ color: '#0b0c0e', metalness: 0.9, roughness: 0.1, side: THREE.DoubleSide }), s * 0.075, 0, 0).scale.set(1.2, 0.85, 1); put(gl, new THREE.BoxGeometry(0.3, 0.012, 0.012), nm, 0, 0.03, 0); }
+  // บ่าเกราะ/ปลอกแขน (นักรบ) และดาบ
+  if (v === 'war') {
+    const pm = plate(GL.c1);
+    for (let i = 0; i < 2; i++) { const s = i ? 1 : -1; const p = put(gA[i], new THREE.SphereGeometry(0.12, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), pm, s * 0.02, 0.02, 0, 0, 0, s * 0.5); p.scale.set(1.1, 0.75, 1.15); put(gA[i], new THREE.TorusGeometry(0.11, 0.008, 6, 20), nm, s * 0.04, -0.03, 0, Math.PI / 2, 0, s * 0.5);
+      put(r.elbows[i], new THREE.CylinderGeometry(0.07, 0.062, 0.2, 12), pm, s * 0.035, -0.2, 0, 0, 0, s * 0.12); }
+    const sw = new THREE.Group(); sw.position.set(0.02, 1.72, -0.22); sw.rotation.z = -0.6; r.body.add(sw);
+    put(sw, new THREE.BoxGeometry(0.035, 1.1, 0.07), metalMat('#d9dde3'), 0, -0.1, 0); put(sw, new THREE.BoxGeometry(0.012, 1.0, 0.075), nm, 0, -0.12, 0); put(sw, new THREE.BoxGeometry(0.2, 0.03, 0.08), metalMat('#8d939b'), 0, 0.46, 0); put(sw, new THREE.CylinderGeometry(0.025, 0.025, 0.22, 8), toon('#151619'), 0, 0.58, 0);
+  }
+  if (v === 'mil') { // ซองปืนต้นขา + กระเป๋าเข็มขัด
+    put(r.legs[1], new THREE.BoxGeometry(0.1, 0.22, 0.16), cloth('#15170f'), 0.15, -0.2, 0.02); put(r.legs[1], new THREE.BoxGeometry(0.11, 0.02, 0.17), nm, 0.15, -0.31, 0.02);
+    for (const px of [-0.15, 0.15]) put(r.body, new THREE.BoxGeometry(0.1, 0.11, 0.06), cloth(GL.c2), px, 1.29, 0.2);
+  }
+  // จุดยึดปืน/เกราะ
+  const hand = new THREE.Group(); hand.position.set(-0.042, -0.36, 0.02); hand.rotation.z = 0.2; r.elbows[0].add(hand);
+  r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand };
+  r.girl = { meshes, v, skel };
+}
+
 /* ---------- ตัวละครโมเดล 3D จริง (GLB มีโครงกระดูก + แอนิเมชัน) ---------- */
 const CHAR = { ready: false, kinds: {} };
-const CH_FILES = { soldier: 'models/Soldier.glb', xbot: 'models/Xbot.glb' };
+const CH_FILES = { soldier: 'models/Soldier.glb', xbot: 'models/Xbot.glb', girl: 'models/girl.glb' };
 const FEMALE = new Set([1, 4, 5, 7]);
 const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
@@ -1459,6 +1592,7 @@ function loadChars() {
   Promise.all(Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
+      if (k === 'girl') { let gm = null; g.scene.traverse(o => { if (!gm && o.isMesh) gm = o; }); if (gm && gm.geometry.attributes.skinIndex) CHAR.kinds.girl = { girl: true, ...girlPrep(gm.geometry, gm.material.map) }; continue; }
       g.scene.updateMatrixWorld(true);
       const bw = n => { for (const nn of BN(n)) { const b = g.scene.getObjectByName(nn); if (b) return b.getWorldPosition(new THREE.Vector3()).y; } return null; };
       const top = bw('HeadTop_End') ?? bw('Head'), ft = Math.min(bw('LeftFoot') ?? 0, bw('RightFoot') ?? 0);
@@ -1477,8 +1611,9 @@ function loadChars() {
     CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
   });
 }
-function charKind(lookIdx, outfit) { const need = outfit === 'sport' ? 'xbot' : FEMALE.has(lookIdx % LOOKS.length) ? 'michelle' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
+function charKind(lookIdx, outfit) { if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
 function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
+  if (kind === 'girl') return attachGirl(r, lookIdx, outfit, SK);
   const K = CHAR.kinds[kind], m = cloneSkinned(K.scene); m.scale.multiplyScalar(K.scale);
   const neon = SK.neon, ski = SKINS.indexOf(SK);
   m.traverse(o => {
@@ -3316,31 +3451,56 @@ function rayCast(o, d, maxT, excludeId, tMin = 0, wallsOnly = false) {
 }
 // ไอเทม
 const pickMeshes = new Map();
-const pickTex = {
-  inf: canvasTex(64, 64, (x) => { x.fillStyle = '#5a1606'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#ff6a1f'; x.fillRect(4, 4, 56, 56); x.fillStyle = '#fff3e0'; x.font = '700 40px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('∞', 32, 30); x.font = '700 10px Oswald, sans-serif'; x.fillText('AMMO', 32, 54); }),
-  god: canvasTex(64, 64, (x) => { x.fillStyle = '#4a3a06'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#ffd23c'; x.fillRect(4, 4, 56, 56); x.fillStyle = '#fffbe6'; x.font = '700 36px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('★', 32, 28); x.fillStyle = '#4a3a06'; x.font = '700 10px Oswald, sans-serif'; x.fillText('GOD', 32, 54); }),
-  armor: canvasTex(64, 64, (x) => { x.fillStyle = '#22324a'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#5b9bd5'; x.beginPath(); x.moveTo(32, 8); x.lineTo(54, 16); x.lineTo(50, 40); x.lineTo(32, 56); x.lineTo(14, 40); x.lineTo(10, 16); x.closePath(); x.fill(); x.fillStyle = '#e8f1fa'; x.font = '700 14px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('+50', 32, 38); }),
-  hp: canvasTex(64, 64, (x) => { x.fillStyle = '#f2f2ee'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#c62828'; x.fillRect(24, 10, 16, 44); x.fillRect(10, 24, 44, 16); }),
-  ammo: canvasTex(64, 64, (x) => { x.fillStyle = '#4a5233'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#d9a12b'; x.fillRect(0, 26, 64, 12); x.fillStyle = '#e8e2d2'; x.font = '700 14px Oswald, sans-serif'; x.textAlign = 'center'; x.fillText('AMMO', 32, 20); }),
-};
+const PICK_COL = { hp: '#ff3b5c', armor: '#39FF14', ammo: '#ffb020', inf: '#ff6a1f', god: '#ffd23c' };
+const pickIconTex = {};
+function pickIcon(k) {
+  if (pickIconTex[k]) return pickIconTex[k];
+  const c = PICK_COL[k], t = canvasTex(128, 128, x => {
+    x.clearRect(0, 0, 128, 128); x.translate(64, 64); x.shadowColor = c; x.shadowBlur = 22; const lc = new THREE.Color(c).lerp(new THREE.Color('#ffffff'), 0.45).getStyle(); x.fillStyle = lc; x.strokeStyle = lc; x.lineWidth = 10; x.lineJoin = 'round';
+    if (k === 'hp') { x.fillRect(-12, -38, 24, 76); x.fillRect(-38, -12, 76, 24); }
+    else if (k === 'armor') { x.beginPath(); x.moveTo(0, -42); x.lineTo(34, -28); x.lineTo(30, 10); x.quadraticCurveTo(22, 32, 0, 44); x.quadraticCurveTo(-22, 32, -30, 10); x.lineTo(-34, -28); x.closePath(); x.stroke(); x.beginPath(); x.moveTo(-14, 0); x.lineTo(-3, 12); x.lineTo(16, -12); x.stroke(); }
+    else if (k === 'ammo') { for (const dx of [-24, 0, 24]) { x.fillRect(dx - 8, -14, 16, 46); x.beginPath(); x.moveTo(dx - 8, -14); x.quadraticCurveTo(dx, -42, dx + 8, -14); x.fill(); } }
+    else if (k === 'inf') { x.font = '900 92px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('∞', 0, 4); }
+    else { x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? 18 : 44; x.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } x.closePath(); x.fill(); }
+  });
+  return (pickIconTex[k] = t);
+}
+const PG = {};
+function pickGeo() {
+  if (PG.base) return PG;
+  PG.base = new THREE.CylinderGeometry(0.6, 0.74, 0.16, 6); PG.baseTop = new THREE.CylinderGeometry(0.46, 0.6, 0.06, 6);
+  PG.ring = new THREE.TorusGeometry(0.56, 0.022, 4, 6); PG.cap = new THREE.CylinderGeometry(0.34, 0.34, 0.07, 6); PG.capL = new THREE.TorusGeometry(0.34, 0.014, 4, 6);
+  PG.strut = new THREE.BoxGeometry(0.035, 0.74, 0.035); PG.core = new THREE.CylinderGeometry(0.27, 0.27, 0.72, 18, 1, true); PG.beam = new THREE.CylinderGeometry(0.4, 0.62, 14, 16, 1, true);
+  PG.ped = metalMat('#1b1e22'); PG.frame = metalMat('#9aa1aa');
+  return PG;
+}
+function makePickup(k) {
+  const G = pickGeo(), col = PICK_COL[k], special = k === 'inf' || k === 'god', sc = special ? 1.25 : 1;
+  const m = new THREE.Group(); m.userData.k = k;
+  const base = new THREE.Mesh(G.base, G.ped); base.position.y = -1.02; base.castShadow = true; base.receiveShadow = true; m.add(base);
+  const bt = new THREE.Mesh(G.baseTop, G.frame); bt.position.y = -0.91; m.add(bt);
+  const glowB = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
+  const ring = new THREE.Mesh(G.ring, glowB); ring.rotation.x = Math.PI / 2; ring.position.y = -0.93; m.add(ring);
+  const fl = new THREE.Group(); fl.scale.setScalar(sc); m.add(fl);
+  for (const y of [-0.4, 0.4]) { const c = new THREE.Mesh(G.cap, G.ped); c.position.y = y; c.castShadow = true; fl.add(c); const l = new THREE.Mesh(G.capL, glowB); l.rotation.x = Math.PI / 2; l.position.y = y + (y > 0 ? -0.04 : 0.04); fl.add(l); }
+  for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3 + Math.PI / 6, s = new THREE.Mesh(G.strut, G.frame); s.position.set(Math.cos(a) * 0.3, 0, Math.sin(a) * 0.3); fl.add(s); }
+  const core = new THREE.Mesh(G.core, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); fl.add(core);
+  const ic = new THREE.Sprite(new THREE.SpriteMaterial({ map: pickIcon(k), transparent: true, depthWrite: false, toneMapped: false })); ic.scale.set(0.58, 0.58, 1); ic.renderOrder = 4; fl.add(ic);
+  if (special) { const beam = new THREE.Mesh(G.beam, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 6; m.add(beam); }
+  m.userData.fl = fl; m.userData.ring = ring; m.userData.ic = ic;
+  return m;
+}
 function syncPickups(list) {
   const ids = new Set((list || []).map(k => k.id));
   for (const [id, m] of pickMeshes) if (!ids.has(id)) { scene.remove(m); pickMeshes.delete(id); }
   for (const k of list || []) {
     let m = pickMeshes.get(k.id);
-    if (!m || m.userData.k !== k.k) {
-      if (m) scene.remove(m);
-      m = new THREE.Group(); m.userData.k = k.k;
-      const special = k.k === 'inf' || k.k === 'god', col = { hp: '#ff5a5a', armor: '#4a90e2', ammo: '#ffcc55', inf: '#ff6a1f', god: '#ffd23c' }[k.k];
-      const b = new THREE.Mesh(special ? new THREE.BoxGeometry(1.1, 1.1, 1.1) : new THREE.BoxGeometry(0.9, 0.7, 0.9), new THREE.MeshStandardMaterial({ map: pickTex[k.k], roughness: 0.6, emissive: col, emissiveIntensity: special ? 0.6 : 0.25 }));
-      b.castShadow = true; m.add(b);
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 6, 28), new THREE.MeshBasicMaterial({ color: { hp: '#ff6b6b', armor: '#6fb1ff', ammo: '#ffd166', inf: '#ff7a33', god: '#ffe066' }[k.k], transparent: true, opacity: 0.7 }));
-      ring.rotation.x = Math.PI / 2; ring.position.y = -0.85; m.add(ring);
-      if (special) { const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.7, 14, 16, 1, true), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 6; m.add(beam); }
-      scene.add(m); pickMeshes.set(k.id, m);
-    }
+    if (!m || m.userData.k !== k.k) { if (m) scene.remove(m); m = makePickup(k.k); scene.add(m); pickMeshes.set(k.id, m); }
     m.position.set(k.x, (k.y || 0) + 1.1, k.z); m.visible = !!k.a;
   }
+}
+function tickPickups(t) {
+  for (const mm of pickMeshes.values()) { const u = mm.userData; if (!u.fl) continue; u.fl.rotation.y = t * 1.4; u.fl.position.y = Math.sin(t * 2.4 + mm.position.x) * 0.1; u.ring.scale.setScalar(1 + 0.06 * Math.sin(t * 4)); u.ic.material.rotation = Math.sin(t * 1.5) * 0.08; }
 }
 
 /* ======================================================================
@@ -3773,11 +3933,6 @@ function ensureGuns(r) {
   g.visible = false;
   // เสื้อเกราะ (แสดงเมื่อมีเกราะ)
   const vest = new THREE.Group(); vest.visible = false; (r.att ? r.att.body : r.body).add(vest);
-  const vm = toon('#1f2a3a'), vs = toon('#3a6ea5');
-  const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; vest.add(o); return o; };
-  add(new THREE.BoxGeometry(0.64, 0.58, 0.12), vm, 0, 1.76, 0.2); add(new THREE.BoxGeometry(0.64, 0.58, 0.11), vm, 0, 1.76, -0.2);
-  add(new THREE.BoxGeometry(0.66, 0.05, 0.14), vs, 0, 1.94, 0.21); add(new THREE.BoxGeometry(0.36, 0.12, 0.04), vs, 0, 1.64, 0.27);
-  for (const sd of [-1, 1]) { add(new THREE.BoxGeometry(0.1, 0.46, 0.42), vm, sd * 0.33, 1.76, 0); add(new THREE.SphereGeometry(0.15, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), vm, sd * 0.37, 2.02, 0).scale.set(1.1, 0.7, 1.1); }
   r.guns = { g, models, vest }; buildArmorTiers(r);
   return r.guns;
 }
@@ -3795,50 +3950,62 @@ function poseShooter(r, mv, alive, pitch, w, dt, cr, air, armor) {
   limbs(r, 0, cr ? [1.55 - s * amp * 0.5, 1.85] : air ? [1.3, 0.5] : null);
   if (r.glb) glbTick(r, dt, mv ? (cr ? 'walk' : 'run') : 'idle', { aim: pitch, crouch: cr, ts: mv && cr ? 0.8 : 0 });
 }
-// ---------- เกราะหลายระดับ (ยิ่งเก็บเยอะ ยิ่งอลังการ) ----------
-const ARMOR_TIERS = ['เสื้อเกราะ', 'เกราะเหล็ก', 'เกราะอัศวิน', 'เกราะทองคำ', 'เกราะตำนาน'];
+// ---------- เกราะ = โล่พลังงานแนบรูปร่างตัวละคร (ยิ่งเก็บเยอะ ยิ่งเข้ม) ----------
+const ARMOR_TIERS = ['โล่พลังงาน', 'โล่เสริมแรง', 'โล่หกเหลี่ยม', 'โล่ซิลเวอร์', 'โล่ตำนาน'];
 const armorTier = a => a <= 0 ? 0 : Math.min(5, Math.ceil(a / 50));
-function buildArmorTiers(r) {
-  const AB = r.att ? r.att.body : r.body, AH = r.att ? r.att.head : r.head, AK = r.att ? r.att.knees : r.knees, AE = r.att ? r.att.elbows : r.elbows;
-  const steel = toon('#8a96a3'), dark = toon('#2a3240'), gold = toon('#c9a227');
-  const glowC = new THREE.MeshStandardMaterial({ color: '#7fe3ff', emissive: '#4fd6ff', emissiveIntensity: 2.2 });
-  const glowO = new THREE.MeshStandardMaterial({ color: '#ffb35a', emissive: '#ff8a1f', emissiveIntensity: 2.4 });
-  const glowG = new THREE.MeshStandardMaterial({ color: '#ffe08a', emissive: '#ffc93c', emissiveIntensity: 1.6, metalness: 0.6, roughness: 0.3 });
-  const T = [null, new THREE.Group(), new THREE.Group(), new THREE.Group(), new THREE.Group(), new THREE.Group()];
-  const attach = (tier, parent, geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) => { const g = new THREE.Group(); g.userData.tier = tier; const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; g.add(m); parent.add(g); (r.armorBits = r.armorBits || []).push(g); return m; };
-  // ระดับ 2: บ่าเหล็ก สนับเข่า เข็มขัดกระเป๋า
-  const half = new THREE.SphereGeometry(0.26, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55);
-  for (const sd of [-1, 1]) { const p = attach(2, AB, half, steel, sd * 0.4, 2.06, 0, 1.0, 0.75, 1.0); p.rotation.z = -sd * 0.35; }
-  for (const l of AK) attach(2, l, new THREE.BoxGeometry(0.2, 0.2, 0.1), steel, 0, -0.02, 0.11);
-  for (const px of [-0.24, -0.08, 0.08, 0.24]) attach(2, AB, new THREE.BoxGeometry(0.12, 0.14, 0.08), dark, px, 1.36, 0.25);
-  // ระดับ 3: หมวกเหล็ก + แถบเลนส์เรืองแสง ปลอกแขน ขลิบทอง แกนพลังงานกลางอก
-  attach(3, AH, new THREE.SphereGeometry(0.49, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), steel, 0, 0.05, -0.02).rotation.x = -0.1;
-  attach(3, AH, new THREE.BoxGeometry(0.62, 0.09, 0.08), glowC, 0, 0.06, 0.42);
-  for (const a of AE) attach(3, a, new THREE.CylinderGeometry(0.085, 0.075, 0.24, 10), steel, 0, -0.14, 0);
-  attach(3, AB, new THREE.BoxGeometry(0.66, 0.05, 0.16), gold, 0, 2.0, 0.24); attach(3, AB, new THREE.BoxGeometry(0.05, 0.56, 0.16), gold, 0, 1.76, 0.25);
-  attach(3, AB, new THREE.OctahedronGeometry(0.08), glowC, 0, 1.82, 0.31);
-  // ระดับ 4: เกราะหลัง + ช่องไอพ่นเรืองไฟ หนามบ่า สนับแข้งทอง
-  attach(4, AB, new THREE.BoxGeometry(0.56, 0.64, 0.16), dark, 0, 1.8, -0.3);
-  for (const sd of [-1, 1]) {
-    attach(4, AB, new THREE.CylinderGeometry(0.08, 0.1, 0.36, 10), gold, sd * 0.16, 1.58, -0.41);
-    attach(4, AB, new THREE.CylinderGeometry(0.065, 0.065, 0.04, 10), glowO, sd * 0.16, 1.39, -0.41);
-    attach(4, AB, new THREE.ConeGeometry(0.07, 0.3, 6), gold, sd * 0.46, 2.22, 0).rotation.z = -sd * 0.5;
-    attach(4, AB, new THREE.ConeGeometry(0.05, 0.22, 6), gold, sd * 0.4, 2.26, -0.1).rotation.z = -sd * 0.6;
-  }
-  for (const l of AK) attach(4, l, new THREE.CylinderGeometry(0.115, 0.095, 0.32, 10), gold, 0, -0.24, 0.01);
-  // ระดับ 5: หงอนหมวก เขา วงแหวนพลังใต้เท้า ผลึกลอยวนรอบตัว
-  attach(5, AH, new THREE.ConeGeometry(0.07, 0.6, 6), glowG, 0, 0.62, -0.05).rotation.x = -0.35;
-  for (const sd of [-1, 1]) attach(5, AH, new THREE.ConeGeometry(0.06, 0.4, 6), glowG, sd * 0.36, 0.38, 0.02).rotation.z = -sd * 0.7;
-  const ringMat = new THREE.MeshBasicMaterial({ color: '#ffd76a', transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false });
-  const ring = attach(5, r.root, new THREE.TorusGeometry(0.95, 0.04, 8, 40), ringMat, 0, 0.12, 0); ring.rotation.x = Math.PI / 2;
-  const ring2 = attach(5, r.root, new THREE.TorusGeometry(1.2, 0.02, 6, 40), ringMat, 0, 0.18, 0); ring2.rotation.x = Math.PI / 2;
-  const shards = [];
-  for (let k = 0; k < 6; k++) shards.push(attach(5, r.root, new THREE.OctahedronGeometry(0.12), glowG, 0, 1.6, 0, 0.7, 1.4, 0.7));
-  r.armorFx = { ring, ring2, shards, glowC, glowO, glowG, vestMats: [] };
-  // สีเสื้อเกราะเปลี่ยนตามระดับ
-  r.guns.vest.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); r.armorFx.vestMats.push(o.material); } });
+const SHIELD_T = [null, { c: '#39FF14', s: 0.5, h: 0.0, i: 0.035 }, { c: '#39FF14', s: 0.7, h: 0.5, i: 0.045 }, { c: '#7dffc8', s: 0.85, h: 0.9, i: 0.055 }, { c: '#e6eeff', s: 0.95, h: 1.0, i: 0.065 }, { c: '#ffd76a', s: 1.1, h: 1.0, i: 0.075 }];
+function shieldMat(SU, inf, sc) {
+  const U = { ...SU, uInf: { value: inf }, uSc: { value: sc } };
+  const m = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = 'uniform float uInf; uniform float uSc; varying vec3 vSN; varying vec3 vSV; varying vec3 vSP;\n' + sh.vertexShader
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n transformed += normalize(normal) * uInf; vSP = position * uSc;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\n vSV = -mvPosition.xyz; vSN = normalize(normalMatrix * normal);');
+    sh.fragmentShader = 'uniform vec3 uCol; uniform float uT; uniform float uStr; uniform float uHex; varying vec3 vSN; varying vec3 vSV; varying vec3 vSP;\n' + sh.fragmentShader
+      .replace('#include <opaque_fragment>', `
+        float fr = pow(1.0 - abs(dot(normalize(vSN), normalize(vSV))), 2.2);
+        vec2 hp = vec2(vSP.x + vSP.z * 0.7, vSP.y * 1.15) * 7.0; hp.x += 0.5 * floor(hp.y);
+        vec2 fh = abs(fract(hp) - 0.5); float hx = smoothstep(0.4, 0.48, max(fh.x, fh.y));
+        float scan = smoothstep(0.9, 1.0, fract(vSP.y * 0.8 - uT * 0.6)), fl = 0.85 + 0.15 * sin(uT * 9.0 + vSP.y * 6.0);
+        float a = (fr * 1.2 + hx * uHex * (0.18 + fr * 0.8) + scan * 0.5) * uStr * fl;
+        gl_FragColor = vec4(uCol * a, clamp(a, 0.0, 1.0));`);
+  };
+  m.customProgramCacheKey = () => 'shield1'; m.userData.U = U; return m;
 }
-const VEST_COL = [null, ['#1f2a3a', '#3a6ea5'], ['#3d4652', '#8a96a3'], ['#2b3340', '#c9a227'], ['#1b1d22', '#e0b43a'], ['#2a2210', '#ffd76a']];
+function buildArmorTiers(r) {
+  const SU = { uCol: { value: new THREE.Color('#39FF14') }, uT: { value: 0 }, uStr: { value: 0.5 }, uHex: { value: 0 } };
+  const src = [];
+  if (r.girl) src.push(r.girl.meshes[0]);
+  else if (r.glb) r.glb.m.traverse(o => { if (o.isSkinnedMesh) src.push(o); });
+  else r.body.traverse(o => { if (o.isMesh && o.visible && !(r.guns && isUnder(o, r.guns.g))) src.push(o); });
+  r.root.updateMatrixWorld(true); const rs = new THREE.Vector3().setFromMatrixScale(r.root.matrixWorld).x || 1;
+  const shells = [], mats = [];
+  for (const o of src) {
+    const sc = new THREE.Vector3().setFromMatrixScale(o.matrixWorld).x / rs, mt = shieldMat(SU, 0.04 / sc, sc); mats.push({ mt, sc });
+    let s;
+    if (o.isSkinnedMesh) { s = new THREE.SkinnedMesh(o.geometry, mt); s.bind(o.skeleton, o.bindMatrix); s.bindMode = o.bindMode; o.parent.add(s); s.position.copy(o.position); s.quaternion.copy(o.quaternion); s.scale.copy(o.scale); }
+    else { s = new THREE.Mesh(o.geometry, mt); s.position.copy(o.position); s.quaternion.copy(o.quaternion); s.scale.copy(o.scale); o.parent.add(s); }
+    s.frustumCulled = false; s.renderOrder = 3; s.visible = false; shells.push(s);
+  }
+  const ringMat = new THREE.MeshBasicMaterial({ color: '#ffd76a', transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false });
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.035, 8, 6), ringMat); ring.rotation.x = Math.PI / 2; ring.position.y = 0.1; ring.visible = false; r.root.add(ring);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.018, 6, 6), ringMat); ring2.rotation.x = Math.PI / 2; ring2.position.y = 0.16; ring2.visible = false; r.root.add(ring2);
+  r.armorBits = []; r.armorFx = { SU, shells, mats, ring, ring2 };
+}
+function isUnder(o, p) { for (let q = o; q; q = q.parent) if (q === p) return true; return false; }
+function poseArmor(r, armor, alive) {
+  const tier = alive ? armorTier(armor) : 0, F = r.armorFx; if (!F) return;
+  if (r.armorTierShown !== tier) {
+    r.armorTierShown = tier; const T = SHIELD_T[tier];
+    F.shells.forEach(s => s.visible = tier > 0); F.ring.visible = F.ring2.visible = tier >= 5;
+    if (T) { F.SU.uCol.value.set(T.c); F.SU.uHex.value = T.h; F.mats.forEach(({ mt, sc }) => { mt.userData.U.uInf.value = T.i / sc; }); F.str = T.s; }
+  }
+  if (tier) {
+    const t = performance.now() / 1000; F.SU.uT.value = t; F.SU.uStr.value = F.str * (0.88 + 0.12 * Math.sin(t * 3.2));
+    if (tier >= 5) { F.ring.rotation.z = t * 1.6; F.ring2.rotation.z = -t * 1.1; F.ring.position.y = 0.1 + 0.05 * Math.sin(t * 3); }
+  }
+}
 function poseBuffs(r, pl, alive) {
   if (!r.buffFx) {
     const bub = new THREE.Mesh(new THREE.SphereGeometry(1.35, 24, 16), new THREE.MeshBasicMaterial({ color: '#ffd23c', transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false }));
@@ -3872,24 +4039,6 @@ function poseBuffs(r, pl, alive) {
     b.tex.needsUpdate = true;
   }
 }
-function poseArmor(r, armor, alive) {
-  const tier = alive ? armorTier(armor) : 0;
-  r.guns.vest.visible = tier > 0;
-  if (r.armorTierShown !== tier) {
-    r.armorTierShown = tier;
-    for (const g of r.armorBits) g.visible = tier >= g.userData.tier;
-    if (tier) r.armorFx.vestMats.forEach((m, i) => m.color.set(VEST_COL[tier][i % 2 ? 1 : 0]));
-  }
-  if (tier >= 3) {
-    const t = performance.now() / 1000, pulse = 0.5 + 0.5 * Math.sin(t * 4);
-    r.armorFx.glowC.emissiveIntensity = 1.6 + pulse * 1.4; r.armorFx.glowO.emissiveIntensity = 1.8 + pulse * 1.6;
-    if (tier >= 5) {
-      r.armorFx.glowG.emissiveIntensity = 1.2 + pulse * 1.6;
-      r.armorFx.ring.rotation.z = t * 1.6; r.armorFx.ring2.rotation.z = -t * 1.1; r.armorFx.ring.material.opacity = 0.5 + pulse * 0.4;
-      r.armorFx.shards.forEach((s, k) => { const a = t * 1.4 + k * Math.PI / 3; s.position.set(Math.cos(a) * 1.05, 1.3 + Math.sin(t * 2 + k) * 0.35, Math.sin(a) * 1.05); s.rotation.y = t * 3; });
-    }
-  }
-}
 // หลอดเลือดบนหัว
 function updateHpBar(r, hp, armor, alive) {
   if (!r.hpBar) {
@@ -3915,7 +4064,7 @@ function updateHpBar(r, hp, armor, alive) {
 function unposeShooter(r) {
   if (r.hpBar) r.hpBar.sp.visible = false;
   if (r.buffFx) { r.buffFx.bub.visible = false; r.buffFx.inf.visible = false; r.buffFx.sp.visible = false; }
-  if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); }
+  if (r.guns) { r.guns.g.visible = false; r.guns.vest.visible = false; r.armorTierShown = 0; (r.armorBits || []).forEach(g => g.visible = false); if (r.armorFx) { r.armorFx.shells.forEach(x => x.visible = false); r.armorFx.ring.visible = r.armorFx.ring2.visible = false; } }
   r.body.rotation.x = 0; r.body.position.y = 0; r.head.rotation.x = 0; r.root.position.y = 0.07;
   r.arms[0].rotation.set(0, 0, -0.1); r.arms[1].rotation.set(0, 0, 0.1); r.legs.forEach(l => l.rotation.x = 0); limbs(r, -0.15);
   if (r.glb) glbTick(r, 0, 'idle', {});
@@ -4068,7 +4217,7 @@ function shooterFrame(dt, t) {
     poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0);
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
   }
-  for (const mm of pickMeshes.values()) { mm.rotation.y = t * 1.6; mm.children[0].position.y = Math.sin(t * 2.4) * 0.15; }
+  tickPickups(t);
   updateTracers(dt);
   // กล้องข้ามไหล่ + ซูม
   const k = me.aimK, cp = Math.cos(me.pitch), f = [Math.sin(me.yaw) * cp, Math.sin(me.pitch), Math.cos(me.yaw) * cp];
