@@ -35,3 +35,15 @@ models/ghoul.glb, models/ghoul_npc.glb - "Giant humanoid zombie" by shivaykaran1
 
 assets/fac/*.jpg - facade crops from "Postwar City - Exterior Scene" by Aurélien Martel (https://sketchfab.com/aurelien_martel)
   https://sketchfab.com/3d-models/postwar-city-exterior-scene-30b694d1a4074855a1116a15a0f75731 - CC BY 4.0
+
+models/gun_rpg.glb - "RPG" by 3dmodelsmith (https://sketchfab.com/3dmodelsmith)
+  https://sketchfab.com/3d-models/rpg-1ca29509b173431bad3927f604fc11a0 - CC BY 4.0
+  Changes: re-oriented, rescaled, origin moved to grip.
+
+models/containers.glb - "Container Pack" by drcrazzie (https://sketchfab.com/drcrazzie)
+  https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5 - CC BY 4.0
+  Changes: only the generic (logo-free) variants kept, normalised to unit size, textures downsized.
+
+models/train.glb - "superconductor train concept WIP" by 3DHaupt (https://sketchfab.com/dennish2010)
+  https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC - CC BY-NC 4.0 (NON-COMMERCIAL)
+  Changes: guideway/pillars removed, rescaled, generic BTS/MRT-style livery painted via vertex colours (no real logos).
