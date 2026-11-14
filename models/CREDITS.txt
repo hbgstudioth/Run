@@ -62,3 +62,14 @@ models/ruin.glb - "Ruined city FREE (5)" by dasy444 (https://sketchfab.com/dasy4
 
 assets/wall/*.jpg - texture crops from "abandoned city street for games" by dasy444 (https://sketchfab.com/dasy444)
   https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2 - Sketchfab Standard License
+
+models/apt.glb - "Apartments" by SrMonteiro (https://sketchfab.com/crispimrafael)
+  https://sketchfab.com/3d-models/apartments-6b81c0e9b2b34f9f892670a673f254db - CC BY 4.0
+  Changes: front entrance opened, decimated, rescaled; collision derived from the geometry.
+
+models/st/*.glb - "Stairs & Railings" by ATD-London (https://sketchfab.com/ATD-London)
+  https://sketchfab.com/3d-models/stairs-railings-a419edddce534968937313dcff8429e7 - CC BY 4.0
+  Changes: single flights / one balustrade extracted, normalised, decimated, recoloured in game.
+
+models/bp/*.glb - street props extracted from "Bangkok Cityscene" by billycorveleyn - CC BY 4.0 (see bkk.glb above)
+models/zp/*.glb - rubble/boards/wires extracted from "abandoned city street for games" by dasy444 - Sketchfab Standard License
