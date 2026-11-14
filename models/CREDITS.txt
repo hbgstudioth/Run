@@ -47,3 +47,18 @@ models/containers.glb - "Container Pack" by drcrazzie (https://sketchfab.com/drc
 models/train.glb - "superconductor train concept WIP" by 3DHaupt (https://sketchfab.com/dennish2010)
   https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC - CC BY-NC 4.0 (NON-COMMERCIAL)
   Changes: guideway/pillars removed, rescaled, generic BTS/MRT-style livery painted via vertex colours (no real logos).
+
+models/ship.glb - "Container Ship" by RM02 (https://sketchfab.com/RM02)
+  https://sketchfab.com/3d-models/container-ship-aaa41cca946b4a08bc08cf692b7757be - CC BY 4.0
+  Changes: original container cargo removed (re-stacked in game), lashing frames removed, rescaled, textures downsized.
+
+models/bkk.glb - "Bangkok Cityscene" by billycorveleyn (https://sketchfab.com/billycorveleyn)
+  https://sketchfab.com/3d-models/bangkok-cityscene-9db96447324d40569566222fccc9a926 - CC BY 4.0
+  Changes: brand ads / posters with real people painted over with generic art, pedestal sides removed, decimated, rescaled.
+
+models/ruin.glb - "Ruined city FREE (5)" by dasy444 (https://sketchfab.com/dasy444)
+  https://sketchfab.com/3d-models/ruined-city-free-5-4b0b0021d91442079a91b075576efe4e - Sketchfab Standard License
+  Changes: decimated, rescaled, textures downsized (used as distant backdrop).
+
+assets/wall/*.jpg - texture crops from "abandoned city street for games" by dasy444 (https://sketchfab.com/dasy444)
+  https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2 - Sketchfab Standard License
