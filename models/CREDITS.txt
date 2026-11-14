@@ -77,3 +77,13 @@ models/zp/*.glb - rubble/boards/wires extracted from "abandoned city street for 
 models/inferno.glb - "Lava Monster horns" by Its Aadi (https://sketchfab.com/ItsAadi)
   https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295 - CC BY 4.0
   Changes: rigged to the game skeleton, rescaled; used as playable character INFERNO and as the zombie-map boss.
+
+models/dragon.glb - "Red Dragon" by GadgetHamster (https://sketchfab.com/GadgetHamster)
+  https://sketchfab.com/3d-models/red-dragon-77e89ab9b88a444cb51339c2ed3959a3 - CC BY 4.0
+  Changes: textures downsized, unused attributes/poses removed; used as the boss of the evening-town map.
+
+models/drake.glb - "Dragon Character 3d by Oscar Creativo" by OSCAR CREATIVO (https://sketchfab.com/oscar_creativo)
+  https://sketchfab.com/3d-models/dragon-character-3d-by-oscar-creativo-7bad9ad76293430f8e5bb24cd499c53b - CC BY-NC 4.0 (NON-COMMERCIAL)
+  Changes: decimated, re-posed (arms down), re-skinned to the game skeleton, textures downsized.
+
+(models/apt.glb "Apartments" is no longer used and was removed.)
