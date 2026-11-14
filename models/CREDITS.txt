@@ -73,3 +73,7 @@ models/st/*.glb - "Stairs & Railings" by ATD-London (https://sketchfab.com/ATD-L
 
 models/bp/*.glb - street props extracted from "Bangkok Cityscene" by billycorveleyn - CC BY 4.0 (see bkk.glb above)
 models/zp/*.glb - rubble/boards/wires extracted from "abandoned city street for games" by dasy444 - Sketchfab Standard License
+
+models/inferno.glb - "Lava Monster horns" by Its Aadi (https://sketchfab.com/ItsAadi)
+  https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295 - CC BY 4.0
+  Changes: rigged to the game skeleton, rescaled; used as playable character INFERNO and as the zombie-map boss.
