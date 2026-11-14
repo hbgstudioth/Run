@@ -1015,12 +1015,17 @@ const CBX = [[-66, -42], [-31, -8.5], [13.5, 36], [47, 66]], CBZ = [[-66, -42], 
 const CITY_SITE = { 1: ['0,2', '3,1'], 2: ['2,3', '1,0'] };
 const cityClear = (x, z, p = 0) => x > -9 - p && x < 14 + p && z > -8 - p && z < 44 + p; // ลานรอ/ลานประกาศผล
 // บ้าน/ตึกแถวเดินเข้าได้ หลายชั้น หลังคาดาดฟ้า
+// ราวกันตกรอบช่องบันไดชั้นบน (เปิดเฉพาะด้านที่บันไดขึ้นมา) กันผู้เล่นร่วงลงช่อง
+function railing(box, hx0, hx1, hz0, hz1, y, mat) {
+  const h = 1.1, t = 0.08;
+  box(hx0 - t, hx0, y, y + h, hz0 - t, hz1, mat); box(hx1, hx1 + t, y, y + h, hz0 - t, hz1, mat); box(hx0 - t, hx1 + t, y, y + h, hz0 - t, hz0, mat);
+}
 function cityHouse(box, floors, o) {
   const T = 0.3, { x0, x1, z0, z1, f, wm, fm, sm, doors, front } = o, fh = o.fh || 3.6, by = 0, cx = (x0 + x1) / 2;
   const opensFor = (a0, a1, yb, door, shop) => {
     const op = [], len = a1 - a0;
-    if (shop) op.push({ a: a0 + 1.2, b: a1 - 1.2, y0: yb, y1: yb + 2.8 });
-    else if (door != null) op.push({ a: door - 1.15, b: door + 1.15, y0: yb, y1: yb + 2.7 });
+    if (shop) op.push({ a: a0 + 1.2, b: a1 - 1.2, y0: yb, y1: yb + 3.05 });
+    else if (door != null) op.push({ a: door - 1.25, b: door + 1.25, y0: yb, y1: yb + 3.05 });
     if (!shop) { const n = Math.max(1, Math.floor((len - 1) / 3.6)); for (let k = 0; k < n; k++) { const c = a0 + len * (k + 0.5) / n; if (door != null && Math.abs(c - door) < 2.2) continue; if (c - 0.65 < a0 + 0.5 || c + 0.65 > a1 - 0.5) continue; op.push({ a: c - 0.65, b: c + 0.65, y0: yb + 1.15, y1: yb + 2.55 }); } }
     return op;
   };
@@ -1040,6 +1045,7 @@ function cityHouse(box, floors, o) {
     for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, sm);
     const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.25;
     box(x0, hx0, ys, yt, z0, z1, fm); box(hx1, x1, ys, yt, z0, z1, fm); box(hx0, hx1, ys, yt, z0, hz0, fm); box(hx0, hx1, ys, yt, hz1, z1, fm);
+    railing(box, hx0, hx1, hz0, hz1, yt, sm);
     floors.push({ x: left ? cx + (x1 - x0) * 0.2 : cx - (x1 - x0) * 0.2, z: z1 - 2.0, y: yt });
   }
   const top = by + f * fh;
@@ -1453,7 +1459,7 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
-const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"RWpn":[-0.346,1.354,0.096],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"LFing":[0.406,1.229,0.149],"LFing2":[0.375,1.176,0.174],"LTip":[0.338,1.158,0.183],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"RWpn":[-0.352,1.378,0.098],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"LFing":[0.414,1.25,0.152],"LFing2":[0.381,1.197,0.177],"LTip":[0.344,1.179,0.186],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]},"cc":{"spine":[0.0,1.733,-0.04],"neck":[0.0,2.153,-0.06],"RArm":[-0.27,2.053,-0.08],"RFore":[-0.3303,1.6986,-0.0906],"RHand":[-0.3574,1.4274,-0.0364],"RFing":[-0.3588,1.3446,-0.0306],"RTip":[-0.3604,1.2434,-0.0236],"LArm":[0.27,2.053,-0.08],"LFore":[0.3303,1.6986,-0.0906],"LHand":[0.3574,1.4274,-0.0364],"LFing":[0.3588,1.3446,-0.0306],"LTip":[0.3604,1.2434,-0.0236],"RUp":[-0.17,1.243,0.0],"RLeg":[-0.1965,0.714,0.0],"LUp":[0.17,1.243,0.0],"LLeg":[0.1965,0.714,0.0]}};
+const HERO_J = {"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"RWpn":[-0.346,1.354,0.096],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"LFing":[0.406,1.229,0.149],"LFing2":[0.375,1.176,0.174],"LTip":[0.338,1.158,0.183],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"RWpn":[-0.352,1.378,0.098],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"LFing":[0.414,1.25,0.152],"LFing2":[0.381,1.197,0.177],"LTip":[0.344,1.179,0.186],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]},"cc":{"spine":[0.0,1.7578,-0.0406],"neck":[0.0,2.1839,-0.0609],"RArm":[-0.2739,2.0824,-0.0811],"RFore":[-0.335,1.7229,-0.0919],"RHand":[-0.3625,1.4478,-0.0369],"RFing":[-0.3639,1.3638,-0.0311],"RTip":[-0.3656,1.2612,-0.0239],"LArm":[0.2739,2.0824,-0.0811],"LFore":[0.335,1.7229,-0.0919],"LHand":[0.3625,1.4478,-0.0369],"LFing":[0.3639,1.3638,-0.0311],"LTip":[0.3656,1.2612,-0.0239],"RUp":[-0.1724,1.2608,0.0],"RLeg":[-0.1993,0.7242,0.0],"LUp":[0.1724,1.2608,0.0],"LLeg":[0.1993,0.7242,0.0]}};
 
 /* ---------- ของประกอบฉาก (โมเดล CC0: Quaternius + Brazil props kit) ---------- */
 const PROP_META = {"lamp":[1.06,8.74,1.06,0],"tlight":[0.86,6.12,0.63,0],"stop":[0.14,3.35,0.86,0],"propane":[1.19,1.6,1.14,1],"trash":[0.8,1.46,1.05,1],"gascan":[0.44,0.58,0.14,0],"ac":[1.76,1.16,1.31,1],"acstack":[1.55,2.33,1.18,1],"antenna":[0.88,3.64,0.14,0],"barrel":[1.0,1.38,1.0,1],"crates":[1.17,2.48,1.17,1],"cone":[0.63,1.02,0.63,0],"hydrant":[0.79,1.16,0.75,1],"stall":[3.64,3.64,2.22,1],"booth":[1.18,3.2,1.13,1],"bin":[0.5,1.6,0.51,1],"bench":[2.85,1.31,0.88,1],"cyl":[0.66,0.87,0.66,0],"wreck":[2.04,2.04,4.08,1],"tires":[2.72,0.73,1.8,1],"drum":[1.78,1.38,1.62,1],"dumpster":[2.32,2.04,2.97,1],"bags":[1.6,0.87,0.92,0],"junk":[3.34,1.46,2.65,1],"rubble":[4.04,1.16,3.71,1],"sofa":[2.7,1.31,1.56,1]};
@@ -2324,6 +2330,7 @@ function buildTown() {
         for (let k = 0; k < n; k++) box(sx0, sx1, yb, yb + rise * (k + 1), zs + k * dz, zs + (k + 1) * dz, stairM, true, hg);
         const hx0 = sx0 - 0.1, hx1 = sx1 + 0.1, hz0 = zs - 0.1, hz1 = zs + n * dz, ys = yt - 0.3;
         box(x0, hx0, ys, yt, z0, z1, floorM, true, hg); box(hx1, x1, ys, yt, z0, z1, floorM, true, hg); box(hx0, hx1, ys, yt, z0, hz0, floorM, true, hg); box(hx0, hx1, ys, yt, hz1, z1, floorM, true, hg);
+        railing((a, b, c, d, e, f2, m2) => box(a, b, c, d, e, f2, m2, true, hg), hx0, hx1, hz0, hz1, yt, stairM);
         floors.push({ x: left ? cx + w * 0.22 : cx - w * 0.22, z: z1 - 2.2, y: yt });
       } else box(x0, x1, yt - 0.3, yt, z0, z1, floorM, true, hg);
       if (fl === 0) { const lx = x1 - T - 0.9, lz = z0 + T + 0.9; box(lx - 0.6, lx + 0.6, by, by + 1.3, lz - 0.6, lz + 0.6, woodM, true, hg); }
@@ -2564,6 +2571,7 @@ function buildHarbor() {
       for (let k = 0; k < n; k++) box(sxa, sxb, yb, yb + rise * (k + 1), sz + k * 0.42, sz + (k + 1) * 0.42, stairM);
       const hx0 = sxa - 0.1, hx1 = sxb + 0.1, hz0 = sz - 0.1, hz1 = sz + n * 0.42 + 0.05, ys = yt - 0.25;
       box(bx0, bx1, ys, yt, bz0, hz0, floorM); box(bx0, bx1, ys, yt, hz1, bz1, floorM); box(bx0, hx0, ys, yt, hz0, hz1, floorM); box(hx1, bx1, ys, yt, hz0, hz1, floorM);
+      railing(box, hx0, hx1, hz0, hz1, yt, stairM);
       floors.push({ x: (bx0 + bx1) / 2, z: bz1 - 2, y: yt });
     }
     const top = D + 2 * fh; for (const [a, b, c, d] of [[bx0, bx1, bz0, bz0 + T], [bx0, bx1, bz1 - T, bz1], [bx0, bx0 + T, bz0, bz1], [bx1 - T, bx1, bz0, bz1]]) box(a, b, top, top + 1.0, c, d, whiteM);
@@ -3616,11 +3624,11 @@ function collidersFor(m) {
     });
   }
   out.push(...world.bcols[m]);
-  out.push(...buildCovers(m).cols);
-  // ลดที่กำบังเล็ก (ลังไม้ กระสอบทราย แบริเออร์) ลง 10% ในพื้นที่เล่น
-  const small = out.filter(c => c.o && c.y0 < 0.3 && c.y1 - c.y0 <= 2.6 && c.x1 - c.x0 <= 3.6 && c.z1 - c.z0 <= 3.6 && inPlay(m, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2, 2)).sort((a, b) => a.x0 - b.x0 || a.z0 - b.z0);
+  const covCols = buildCovers(m).cols, isCov = new Set(covCols); out.push(...covCols);
+  // ลดที่กำบังเล็ก (ลังไม้ กระสอบทราย แบริเออร์) ลง 10% ในพื้นที่เล่น — เฉพาะของกำบัง ไม่แตะบ้าน/บันได
+  const small = out.filter(c => isCov.has(c) && c.o && c.y0 < 0.3 && c.y1 - c.y0 <= 2.6 && c.x1 - c.x0 <= 3.6 && c.z1 - c.z0 <= 3.6 && inPlay(m, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2, 2)).sort((a, b) => a.x0 - b.x0 || a.z0 - b.z0);
   const drop = new Set(small.filter((_, i) => i % 10 === 3));
-  for (const c of out) if (c.o && !drop.has(c)) for (const d of drop) if (c.y0 >= d.y1 - 0.08 && c.x0 < d.x1 && c.x1 > d.x0 && c.z0 < d.z1 && c.z1 > d.z0) { drop.add(c); break; }
+  for (const c of out) if (isCov.has(c) && c.o && !drop.has(c)) for (const d of drop) if (c.y0 >= d.y1 - 0.08 && c.y0 <= d.y1 + 0.1 && c.x0 < d.x1 && c.x1 > d.x0 && c.z0 < d.z1 && c.z1 > d.z0) { drop.add(c); break; }
   for (const d of drop) d.o.visible = false;
   return (COLS[m] = out.filter(c => !drop.has(c)));
 }
