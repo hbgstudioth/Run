@@ -87,3 +87,8 @@ models/drake.glb - "Dragon Character 3d by Oscar Creativo" by OSCAR CREATIVO (ht
   Changes: decimated, re-posed (arms down), re-skinned to the game skeleton, textures downsized.
 
 (models/apt.glb "Apartments" is no longer used and was removed.)
+
+stadium.glb — "Thanh Hoa Stadium" by NGUYENNGHIAKK
+  https://sketchfab.com/3d-models/thanh-hoa-stadium-7215e81a92914f1a879f2970f0fb955d
+  License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+  Changes: rescaled to fit the game's track, decimated, club/league logos replaced with game signage.
