@@ -28,3 +28,7 @@ models/props.glb - scene props, CC0:
 models/car.glb - "Car Concept" from KhronosGroup/glTF-Sample-Assets (based on a public-domain model by Unity Fan)
   https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept - CC BY 4.0 (excluding Khronos logos)
   Changes: decimated, interior/plate removed, transmission/variants stripped, paint recoloured.
+
+models/ghoul.glb, models/ghoul_npc.glb - "Giant humanoid zombie" by shivaykaran1434 (https://sketchfab.com/shivaykaran1434)
+  https://sketchfab.com/3d-models/giant-humanoid-zombie-bed2a788157242c9881cd980bfd55ddf - CC BY 4.0
+  Changes: decimated (NPC version further reduced), rigged, arms lowered from T-pose, torn clothing layers added.
