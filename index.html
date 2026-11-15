@@ -322,6 +322,23 @@
   #killFeed { position: absolute; right: 60px; top: 12px; text-align: right; pointer-events: none; font-size: 13px; }
   #killFeed div { background: rgba(10,12,15,.7); padding: 3px 10px; margin-bottom: 3px; border-radius: 2px; animation: slide .3s both; }
   #killFeed b { color: var(--acc); font-weight: 500; } #killFeed span { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #killFeed i { font-style: normal; color: #e0866f; }
+  #skillPop { position: absolute; left: 50%; top: 16%; width: min(86vw, 380px); transform: translate(-50%, -30px) scale(.8); opacity: 0; pointer-events: none; text-align: center; padding: 16px 18px 18px; z-index: 8; font-family: "Kanit", sans-serif; color: #eaffe2;
+    background: linear-gradient(160deg, rgba(8,12,9,.94), rgba(14,24,14,.94)); border: 1px solid #39FF14; clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px); box-shadow: 0 0 40px rgba(57,255,20,.45); transition: opacity .35s, transform .45s cubic-bezier(.2,1.5,.4,1); }
+  #skillPop.show { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
+  #skillPop .sp-tag { font: 800 13px "Oswald", sans-serif; letter-spacing: 4px; color: #39FF14; animation: spBlink 1s steps(2) infinite; }
+  #skillPop .sp-ico { width: 74px; height: 74px; margin: 6px auto 0; display: block; filter: drop-shadow(0 0 10px #39FF14); animation: spFloat 1.6s ease-in-out infinite; }
+  #skillPop .sp-name { font: 800 34px "Oswald", sans-serif; letter-spacing: 3px; color: #fff; text-shadow: 0 0 16px #39FF14; line-height: 1.1; }
+  #skillPop .sp-sub { font-size: 12px; color: #9fd08f; letter-spacing: 1px; } #skillPop .sp-desc { font-size: 13px; margin: 8px 0 12px; line-height: 1.5; } #skillPop .sp-desc b { color: #39FF14; }
+  #skillGo { font: 600 15px "Kanit", sans-serif; color: #071006; background: #39FF14; border: 0; padding: 9px 20px; cursor: pointer; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); animation: spPulse 1s ease-in-out infinite; } #skillGo b { background: #071006; color: #39FF14; padding: 1px 8px; margin: 0 3px; border-radius: 3px; }
+  #skillBtn { position: absolute; left: 50%; bottom: 150px; width: 78px; height: 78px; margin-left: -39px; display: none; border-radius: 14px; border: 2px solid #39FF14; background: rgba(8,14,9,.85); color: #39FF14; font: 800 11px "Oswald", sans-serif; letter-spacing: 2px; cursor: pointer; z-index: 7; touch-action: none; animation: spPulse 1.1s ease-in-out infinite; }
+  #skillBtn.show { display: block; } #skillBtn svg { width: 40px; height: 40px; display: block; margin: 2px auto -2px; } #skillBtn em { position: absolute; right: -8px; top: -8px; font-style: normal; background: #39FF14; color: #071006; width: 22px; height: 22px; line-height: 22px; border-radius: 4px; font-size: 13px; }
+  #mechHud { position: absolute; left: 50%; bottom: 128px; width: min(70vw, 300px); transform: translateX(-50%); display: none; font-family: "Kanit", sans-serif; color: #eaffe2; pointer-events: none; z-index: 6; text-shadow: 0 1px 3px #000; }
+  #mechHud.show { display: block; } #mechHud .mh-top { display: flex; justify-content: space-between; font: 800 14px "Oswald", sans-serif; letter-spacing: 2px; color: #39FF14; } #mechHud .mh-top span { color: #fff; }
+  #mechHud .mh-bar, #mechHud .mh-load { height: 6px; background: rgba(0,0,0,.55); border: 1px solid rgba(57,255,20,.5); margin: 3px 0; position: relative; } #mechHud .mh-bar i { display: block; height: 100%; background: #39FF14; box-shadow: 0 0 8px #39FF14; }
+  #mechHud .mh-load { height: 14px; } #mechHud .mh-load i { display: block; height: 100%; background: rgba(57,255,20,.45); } #mechHud .mh-load span { position: absolute; inset: 0; font-size: 10px; line-height: 13px; text-align: center; }
+  #mechPips { display: flex; gap: 3px; margin: 4px 0; } #mechPips i { flex: 1; height: 9px; background: rgba(255,255,255,.14); transform: skewX(-18deg); } #mechPips i.on { background: #39FF14; box-shadow: 0 0 6px #39FF14; } #mechFly { font-size: 11px; text-align: center; color: #b9f5a6; }
+  @keyframes spBlink { 50% { opacity: .45; } } @keyframes spFloat { 50% { transform: translateY(-5px); } } @keyframes spPulse { 50% { box-shadow: 0 0 22px #39FF14; filter: brightness(1.25); } }
+  @media (pointer: coarse) { #skillBtn em { display: none; } #skillBtn { bottom: 130px; } #mechHud { bottom: 110px; } }
   #bToast { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); font-family: "Kanit", sans-serif; font-size: 16px; color: #fff; text-shadow: 0 2px 6px #000; opacity: 0; transition: opacity .3s; pointer-events: none; }
   #hpBox { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(10,12,15,.72); border: 1px solid var(--line); padding: 6px 14px; border-radius: 4px; pointer-events: none; }
   #hpBox .row2 { display: flex; align-items: center; gap: 10px; margin: 2px 0; }
@@ -449,7 +466,7 @@
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
         <div class="secT">เครดิต</div>
-        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>VIPER ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/sexy-necromancer-12221428cf0c4e9580d65d146e5f8798" style="color:#39FF14" target="_blank" rel="noopener">"Sexy Necromancer"</a> โดย <a href="https://sketchfab.com/jeraynor979" style="color:#39FF14" target="_blank" rel="noopener">jeraynor979</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน-ขาใหม่)<br>รถยนต์: <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" style="color:#39FF14" target="_blank" rel="noopener">"Car Concept"</a> — Khronos Group (ต้นแบบ public domain โดย Unity Fan) — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน เอาป้ายทะเบียนออก เปลี่ยนสี)<br>ภาพตึกขอบด่าน: จาก <a href="https://sketchfab.com/3d-models/postwar-city-exterior-scene-30b694d1a4074855a1116a15a0f75731" style="color:#39FF14" target="_blank" rel="noopener">"Postwar City - Exterior Scene"</a> โดย <a href="https://sketchfab.com/aurelien_martel" style="color:#39FF14" target="_blank" rel="noopener">Aurélien Martel</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ตัดภาพ facade มาใช้)<br>ของประกอบฉาก: Quaternius และ Brazil Lowpoly Props Kit (kayquer) — CC0<br>GHOUL และซอมบี้ NPC ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/giant-humanoid-zombie-bed2a788157242c9881cd980bfd55ddf" style="color:#39FF14" target="_blank" rel="noopener">"Giant humanoid zombie"</a> โดย <a href="https://sketchfab.com/shivaykaran1434" style="color:#39FF14" target="_blank" rel="noopener">shivaykaran1434</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน เพิ่มเสื้อผ้าขาด)<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen · <a href="https://sketchfab.com/3d-models/rpg-1ca29509b173431bad3927f604fc11a0" style="color:#39FF14" target="_blank" rel="noopener">"RPG"</a> โดย 3dmodelsmith — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)<br>ตู้คอนเทนเนอร์: <a href="https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5" style="color:#39FF14" target="_blank" rel="noopener">"Container Pack"</a> โดย drcrazzie — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้เฉพาะแบบไม่มีโลโก้ ปรับขนาด)<br>รถไฟฟ้า: <a href="https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC" style="color:#39FF14" target="_blank" rel="noopener">"superconductor train concept WIP"</a> โดย 3DHaupt — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ดัดแปลง: ตัดรางออก ลงสีลายรถไฟฟ้า ปรับขนาด)<br>เรือสินค้า: <a href="https://sketchfab.com/3d-models/container-ship-aaa41cca946b4a08bc08cf692b7757be" style="color:#39FF14" target="_blank" rel="noopener">"Container Ship"</a> โดย RM02 — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ถอดตู้เดิมออก จัดตู้ใหม่ ปรับขนาด)<br>ย่านกรุงเทพ: <a href="https://sketchfab.com/3d-models/bangkok-cityscene-9db96447324d40569566222fccc9a926" style="color:#39FF14" target="_blank" rel="noopener">"Bangkok Cityscene"</a> โดย billycorveleyn — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้ของแต่งถนน: รถเข็น สามล้อ กระถางต้นไม้ จาน TV ถังน้ำ ฯลฯ · ลบโฆษณาที่มีแบรนด์/บุคคลจริง)<br>สนามกีฬา: <a href="https://sketchfab.com/3d-models/thanh-hoa-stadium-7215e81a92914f1a879f2970f0fb955d" style="color:#39FF14" target="_blank" rel="noopener">"Thanh Hoa Stadium"</a> โดย NGUYENNGHIAKK — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ปรับสัดส่วนให้เข้ากับลู่ ลดโพลิกอน เปลี่ยนป้ายโลโก้เป็นของเกม)<br>บอสมังกรแดง: <a href="https://sketchfab.com/3d-models/red-dragon-77e89ab9b88a444cb51339c2ed3959a3" style="color:#39FF14" target="_blank" rel="noopener">"Red Dragon"</a> โดย GadgetHamster — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ย่อเท็กซ์เจอร์ ปรับขนาด)<br>ตัวละคร DRAKE: <a href="https://sketchfab.com/3d-models/dragon-character-3d-by-oscar-creativo-7bad9ad76293430f8e5bb24cd499c53b" style="color:#39FF14" target="_blank" rel="noopener">"Dragon Character 3d"</a> โดย OSCAR CREATIVO — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ลดโพลิกอน จัดท่า ผูกโครงกระดูกเกม)<br>ตัวละคร/บอส INFERNO: <a href="https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295" style="color:#39FF14" target="_blank" rel="noopener">"Lava Monster horns"</a> โดย Its Aadi — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใส่โครงกระดูก ปรับขนาด)<br>บันได/ราวจับ: <a href="https://sketchfab.com/3d-models/stairs-railings-a419edddce534968937313dcff8429e7" style="color:#39FF14" target="_blank" rel="noopener">"Stairs &amp; Railings"</a> โดย ATD-London — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (แยกชิ้น ลดโพลิกอน ย้อมสีตามพื้นที่)<br>เมืองถล่ม: <a href="https://sketchfab.com/3d-models/ruined-city-free-5-4b0b0021d91442079a91b075576efe4e" style="color:#39FF14" target="_blank" rel="noopener">"Ruined city FREE (5)"</a> · พื้นผิวผนัง: <a href="https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2" style="color:#39FF14" target="_blank" rel="noopener">"abandoned city street for games"</a> โดย dasy444 — Sketchfab Standard License (ลดโพลิกอน ปรับขนาด)</div>
+        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>VIPER ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/sexy-necromancer-12221428cf0c4e9580d65d146e5f8798" style="color:#39FF14" target="_blank" rel="noopener">"Sexy Necromancer"</a> โดย <a href="https://sketchfab.com/jeraynor979" style="color:#39FF14" target="_blank" rel="noopener">jeraynor979</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน-ขาใหม่)<br>รถยนต์: <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" style="color:#39FF14" target="_blank" rel="noopener">"Car Concept"</a> — Khronos Group (ต้นแบบ public domain โดย Unity Fan) — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน เอาป้ายทะเบียนออก เปลี่ยนสี)<br>ภาพตึกขอบด่าน: จาก <a href="https://sketchfab.com/3d-models/postwar-city-exterior-scene-30b694d1a4074855a1116a15a0f75731" style="color:#39FF14" target="_blank" rel="noopener">"Postwar City - Exterior Scene"</a> โดย <a href="https://sketchfab.com/aurelien_martel" style="color:#39FF14" target="_blank" rel="noopener">Aurélien Martel</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ตัดภาพ facade มาใช้)<br>ของประกอบฉาก: Quaternius และ Brazil Lowpoly Props Kit (kayquer) — CC0<br>GHOUL และซอมบี้ NPC ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/giant-humanoid-zombie-bed2a788157242c9881cd980bfd55ddf" style="color:#39FF14" target="_blank" rel="noopener">"Giant humanoid zombie"</a> โดย <a href="https://sketchfab.com/shivaykaran1434" style="color:#39FF14" target="_blank" rel="noopener">shivaykaran1434</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน เพิ่มเสื้อผ้าขาด)<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen · <a href="https://sketchfab.com/3d-models/rpg-1ca29509b173431bad3927f604fc11a0" style="color:#39FF14" target="_blank" rel="noopener">"RPG"</a> โดย 3dmodelsmith — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)<br>ตู้คอนเทนเนอร์: <a href="https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5" style="color:#39FF14" target="_blank" rel="noopener">"Container Pack"</a> โดย drcrazzie — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้เฉพาะแบบไม่มีโลโก้ ปรับขนาด)<br>รถไฟฟ้า: <a href="https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC" style="color:#39FF14" target="_blank" rel="noopener">"superconductor train concept WIP"</a> โดย 3DHaupt — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ดัดแปลง: ตัดรางออก ลงสีลายรถไฟฟ้า ปรับขนาด)<br>เรือสินค้า: <a href="https://sketchfab.com/3d-models/container-ship-aaa41cca946b4a08bc08cf692b7757be" style="color:#39FF14" target="_blank" rel="noopener">"Container Ship"</a> โดย RM02 — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ถอดตู้เดิมออก จัดตู้ใหม่ ปรับขนาด)<br>ย่านกรุงเทพ: <a href="https://sketchfab.com/3d-models/bangkok-cityscene-9db96447324d40569566222fccc9a926" style="color:#39FF14" target="_blank" rel="noopener">"Bangkok Cityscene"</a> โดย billycorveleyn — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้ของแต่งถนน: รถเข็น สามล้อ กระถางต้นไม้ จาน TV ถังน้ำ ฯลฯ · ลบโฆษณาที่มีแบรนด์/บุคคลจริง)<br>ตัวละคร MECHA / หุ่นรบ: <a href="https://sketchfab.com/3d-models/muv-luv-f16-tsf-wip-fb25fba3d6ff42a2a2920f52df328b1d" style="color:#39FF14" target="_blank" rel="noopener">"[Muv-Luv] F16-TSF WIP"</a> โดย EXcaliburK117 — Sketchfab Standard License (ผูกโครงกระดูก เปลี่ยนสีเป็นดำ-เขียว)<br>สนามกีฬา: <a href="https://sketchfab.com/3d-models/thanh-hoa-stadium-7215e81a92914f1a879f2970f0fb955d" style="color:#39FF14" target="_blank" rel="noopener">"Thanh Hoa Stadium"</a> โดย NGUYENNGHIAKK — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ปรับสัดส่วนให้เข้ากับลู่ ลดโพลิกอน เปลี่ยนป้ายโลโก้เป็นของเกม)<br>บอสมังกรแดง: <a href="https://sketchfab.com/3d-models/red-dragon-77e89ab9b88a444cb51339c2ed3959a3" style="color:#39FF14" target="_blank" rel="noopener">"Red Dragon"</a> โดย GadgetHamster — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ย่อเท็กซ์เจอร์ ปรับขนาด)<br>ตัวละคร DRAKE: <a href="https://sketchfab.com/3d-models/dragon-character-3d-by-oscar-creativo-7bad9ad76293430f8e5bb24cd499c53b" style="color:#39FF14" target="_blank" rel="noopener">"Dragon Character 3d"</a> โดย OSCAR CREATIVO — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ลดโพลิกอน จัดท่า ผูกโครงกระดูกเกม)<br>ตัวละคร/บอส INFERNO: <a href="https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295" style="color:#39FF14" target="_blank" rel="noopener">"Lava Monster horns"</a> โดย Its Aadi — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใส่โครงกระดูก ปรับขนาด)<br>บันได/ราวจับ: <a href="https://sketchfab.com/3d-models/stairs-railings-a419edddce534968937313dcff8429e7" style="color:#39FF14" target="_blank" rel="noopener">"Stairs &amp; Railings"</a> โดย ATD-London — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (แยกชิ้น ลดโพลิกอน ย้อมสีตามพื้นที่)<br>เมืองถล่ม: <a href="https://sketchfab.com/3d-models/ruined-city-free-5-4b0b0021d91442079a91b075576efe4e" style="color:#39FF14" target="_blank" rel="noopener">"Ruined city FREE (5)"</a> · พื้นผิวผนัง: <a href="https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2" style="color:#39FF14" target="_blank" rel="noopener">"abandoned city street for games"</a> โดย dasy444 — Sketchfab Standard License (ลดโพลิกอน ปรับขนาด)</div>
       </div>
     </div>
   </section>
@@ -506,6 +523,15 @@
     <div id="killFeed"></div>
     <div id="bToast"></div>
     <div id="buffs"></div>
+    <div id="skillPop"><div class="sp-tag">⚡ SKILL UNLOCKED</div>
+      <svg class="sp-ico" viewBox="0 0 64 64"><path d="M22 8h20l6 10v12l-6 6H22l-6-6V18z" fill="#0b0f0c" stroke="#39FF14" stroke-width="2.5"/><path d="M20 20h24l-3 7H23z" fill="#39FF14"/><path d="M10 38h44l-4 18H38l-2-8h-8l-2 8H14z" fill="#0b0f0c" stroke="#39FF14" stroke-width="2.5"/><path d="M4 34l8-6v14zM60 34l-8-6v14z" fill="#39FF14"/></svg>
+      <div class="sp-name">MECHA DRIVE</div><div class="sp-sub">รางวัลผู้พิชิตบอส</div>
+      <div class="sp-desc">ขี่หุ่นรบยักษ์ <b>30 วินาที</b> · จรวดติดตามอัตโนมัติ <b>10 นัด</b><br>กระโดด 2 ครั้ง = บินเหนือตึก</div>
+      <button id="skillGo">กด <b id="skillKey">F</b> เพื่อเรียกหุ่นรบ</button></div>
+    <button id="skillBtn"><svg viewBox="0 0 64 64"><path d="M22 8h20l6 10v12l-6 6H22l-6-6V18z" fill="none" stroke="#39FF14" stroke-width="3"/><path d="M20 20h24l-3 7H23z" fill="#39FF14"/><path d="M10 38h44l-4 18H38l-2-8h-8l-2 8H14z" fill="none" stroke="#39FF14" stroke-width="3"/></svg><span>MECH</span><em>F</em></button>
+    <div id="mechHud"><div class="mh-top"><b>MECHA DRIVE</b><span id="mechTime">30s</span></div><div class="mh-bar"><i id="mechBar"></i></div>
+      <div id="mechPips"></div><div class="mh-load"><i id="mechLoad"></i><span id="mechLoadT">พร้อมยิง</span></div><div id="mechFly"></div></div>
+
     <div id="scope"><div class="ring"></div><i class="h"></i><i class="v"></i><b></b></div>
     <div id="redDot"></div>
     <div id="hpBox">
@@ -572,6 +598,7 @@ const LOOKS = [
   { name: 'TITAN', skin: '#8f6248', hair: '#1b1612', hairStyle: 'buzz', top: '#2a2c2e', pants: '#2e3029', boots: '#1a1b1e', trim: '#6b2620', gear: 'helmet', helmet: '#1d1f22', vest: '#3a3d33', mask: '#121315', glow: '#ff3b3b' },
   { name: 'INFERNO', skin: '#2a2420', hair: '#111', hairStyle: 'short', top: '#2b2622', pants: '#1c1917', boots: '#111111', trim: '#ff6a1f', gear: null, glow: '#ff7a1f' },
   { name: 'DRAKE', skin: '#232a3d', hair: '#111', hairStyle: 'short', top: '#1f2638', pants: '#161b2a', boots: '#0d1018', trim: '#3aa0ff', gear: null, glow: '#3aa0ff' },
+  { name: 'MECHA', skin: '#131615', hair: '#111', hairStyle: 'short', top: '#131615', pants: '#0c0e0d', boots: '#060707', trim: '#39FF14', gear: null, glow: '#39FF14' },
 ].map(l => ({ ...l, shirt: l.top }));
 const DIFFS = [
   { name: 'ง่าย', icon: '🟢', time: 8000, acc: 0.88, desc: 'เช่น 7 + 5, 3 × 4' },
@@ -1703,7 +1730,7 @@ const bibCache = {};
 function bibMat(n) {
   return bibCache[n] || (bibCache[n] = pbr('#ffffff', { map: canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#f4f4f0'; x.fillRect(0, 0, w, h); x.fillStyle = '#7be22b'; x.fillRect(0, 0, w, 14); x.fillStyle = '#111'; x.font = '700 62px Oswald, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), w / 2, h / 2 + 8); x.fillStyle = '#555'; x.font = '600 10px Oswald, sans-serif'; x.fillText('HAXY MATCH', w / 2, 8); }), roughness: 0.9 }));
 }
-const HERO_J = {"cd":{"pelvis":[-0.0,1.5587,0.0077],"spine":[-0.0,1.9559,0.0198],"neck":[-0.0,2.1444,0.0048],"head":[-0.0,2.4322,0.0318],"RArm":[-0.3468,1.938,0.0324],"RFore":[-0.4125,1.6094,0.0324],"RHand":[-0.4459,1.276,0.0991],"RTip":[-0.3166,0.8917,0.1225],"RUp":[-0.1862,1.3611,0.0067],"RLeg":[-0.2709,0.8626,0.16],"RFoot":[-0.3424,0.1654,0.0106],"RToe":[-0.3693,0.0646,0.3585],"LArm":[0.3468,1.938,0.0324],"LFore":[0.4125,1.6094,0.0324],"LHand":[0.4459,1.276,0.0991],"LTip":[0.3166,0.8917,0.1225],"LUp":[0.1862,1.3611,0.0067],"LLeg":[0.2709,0.8626,0.16],"LFoot":[0.3424,0.1654,0.0106],"LToe":[0.3693,0.0646,0.3585],"RFing":[-0.3877,1.103,0.1096],"LFing":[0.3877,1.103,0.1096]},"cl":{"pelvis":[0.0,1.2,0.12],"spine":[0.0,1.6,0.15],"neck":[0.0,2.02,0.25],"head":[0.0,2.3,0.35],"RArm":[-0.62,1.85,0.12],"LArm":[0.62,1.85,0.12],"RFore":[-0.85,1.25,0.15],"LFore":[0.85,1.25,0.15],"RHand":[-0.93,0.85,0.2],"LHand":[0.93,0.85,0.2],"RTip":[-0.95,0.52,0.28],"LTip":[0.95,0.52,0.28],"RUp":[-0.3,1.18,0.1],"LUp":[0.3,1.18,0.1],"RLeg":[-0.42,0.72,0.14],"LLeg":[0.42,0.72,0.14],"RFoot":[-0.43,0.28,0.1],"LFoot":[0.43,0.28,0.1],"RToe":[-0.46,0.04,0.38],"LToe":[0.46,0.04,0.38],"RFing":[-0.939,0.7015,0.236],"LFing":[0.939,0.7015,0.236]},"cz":{"spine":[0.0,1.722,-0.0499],"neck":[0.0,2.181,-0.0798],"RArm":[-0.3293,2.0213,-0.1197],"RFore":[-0.3964,1.6267,-0.1316],"RHand":[-0.4289,1.3012,-0.0665],"RFing":[-0.4462,1.218,-0.0306],"RTip":[-0.4673,1.1164,0.0133],"LArm":[0.3293,2.0213,-0.1197],"LFore":[0.3964,1.6267,-0.1316],"LHand":[0.4289,1.3012,-0.0665],"LFing":[0.4462,1.218,-0.0306],"LTip":[0.4673,1.1164,0.0133],"RUp":[-0.1497,1.253,-0.0299],"RLeg":[-0.1922,0.7213,-0.0459],"LUp":[0.1497,1.253,-0.0299],"LLeg":[0.1922,0.7213,-0.0459]},"czn":{"spine":[0.0,1.722,-0.0499],"neck":[0.0,2.181,-0.0798],"RArm":[-0.3293,2.0213,-0.1197],"RFore":[-0.3964,1.6267,-0.1316],"RHand":[-0.4289,1.3012,-0.0665],"RFing":[-0.4462,1.218,-0.0306],"RTip":[-0.4673,1.1164,0.0133],"LArm":[0.3293,2.0213,-0.1197],"LFore":[0.3964,1.6267,-0.1316],"LHand":[0.4289,1.3012,-0.0665],"LFing":[0.4462,1.218,-0.0306],"LTip":[0.4673,1.1164,0.0133],"RUp":[-0.1497,1.253,-0.0299],"RLeg":[-0.1922,0.7213,-0.0459],"LUp":[0.1497,1.253,-0.0299],"LLeg":[0.1922,0.7213,-0.0459]},"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"RWpn":[-0.346,1.354,0.096],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"LFing":[0.406,1.229,0.149],"LFing2":[0.375,1.176,0.174],"LTip":[0.338,1.158,0.183],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"RWpn":[-0.352,1.378,0.098],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"LFing":[0.414,1.25,0.152],"LFing2":[0.381,1.197,0.177],"LTip":[0.344,1.179,0.186],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]},"cc":{"spine":[0.0,1.7578,-0.0406],"neck":[0.0,2.1839,-0.0609],"RArm":[-0.2739,2.0824,-0.0811],"RFore":[-0.335,1.7229,-0.0919],"RHand":[-0.3625,1.4478,-0.0369],"RFing":[-0.3639,1.3638,-0.0311],"RTip":[-0.3656,1.2612,-0.0239],"LArm":[0.2739,2.0824,-0.0811],"LFore":[0.335,1.7229,-0.0919],"LHand":[0.3625,1.4478,-0.0369],"LFing":[0.3639,1.3638,-0.0311],"LTip":[0.3656,1.2612,-0.0239],"RUp":[-0.1724,1.2608,0.0],"RLeg":[-0.1993,0.7242,0.0],"LUp":[0.1724,1.2608,0.0],"LLeg":[0.1993,0.7242,0.0]}};
+const HERO_J = {"cm":{"pelvis":[0.0,1.6248,-0.0478],"spine":[0.0,1.9115,-0.0478],"neck":[0.0,2.3416,-0.0319],"head":[0.0,2.4849,-0.0159],"RArm":[-0.3823,2.2619,-0.0796],"RFore":[-0.5257,1.9433,-0.0796],"RHand":[-0.6212,1.577,0.0478],"RTip":[-0.6849,1.354,0.0956],"RUp":[-0.2071,1.5292,-0.0637],"RLeg":[-0.3568,1.0513,-0.0159],"RFoot":[-0.4938,0.2071,-0.0159],"RToe":[-0.5257,0.0159,0.2867],"LArm":[0.3823,2.2619,-0.0796],"LFore":[0.5257,1.9433,-0.0796],"LHand":[0.6212,1.577,0.0478],"LTip":[0.6849,1.354,0.0956],"LUp":[0.2071,1.5292,-0.0637],"LLeg":[0.3568,1.0513,-0.0159],"LFoot":[0.4938,0.2071,-0.0159],"LToe":[0.5257,0.0159,0.2867],"RFing":[-0.6499,1.4766,0.0693],"LFing":[0.6499,1.4766,0.0693]},"cd":{"pelvis":[-0.0,1.5587,0.0077],"spine":[-0.0,1.9559,0.0198],"neck":[-0.0,2.1444,0.0048],"head":[-0.0,2.4322,0.0318],"RArm":[-0.3468,1.938,0.0324],"RFore":[-0.4125,1.6094,0.0324],"RHand":[-0.4459,1.276,0.0991],"RTip":[-0.3166,0.8917,0.1225],"RUp":[-0.1862,1.3611,0.0067],"RLeg":[-0.2709,0.8626,0.16],"RFoot":[-0.3424,0.1654,0.0106],"RToe":[-0.3693,0.0646,0.3585],"LArm":[0.3468,1.938,0.0324],"LFore":[0.4125,1.6094,0.0324],"LHand":[0.4459,1.276,0.0991],"LTip":[0.3166,0.8917,0.1225],"LUp":[0.1862,1.3611,0.0067],"LLeg":[0.2709,0.8626,0.16],"LFoot":[0.3424,0.1654,0.0106],"LToe":[0.3693,0.0646,0.3585],"RFing":[-0.3877,1.103,0.1096],"LFing":[0.3877,1.103,0.1096]},"cl":{"pelvis":[0.0,1.2,0.12],"spine":[0.0,1.6,0.15],"neck":[0.0,2.02,0.25],"head":[0.0,2.3,0.35],"RArm":[-0.62,1.85,0.12],"LArm":[0.62,1.85,0.12],"RFore":[-0.85,1.25,0.15],"LFore":[0.85,1.25,0.15],"RHand":[-0.93,0.85,0.2],"LHand":[0.93,0.85,0.2],"RTip":[-0.95,0.52,0.28],"LTip":[0.95,0.52,0.28],"RUp":[-0.3,1.18,0.1],"LUp":[0.3,1.18,0.1],"RLeg":[-0.42,0.72,0.14],"LLeg":[0.42,0.72,0.14],"RFoot":[-0.43,0.28,0.1],"LFoot":[0.43,0.28,0.1],"RToe":[-0.46,0.04,0.38],"LToe":[0.46,0.04,0.38],"RFing":[-0.939,0.7015,0.236],"LFing":[0.939,0.7015,0.236]},"cz":{"spine":[0.0,1.722,-0.0499],"neck":[0.0,2.181,-0.0798],"RArm":[-0.3293,2.0213,-0.1197],"RFore":[-0.3964,1.6267,-0.1316],"RHand":[-0.4289,1.3012,-0.0665],"RFing":[-0.4462,1.218,-0.0306],"RTip":[-0.4673,1.1164,0.0133],"LArm":[0.3293,2.0213,-0.1197],"LFore":[0.3964,1.6267,-0.1316],"LHand":[0.4289,1.3012,-0.0665],"LFing":[0.4462,1.218,-0.0306],"LTip":[0.4673,1.1164,0.0133],"RUp":[-0.1497,1.253,-0.0299],"RLeg":[-0.1922,0.7213,-0.0459],"LUp":[0.1497,1.253,-0.0299],"LLeg":[0.1922,0.7213,-0.0459]},"czn":{"spine":[0.0,1.722,-0.0499],"neck":[0.0,2.181,-0.0798],"RArm":[-0.3293,2.0213,-0.1197],"RFore":[-0.3964,1.6267,-0.1316],"RHand":[-0.4289,1.3012,-0.0665],"RFing":[-0.4462,1.218,-0.0306],"RTip":[-0.4673,1.1164,0.0133],"LArm":[0.3293,2.0213,-0.1197],"LFore":[0.3964,1.6267,-0.1316],"LHand":[0.4289,1.3012,-0.0665],"LFing":[0.4462,1.218,-0.0306],"LTip":[0.4673,1.1164,0.0133],"RUp":[-0.1497,1.253,-0.0299],"RLeg":[-0.1922,0.7213,-0.0459],"LUp":[0.1497,1.253,-0.0299],"LLeg":[0.1922,0.7213,-0.0459]},"ca":{"spine":[0.0,1.845,-0.051],"neck":[-0.0,2.18,-0.043],"RArm":[-0.295,2.004,-0.104],"RFore":[-0.361,1.677,-0.104],"RHand":[-0.413,1.377,0.061],"RWpn":[-0.346,1.354,0.096],"LArm":[0.295,2.004,-0.104],"LFore":[0.361,1.677,-0.104],"LHand":[0.413,1.377,0.061],"LFing":[0.406,1.229,0.149],"LFing2":[0.375,1.176,0.174],"LTip":[0.338,1.158,0.183],"RUp":[-0.172,1.381,0.012],"RLeg":[-0.176,0.743,0.04],"LUp":[0.172,1.381,0.012],"LLeg":[0.176,0.743,0.04]},"cb":{"spine":[0.0,1.877,-0.052],"neck":[-0.0,2.218,-0.044],"RArm":[-0.3,2.039,-0.106],"RFore":[-0.368,1.706,-0.106],"RHand":[-0.421,1.401,0.062],"RWpn":[-0.352,1.378,0.098],"LArm":[0.3,2.039,-0.106],"LFore":[0.368,1.706,-0.106],"LHand":[0.421,1.401,0.062],"LFing":[0.414,1.25,0.152],"LFing2":[0.381,1.197,0.177],"LTip":[0.344,1.179,0.186],"RUp":[-0.175,1.406,0.012],"RLeg":[-0.179,0.756,0.041],"LUp":[0.175,1.406,0.012],"LLeg":[0.179,0.756,0.041]},"cc":{"spine":[0.0,1.7578,-0.0406],"neck":[0.0,2.1839,-0.0609],"RArm":[-0.2739,2.0824,-0.0811],"RFore":[-0.335,1.7229,-0.0919],"RHand":[-0.3625,1.4478,-0.0369],"RFing":[-0.3639,1.3638,-0.0311],"RTip":[-0.3656,1.2612,-0.0239],"LArm":[0.2739,2.0824,-0.0811],"LFore":[0.335,1.7229,-0.0919],"LHand":[0.3625,1.4478,-0.0369],"LFing":[0.3639,1.3638,-0.0311],"LTip":[0.3656,1.2612,-0.0239],"RUp":[-0.1724,1.2608,0.0],"RLeg":[-0.1993,0.7242,0.0],"LUp":[0.1724,1.2608,0.0],"LLeg":[0.1993,0.7242,0.0]}};
 
 /* ---------- ของประกอบฉาก (โมเดล CC0: Quaternius + Brazil props kit) ---------- */
 const PROP_META = {"lamp":[1.06,8.74,1.06,0],"tlight":[0.86,6.12,0.63,0],"stop":[0.14,3.35,0.86,0],"propane":[1.19,1.6,1.14,1],"trash":[0.8,1.46,1.05,1],"gascan":[0.44,0.58,0.14,0],"ac":[1.76,1.16,1.31,1],"acstack":[1.55,2.33,1.18,1],"antenna":[0.88,3.64,0.14,0],"barrel":[1.0,1.38,1.0,1],"crates":[1.17,2.48,1.17,1],"cone":[0.63,1.02,0.63,0],"hydrant":[0.79,1.16,0.75,1],"stall":[3.64,3.64,2.22,1],"booth":[1.18,3.2,1.13,1],"bin":[0.5,1.6,0.51,1],"bench":[2.85,1.31,0.88,1],"cyl":[0.66,0.87,0.66,0],"wreck":[2.04,2.04,4.08,1],"tires":[2.72,0.73,1.8,1],"drum":[1.78,1.38,1.62,1],"dumpster":[2.32,2.04,2.97,1],"bags":[1.6,0.87,0.92,0],"junk":[3.34,1.46,2.65,1],"rubble":[4.04,1.16,3.71,1],"sofa":[2.7,1.31,1.56,1]};
@@ -1984,7 +2011,7 @@ function muzzleBlast(p, dir) { // แก๊สพ่นด้านหลัง�
 function addPart(k, p, v, s0, s1, life, add, a0 = 1, grav = 0) {
   const s = RPG.parts.length > 260 ? RPG.parts.shift().s : (RPG.free && RPG.free.length ? RPG.free.pop() : rpgSprite(k, add));
   if (s.material.map !== rpgTex(k)) { s.material.map = rpgTex(k); s.material.blending = add ? THREE.AdditiveBlending : THREE.NormalBlending; s.material.toneMapped = !add; s.material.needsUpdate = true; }
-  s.visible = true; s.position.copy(p); s.material.rotation = Math.random() * 6.28; RPG.parts.push({ s, v, s0, s1, life, t: 0, a0, grav, spin: (Math.random() - .5) * 2 });
+  s.visible = true; s.material.color.set('#ffffff'); s.position.copy(p); s.material.rotation = Math.random() * 6.28; RPG.parts.push({ s, v, s0, s1, life, t: 0, a0, grav, spin: (Math.random() - .5) * 2 });
 }
 function explode(p, owner) {
   // แสงวาบ
@@ -2028,7 +2055,7 @@ function explode(p, owner) {
 function updateRPG(dt) {
   poolInit();
   for (let i = RPG.list.length - 1; i >= 0; i--) {
-    const R = RPG.list[i]; R.t += dt; const k = Math.min(1, (R.t * ROCKET_V) / Math.max(0.01, R.L));
+    const R = RPG.list[i]; if (R.hom) { if (homingStep(R, dt)) RPG.list.splice(i, 1); continue; } R.t += dt; const k = Math.min(1, (R.t * ROCKET_V) / Math.max(0.01, R.L));
     // เร่งความเร็วช่วงแรกเล็กน้อย + ส่ายเบาๆ
     const pos = R.a.clone().lerp(R.b, k); pos.y += Math.sin(R.t * 30) * 0.02; R.m.position.copy(pos); R.m.userData.pl.position.copy(pos);
     const back = R.b.clone().sub(R.a).normalize(); R.m.userData.fl.position.copy(pos).addScaledVector(back, -0.5); R.m.userData.fl.scale.setScalar(0.55 + Math.random() * 0.35);
@@ -2286,7 +2313,7 @@ function attachGirl(r, lookIdx, outfit, SK) {
 
 /* ---------- ตัวละครโมเดล 3D จริง (GLB มีโครงกระดูก + แอนิเมชัน) ---------- */
 const CHAR = { ready: false, kinds: {} };
-const CH_FILES = { ca: 'models/vanguard.glb', cc: 'models/viper.glb', cz: 'models/ghoul.glb', czn: 'models/ghoul_npc.glb', cb: 'models/titan.glb', cl: 'models/inferno.glb', cd: 'models/drake.glb' };
+const CH_FILES = { ca: 'models/vanguard.glb', cc: 'models/viper.glb', cz: 'models/ghoul.glb', czn: 'models/ghoul_npc.glb', cb: 'models/titan.glb', cl: 'models/inferno.glb', cd: 'models/drake.glb', cm: 'models/mecha.glb' };
 const FEMALE = new Set();
 const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
@@ -2295,7 +2322,7 @@ function loadChars() {
   Promise.all([loadGuns(ld), loadProps(ld), loadContainers(ld), loadTrain(ld), loadShip(ld), loadBkk(ld), loadApt(ld), loadStairKit(ld), loadStadium(ld), loadZProps(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
-      if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene, k === 'cc' || k === 'cz' || k === 'czn' || k === 'cl' || k === 'cd' ? 1.0 : 1.45) }; if (k === 'cc' || k === 'cd') CHAR.kinds[k].prims.forEach(p => { p.mat.side = THREE.DoubleSide; }); continue; }
+      if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene, k === 'cc' || k === 'cz' || k === 'czn' || k === 'cl' || k === 'cd' || k === 'cm' ? 1.0 : 1.45) }; if (k === 'cc' || k === 'cd' || k === 'cm') CHAR.kinds[k].prims.forEach(p => { p.mat.side = THREE.DoubleSide; }); continue; }
       if (k === 'girl') { let gm = null; g.scene.traverse(o => { if (!gm && o.isMesh) gm = o; }); if (gm && gm.geometry.attributes.skinIndex) CHAR.kinds.girl = { girl: true, ...girlPrep(gm.geometry, gm.material.map) }; continue; }
       g.scene.updateMatrixWorld(true);
       const bw = n => { for (const nn of BN(n)) { const b = g.scene.getObjectByName(nn); if (b) return b.getWorldPosition(new THREE.Vector3()).y; } return null; };
@@ -2315,7 +2342,7 @@ function loadChars() {
     CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
   });
 }
-function charKind(lookIdx, outfit) { const hk = FORCE_KIND || ['ca', 'cc', 'cz', 'cb', 'cl', 'cd'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
+function charKind(lookIdx, outfit) { const hk = FORCE_KIND || ['ca', 'cc', 'cz', 'cb', 'cl', 'cd', 'cm'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
 function attachGLB(r, kind, lookIdx, outfit, SK, lk) {
   if (kind === 'girl') return attachGirl(r, lookIdx, outfit, SK);
   if (CHAR.kinds[kind] && CHAR.kinds[kind].hero) return attachHero(r, kind);
@@ -3722,7 +3749,7 @@ function mobHit(a, p) {
   const w = a.w | 0, W = WEAPONS[w] || WEAPONS[0], dmg = Math.max(0, Math.min(W.dmg * (m.k ? 1 : 2), Math.round(+a.dmg || 0))); if (!dmg) return;
   m.hp -= dmg;
   if (!m.k) { m.tg = a.id; m.lose = Date.now() + 7000; if (m.st === 0) m.st = 1; }
-  if (m.hp <= 0) { m.hp = 0; m.st = 3; m.t0 = Date.now() + 20000; mobEvent(['d', i, m.k]);
+  if (m.hp <= 0) { m.hp = 0; m.st = 3; m.t0 = Date.now() + 20000; mobEvent(['d', i, m.k]); if (m.k) mobEvent(['s', a.id, p.name]);
     if (m.k) { H.feed.push({ k: p.name, v: m.k === 2 ? 'บอสมังกรแดง' : 'บอส INFERNO', w, t: Date.now(), kid: a.id, vid: null, hs: false }); if (H.feed.length > 5) H.feed.shift(); H.dirty = true; } }
 }
 /* ---------- บอสมังกรแดง (ด่านเมืองยามเย็น): ออกจากประตูมิติกลางแผนที่ · บินได้ (ช้ากว่าคนเดิน 2 เท่า) · พ่นไฟ ทุก 3 วินาที ---------- */
@@ -3803,7 +3830,8 @@ function mobStateFx(m, was) {
 }
 function onMobEvent(a) {
   const k = a[1];
-  if (k === 'p') openPortal(+a[2], +a[3], a[4] === 2 ? 'มังกรแดง' : 'INFERNO');
+  if (k === 's') { if (a[2] === myId) mechGrant(); else toast(`⚡ ${a[3]} ได้รับสกิล MECHA DRIVE`); }
+  else if (k === 'p') openPortal(+a[2], +a[3], a[4] === 2 ? 'มังกรแดง' : 'INFERNO');
   else if (k === 'r') { const b = new THREE.Vector3(+a[3], +a[4], +a[5]), m = MOB.list[a[2] | 0]; (MOB.breaths = MOB.breaths || []).push({ i: a[2] | 0, b, a: new THREE.Vector3(m ? m.rx : b.x, DR_ALT, m ? m.rz : b.z), t: 0 }); Music.mob('breath', Math.max(0.3, mobVol(b.x, b.z, 120))); }
   else if (k === 'f') throwBall(new THREE.Vector3(+a[2], +a[3], +a[4]), new THREE.Vector3(+a[5], +a[6], +a[7]), (+a[8] || 300) / 1000);
   else if (k === 'b') { Music.mob('bite', Math.max(a[4] === myId ? 1 : 0, mobVol(+a[2], +a[3], 30))); if (a[4] === myId) { me.shake = Math.max(me.shake || 0, 0.7); me.flash = Math.max(me.flash || 0, 0.5); } }
@@ -3929,6 +3957,99 @@ function mobsIdle() { // ออกจากโหมดเครือข่า�
   if (MOB.bar) MOB.bar.style.display = 'none';
 }
 
+/* ---------- สกิล MECHA DRIVE: ได้จากการยิงบอสนัดสุดท้าย · ขี่หุ่นรบ 30 วิ · จรวดติดตาม 10 นัด (รีโหลด 3 วิ) · กระโดด 2 ครั้ง = บินเหนือตึก ---------- */
+const MECH = { have: false, on: false, until: 0, ammo: 0, cool: 0, fly: false, jumpT: 0, k: 0, rigs: new Map(), popT: 0, puff: 0 };
+const MECH_MS = 30000, MECH_AMMO = 10, MECH_CD = 3000, MECH_FLY_Y = 18, MECH_LOOK = 6;
+function mechReset() { MECH.have = MECH.on = MECH.fly = false; MECH.until = 0; MECH.k = 0; for (const r of MECH.rigs.values()) r.root.visible = false; mechHud(); const p = $('#skillPop'); if (p) p.classList.remove('show'); }
+function mechGrant() {
+  MECH.have = true; MECH.popT = performance.now() + 7000; Music.sfx('kill'); setTimeout(() => Music.mob('charge', 0.7), 120);
+  $('#skillKey').textContent = isTouch ? 'แตะ' : 'F'; $('#skillPop').classList.remove('show'); void $('#skillPop').offsetWidth; $('#skillPop').classList.add('show'); mechHud();
+}
+function mechStart() {
+  const P = S && S.players.find(p => p.id === myId);
+  if (!MECH.have || MECH.on || !battleOn() || S.state !== 'battle' || !P || P.alive === false) return;
+  MECH.have = false; MECH.on = true; MECH.fly = false; MECH.until = performance.now() + MECH_MS; MECH.ammo = MECH_AMMO; MECH.cool = performance.now() + 600; me.cr = 0; me.reload = null; setAim(0);
+  $('#skillPop').classList.remove('show'); mechBurst(me.x, me.y, me.z); Music.mob('portal', 0.8); me.shake = Math.max(me.shake || 0, 0.6); toast('MECHA DRIVE · ยิง = จรวดติดตาม · กระโดด 2 ครั้ง = บิน'); mechHud();
+  pub('fx', ['#k', myId, +me.x.toFixed(1), +me.y.toFixed(1), +me.z.toFixed(1)]);
+}
+function mechStop(msg) { if (!MECH.on) return; MECH.on = false; MECH.fly = false; mechBurst(me.x, me.y, me.z); if (msg) toast(msg); mechHud(); }
+function mechBurst(x, y, z) { // แสงเขียว + ควันตอนหุ่นปรากฏ/หายไป
+  const p = new THREE.Vector3(x, y + 3, z);
+  for (let i = 0; i < 14; i++) { const a = i / 14 * 6.28; addPart('smoke', new THREE.Vector3(x, y + 0.4, z), new THREE.Vector3(Math.cos(a) * 7, 0.6, Math.sin(a) * 7), 1.2, 5, 1.3, false, 0.55); }
+  for (let i = 0; i < 2; i++) { addPart('glow', p.clone().add(new THREE.Vector3(0, i * 2.4 - 1.2, 0)), new THREE.Vector3(0, 2.5, 0), 2, 6.5, 0.5, true, 0.42); RPG.parts[RPG.parts.length - 1].s.material.color.set('#39FF14'); RPG.parts[RPG.parts.length - 1].tint = 1; }
+}
+function mechRig(id) {
+  let r = MECH.rigs.get(id); if (r) return r; if (!CHAR.kinds.cm) return null;
+  FORCE_KIND = 'cm'; try { r = makeRunner(MECH_LOOK, null, false, scene); } catch (e) { console.warn('mech', e); r = null; } FORCE_KIND = null; if (!r) return null;
+  r.root.scale.setScalar(BOSS_SC); r.root.userData.noCrop = true; r.root.traverse(o => { o.frustumCulled = false; }); MECH.rigs.set(id, r); return r;
+}
+function mechTarget(from) { // ผู้เล่นที่ใกล้ที่สุด (ยังไม่ตาย)
+  let best = null, bd = 1e9;
+  for (const pl of S.players) { if (pl.id === myId || pl.alive === false) continue; const s = remotes.get(pl.id); if (!s) continue; const d = Math.hypot((s.rx ?? s.x) - from.x, (s.rz ?? s.z) - from.z); if (d < bd) { bd = d; best = pl.id; } }
+  return best;
+}
+function mechFire() {
+  const now = performance.now(); if (now < MECH.cool) return true;
+  if (MECH.ammo <= 0) { MECH.cool = now + 500; Music.sfx('empty'); return true; }
+  MECH.ammo--; MECH.cool = now + MECH_CD;
+  const fx = Math.sin(me.yaw), fz = Math.cos(me.yaw), rx = -Math.cos(me.yaw), rz = Math.sin(me.yaw);
+  const a = new THREE.Vector3(me.x + fx * 1.6 + rx * 1.5, me.y + 5.9, me.z + fz * 1.6 + rz * 1.5), tg = mechTarget(me) || '';
+  const d = new THREE.Vector3(fx * Math.cos(me.pitch), 0.35 + Math.sin(me.pitch), fz * Math.cos(me.pitch)).normalize();
+  spawnHoming(a, d, tg, myId); me.shake = Math.max(me.shake, 0.4); me.fovKick = 4; me.fireT = now;
+  pub('fx', [myId, +a.x.toFixed(2), +a.y.toFixed(2), +a.z.toFixed(2), +d.x.toFixed(2), +d.y.toFixed(2), +d.z.toFixed(2), 4, tg]);
+  if (!tg) toast('ไม่มีเป้าหมาย · จรวดพุ่งตรง'); mechHud(); return true;
+}
+function spawnHoming(a, dir, tg, owner) {
+  const m = rocketMesh(); m.scale.setScalar(2.2); m.position.copy(a); m.lookAt(a.clone().add(dir));
+  RPG.list.push({ m, hom: true, p: a.clone(), v: dir.clone(), tg, owner, t: 0, puff: 0, a: a.clone(), b: a.clone(), L: 1 });
+  muzzleBlast(a, dir.clone()); Music.rpg(clampN(1 - Math.hypot(a.x - me.x, a.z - me.z) / 120, 0.08, 1));
+}
+function homPos(id) {
+  if (!id || !S || !S.players) return null; const pl = S.players.find(p => p.id === id); if (!pl || pl.alive === false) return null;
+  if (id === myId) return new THREE.Vector3(me.x, me.y + 1.3, me.z); const s = remotes.get(id); return s ? new THREE.Vector3(s.rx ?? s.x, (s.ry || 0) + 1.3, s.rz ?? s.z) : null;
+}
+function homingStep(R, dt) { // คืน true เมื่อระเบิดแล้ว
+  R.t += dt; const tp = homPos(R.tg);
+  if (tp && R.t > 0.25) { const want = tp.clone().sub(R.p).normalize(); R.v.lerp(want, Math.min(1, dt * (2.2 + R.t * 4))).normalize(); }
+  const step = (22 + Math.min(R.t, 1.2) * 14) * dt, hw = rayCast(R.p, R.v, step + 0.4, null, 0, true), near = tp && R.p.distanceTo(tp) < 1.5 + step;
+  if (near) R.p.copy(tp); else R.p.addScaledVector(R.v, Math.min(step, Math.max(0, hw.t - 0.1)));
+  R.m.position.copy(R.p); R.m.lookAt(R.p.clone().add(R.v)); R.m.userData.pl.position.copy(R.p); R.m.userData.fl.position.copy(R.p).addScaledVector(R.v, -1.0); R.m.userData.fl.scale.setScalar(1.1 + Math.random() * 0.6);
+  R.puff -= dt; if (R.puff <= 0) { R.puff = 0.022; addPart('smoke', R.p.clone().addScaledVector(R.v, -1.2), new THREE.Vector3((Math.random() - .5) * 0.6, 0.3, (Math.random() - .5) * 0.6), 0.5, 2.8, 1.5 + Math.random(), false, 0.6); }
+  if (near || hw.t < step + 0.3 || R.t > 8 || R.p.y < groundAt(R.p.x, R.p.z, R.p.y + 0.5) + 0.15) { R.m.userData.pl.intensity = 0; scene.remove(R.m); scene.remove(R.m.userData.fl); explode(R.p.clone(), R.owner); return true; }
+  return false;
+}
+function mechJump() { // กระโดด 2 ครั้งติดกัน = สลับโหมดบิน
+  const now = performance.now();
+  if (now - MECH.jumpT < 450) { MECH.fly = !MECH.fly; MECH.jumpT = 0; me.vy = 0; Music.mob('charge', 0.5); toast(MECH.fly ? 'โหมดบิน · กระโดด 2 ครั้งเพื่อลงจอด' : 'ลงจอด'); mechHud(); return; }
+  MECH.jumpT = now; if (!MECH.fly && me.grounded) { me.vy = JUMP_V * 1.25; Music.sfx('swap'); }
+}
+function mechPose(id, r, src, pl, yy, dt, air) { // วาดหุ่นแทนตัวละคร (ทั้งของเราและคนอื่น)
+  const mk = id === myId ? (MECH.on ? (MECH.fly ? 2 : 1) : 0) : (src.mech | 0), old = MECH.rigs.get(id);
+  if (!mk || pl.alive === false) { if (old) old.root.visible = false; return false; }
+  const mr = mechRig(id); if (!mr) return false;
+  r.root.visible = false; mr.root.visible = true; mr.root.position.set(src.rx, 0.07 + yy, src.rz); mr.root.rotation.y = id === myId ? me.yaw : src.ryaw;
+  try { poseShooter(mr, mk === 2 ? 0 : src.mv, true, id === myId ? me.pitch : src.pitch || 0, 3, dt, 0, mk === 2 ? false : air, 0, 1); } catch (e) {}
+  if (mk === 2 || air) { mr.puff = (mr.puff || 0) - dt; if (mr.puff <= 0) { mr.puff = 0.05; const bx = -Math.sin(mr.root.rotation.y), bz = -Math.cos(mr.root.rotation.y);
+    for (const s of [-1, 1]) { const p = new THREE.Vector3(src.rx + bx * 2.2 - bz * s * 1.6, yy + 3.2, src.rz + bz * 2.2 + bx * s * 1.6); addPart('fire', p, new THREE.Vector3(bx * 2, -9, bz * 2), 0.9, 2.2, 0.22, true, 0.9); RPG.parts[RPG.parts.length - 1].s.material.color.set('#8dff5a'); RPG.parts[RPG.parts.length - 1].tint = 1; } } }
+  return true;
+}
+function mechHud() {
+  const el = $('#mechHud'), sb = $('#skillBtn'); if (!el) return;
+  sb.classList.toggle('show', MECH.have && !MECH.on); el.classList.toggle('show', MECH.on);
+  if (MECH.on) { let h = ''; for (let i = 0; i < MECH_AMMO; i++) h += `<i class="${i < MECH.ammo ? 'on' : ''}"></i>`; if ($('#mechPips').dataset.n !== String(MECH.ammo)) { $('#mechPips').innerHTML = h; $('#mechPips').dataset.n = String(MECH.ammo); } $('#mechFly').textContent = MECH.fly ? '▲ กำลังบิน · กระโดด 2 ครั้งเพื่อลงจอด' : '▲ กระโดด 2 ครั้งเพื่อบิน'; }
+}
+function mechTick(dt) {
+  const inB = battleOn() && S && S.state === 'battle', P = inB ? S.players.find(p => p.id === myId) : null;
+  if (!inB) { if (MECH.on || MECH.have || MECH.k) mechReset(); for (const r of MECH.rigs.values()) r.root.visible = false; return; }
+  if (MECH.on && (!P || P.alive === false)) mechStop('หุ่นรบถูกทำลาย');
+  if (MECH.on && performance.now() > MECH.until) mechStop('หมดเวลา MECHA DRIVE');
+  if (!MECH.on) MECH.fly = false;
+  MECH.k += ((MECH.on ? 1 : 0) - MECH.k) * Math.min(1, dt * 5);
+  if (MECH.have && MECH.popT && performance.now() > MECH.popT) { MECH.popT = 0; $('#skillPop').classList.remove('show'); }
+  if (MECH.on) { const now = performance.now(), left = Math.max(0, MECH.until - now), cd = clampN((MECH.cool - now) / MECH_CD, 0, 1);
+    $('#mechTime').textContent = Math.ceil(left / 1000) + 's'; $('#mechBar').style.width = Math.min(100, left / MECH_MS * 100) + '%'; $('#mechLoad').style.width = ((1 - cd) * 100) + '%'; $('#mechLoadT').textContent = MECH.ammo <= 0 ? 'จรวดหมด' : cd > 0.01 ? 'กำลังรีโหลด…' : 'พร้อมยิง'; }
+}
+function onMechFx(a) { if (a[1] !== myId) mechBurst(+a[2], +a[3], +a[4]); }
 function losClear(a, b) {
   const o = new THREE.Vector3(a.x, (a.y || 0) + 1.9, a.z), d = new THREE.Vector3(b.x - a.x, (b.y || 0) + 1.5 - o.y, b.z - a.z); const len = d.length(); if (!len) return true; d.divideScalar(len);
   const h = rayCast(o, d, len, null, 0, true); return h.t >= len - 0.6;
@@ -4620,8 +4741,8 @@ function showcaseLook(i) { demo.forEach((d, k) => d.root.scale.setScalar(k === i
 const EMOTE_T = 3.4, BLEND_T = 0.5;
 const emoDur = n => n === 'tactical' ? 7.3 : n === 'titan' ? 6.3 : n === 'shade' ? 8.9 : n === 'ghoul' ? 7.6 : n === 'inferno' ? 6.0 : EMOTE_T, emoT = (n, tl, tg) => (n === 'tactical' || n === 'titan' || n === 'shade' || n === 'ghoul' || n === 'inferno') ? tl : tg;
 // ท่าประจำตัวของตัวละครแต่ละตัว (ไม่ซ้ำกัน)
-const SIG = ['tactical', 'shade', 'ghoul', 'titan', 'inferno', 'inferno'];
-const SIG_NAME = ['สัญญาณยุทธวิธี', 'ราชินีอสรพิษ', 'ซอมบี้คลั่ง', 'พลังไททัน', 'คำรามเพลิง', 'คำรามมังกร'];
+const SIG = ['tactical', 'shade', 'ghoul', 'titan', 'inferno', 'inferno', 'titan'];
+const SIG_NAME = ['สัญญาณยุทธวิธี', 'ราชินีอสรพิษ', 'ซอมบี้คลั่ง', 'พลังไททัน', 'คำรามเพลิง', 'คำรามมังกร', 'ระบบรบพร้อม'];
 const EM_POOL = ['idle', 'idle2', 'cross', 'idle', 'flex'];
 const easeIO = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 function pvBase() { return { ry: 0, by: 0, bx: 0, bz: 0, hx: 0, hy: 0, hz: 0, l: [0, 0], k: [0.06, 0.06], a: [[0, -0.1], [0, 0.1]], e: [[-0.18, 0], [-0.18, 0]], gun: 0, gunAim: 0, ow: 0, oRU: [0, -1, 0], oRF: [0, -1, 0], oLU: [0, -1, 0], oLF: [0, -1, 0], run: 0 }; }
@@ -4887,7 +5008,7 @@ function frame() {
     world.seats.forEach(([x, y, z, ph], i) => { const yy = y + Math.max(0, Math.sin(t * 5 + ph)) * 0.35; m.makeTranslation(x, yy, z); world.crowd.setMatrixAt(i, m); m.makeTranslation(x, yy + 0.62, z); world.crowdHeads.setMatrixAt(i, m); });
     world.crowd.instanceMatrix.needsUpdate = true; world.crowdHeads.instanceMatrix.needsUpdate = true;
     world.flags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2 + i) * 0.4; });
-    updateZombie(dt, t); mobFxTick(dt); breathTick(dt); if (mobsActive()) updateMobs(dt); else mobsIdle();
+    updateZombie(dt, t); mobFxTick(dt); breathTick(dt); mechTick(dt); if (mobsActive()) updateMobs(dt); else mobsIdle();
     if (world.bkk && world.bkk.visible) {
       world.bkkFlags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2.2 + i) * 0.45; });
       for (const c of world.cars) {
@@ -4934,7 +5055,7 @@ const GRAV = 22, JUMP_V = 8.2;
 function onPos(a) {
   const id = a[0]; if (id === myId) return;
   let r = remotes.get(id); if (!r) { r = { rx: +a[1], rz: +a[2], ry: +a[8] || 0, ryaw: +a[3] }; remotes.set(id, r); }
-  Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, y: +a[8] || 0, cr: a[9] | 0, st: a[10] | 0, t: performance.now() });
+  Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, y: +a[8] || 0, cr: a[9] | 0, st: a[10] | 0, mech: a[11] | 0, t: performance.now() });
 }
 // เส้นกระสุน + แสงปากกระบอก
 const tracers = [];
@@ -5019,10 +5140,12 @@ function updateTracers(dt) {
 function onFx(a, local) {
   if (a[0] === '#m') { if (!isHost) onMobs(a); return; }
   if (a[0] === '#e') { if (!isHost) onMobEvent(a); return; }
+  if (a[0] === '#k') { onMechFx(a); return; }
   if (!local && a[0] === myId) return;
   { const rr = remotes.get(a[0]); if (rr) rr.fireT = performance.now(); const ru = runners.get(a[0]); if (ru && ru.wpS) ru.wpS.kick = a[7] == 3 ? 0.3 : a[7] == 2 ? 0.2 : 0.09; }
   const A = new THREE.Vector3(+a[1], +a[2], +a[3]), B = new THREE.Vector3(+a[4], +a[5], +a[6]);
   if ((a[7] | 0) === 3) { spawnRocket(A, B, a[0]); return; }
+  if ((a[7] | 0) === 4) { spawnHoming(A, B.normalize(), a[8] || '', a[0]); return; }
   tracer(A, B, a[7] | 0);
   const d = Math.hypot(A.x - me.x, A.z - me.z); Music.shot(a[7] | 0, clampN(1 - d / ((a[7] | 0) === 2 ? 140 : 80), 0.06, 0.8));
 }
@@ -5270,15 +5393,15 @@ function reloadTick() {
   if (performance.now() >= me.reload.end) { const W = WEAPONS[me.w], n = Math.min(W.mag - me.ammo[me.w], me.res[me.w]); me.ammo[me.w] += n; me.res[me.w] -= n; me.reload = null; renderWeaponBar(); }
 }
 function swapWeapon(w) { me.reload = null; me.w = w == null ? (me.w + 1) % WEAPONS.length : w; me.pressFired = false; me.cool = Math.max(me.cool, performance.now() + 250); Music.sfx('swap'); renderWeaponBar(); }
-function doJump() { if (me.grounded && battleOn() && S.state === 'battle') { if (me.cr) { me.cr = 0; return; } me.vy = JUMP_V; Music.sfx('swap'); } }
-function toggleCrouch() { if (!me.grounded) return; me.cr = me.cr ? 0 : 1; $('#crouchBtn').classList.toggle('on', !!me.cr); }
+function doJump() { if (MECH.on && battleOn() && S.state === 'battle') return mechJump(); if (me.grounded && battleOn() && S.state === 'battle') { if (me.cr) { me.cr = 0; return; } me.vy = JUMP_V; Music.sfx('swap'); } }
+function toggleCrouch() { if (!me.grounded || MECH.on) return; me.cr = me.cr ? 0 : 1; $('#crouchBtn').classList.toggle('on', !!me.cr); }
 function myStance() { if (me.reload) return 3; return (me.aimK > 0.3 || performance.now() - (me.fireT || 0) < 1600) ? 1 : (me.mv && (keys.ShiftLeft || keys.ShiftRight) ? 2 : 0); }
 function setAim(v) { me.aim = v ? 1 : 0; $('#aimBtn').classList.toggle('on', !!me.aim); }
 addEventListener('keydown', e => {
   if (!battleOn() || document.activeElement.tagName === 'INPUT') return;
   keys[e.code] = true;
   if (e.repeat) return;
-  if (e.code === 'KeyQ') swapWeapon(); else if (e.code === 'Digit1') swapWeapon(0); else if (e.code === 'Digit2') swapWeapon(1); else if (e.code === 'Digit3') swapWeapon(2); else if (e.code === 'Digit4') swapWeapon(3); else if (e.code === 'KeyR' && battleOn()) startReload();
+  if (e.code === 'KeyQ') swapWeapon(); else if (e.code === 'Digit1') swapWeapon(0); else if (e.code === 'Digit2') swapWeapon(1); else if (e.code === 'Digit3') swapWeapon(2); else if (e.code === 'Digit4') swapWeapon(3); else if (e.code === 'KeyR' && battleOn()) startReload(); else if (e.code === 'KeyF' && battleOn()) mechStart();
   else if (e.code === 'Space') { doJump(); e.preventDefault(); } else if (e.code === 'KeyC') toggleCrouch(); else if (e.code === 'KeyE') setAim(!me.aim);
   if (e.code.startsWith('Arrow')) e.preventDefault();
 });
@@ -5316,7 +5439,7 @@ $('#shootHud').addEventListener('touchend', touchEnd); $('#shootHud').addEventLi
 $('#fireBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firing = true; me.pressFired = false; });
 for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) $('#fireBtn').addEventListener(ev, () => { firing = false; });
 const tapBtn = (sel, fn) => $(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); fn(); });
-tapBtn('#swapBtn', () => swapWeapon()); tapBtn('#jumpBtn', doJump); tapBtn('#crouchBtn', toggleCrouch); tapBtn('#aimBtn', () => setAim(!me.aim));
+tapBtn('#swapBtn', () => swapWeapon()); tapBtn('#jumpBtn', doJump); tapBtn('#skillBtn', mechStart); tapBtn('#skillGo', mechStart); tapBtn('#crouchBtn', toggleCrouch); tapBtn('#aimBtn', () => setAim(!me.aim));
 $('#weaponBar').addEventListener('pointerdown', e => { const s = e.target.closest('.wslot'); if (s) { e.preventDefault(); e.stopPropagation(); swapWeapon(+s.dataset.w); } });
 function renderWeaponBar() {
   $('#weaponBar').innerHTML = WEAPONS.map((W, i) => `<div class="wslot${i === me.w ? ' on' : ''}" data-w="${i}"><span class="k">${i + 1}</span>${GUN_ICONS[i] ? `<img src="${GUN_ICONS[i]}" alt="">` : ''}<span class="n">${W.name} · ${me.ammo[i] + (me.res ? me.res[i] : 0)}</span></div>`).join('');
@@ -5326,6 +5449,7 @@ function toast(msg) { $('#bToast').textContent = msg; $('#bToast').style.opacity
 // ยิง
 function fireShot() {
   me.fireT = performance.now(); { const ru = runners.get(myId); if (ru && ru.wpS) ru.wpS.kick = me.w === 3 ? 0.3 : me.w === 2 ? 0.2 : me.w === 0 ? 0.14 : 0.07; }
+  if (MECH.on) return mechFire();
   const W = WEAPONS[me.w], now = performance.now(); if (now < me.cool) return false;
   const Pm = S.players.find(p => p.id === myId), inf = !!Pm && (Pm.infU || 0) > hostNow();
   if (me.reload) return true;
@@ -5373,7 +5497,7 @@ const headV = new THREE.Vector3(), dirV = new THREE.Vector3();
 let battleWasOn = false;
 function setCovers(m) { for (const k in COVERS) COVERS[k].g.visible = +k === m; }
 function shooterFrame(dt, t) {
-  if (!battleWasOn) { battleWasOn = true; lastFeedT = hostNow(); battleSprites(true); me.spSeq = -1; const P0 = S.players.find(p => p.id === myId); me.ag = P0 ? P0.ag : 0; me.lastHp = HP_MAX; me.lastAr = 0; remotes.clear(); renderWeaponBar(); }
+  if (!battleWasOn) { battleWasOn = true; lastFeedT = hostNow(); battleSprites(true); me.spSeq = -1; const P0 = S.players.find(p => p.id === myId); me.ag = P0 ? P0.ag : 0; me.lastHp = HP_MAX; me.lastAr = 0; remotes.clear(); renderWeaponBar(); mechReset(); }
   const m = S.map | 0; buildCovers(m); collidersFor(m); setCovers(m);
   const P = S.players.find(p => p.id === myId), alive = !!P && P.alive !== false, battle = S.state === 'battle';
   if (P && P.sp && P.sp[2] !== me.spSeq) { me.spSeq = P.sp[2]; me.x = me.rx = P.sp[0]; me.z = me.rz = P.sp[1]; me.y = P.sp[3] || 0; me.vy = 0; me.cr = 0; me.grounded = true; me.yaw = Math.atan2(-me.x, -me.z); me.pitch = 0.05; me.ammo = WEAPONS.map(W => W.mag); me.res = WEAPONS.map(W => W.res); me.reload = null; setAim(0); renderWeaponBar(); $('#crouchBtn').classList.remove('on'); }
@@ -5398,7 +5522,8 @@ function shooterFrame(dt, t) {
   if (me.cr) spd *= 0.5; spd *= 1 - me.aimK * (me.w === 2 ? 0.6 : 0.4);
   const fx = Math.sin(me.yaw), fz = Math.cos(me.yaw), rx = -Math.cos(me.yaw), rz = Math.sin(me.yaw);
   if (il > 0.05) { const res = moveCollide(me.x, me.z, me.x + (fx * iz + rx * ix) * spd * dt, me.z + (fz * iz + rz * ix) * spd * dt, me.y); me.mv = Math.hypot(res.x - me.x, res.z - me.z) > 0.001 ? 1 : 0; me.x = res.x; me.z = res.z; } else me.mv = 0;
-  {
+  if (MECH.fly) { me.y += (MECH_FLY_Y - me.y) * Math.min(1, dt * 2.2); me.vy = 0; me.grounded = false; }
+  else {
     const gnd = groundAt(me.x, me.z, me.y);
     if (me.vy > 0) { me.y += me.vy * dt; me.vy -= GRAV * dt; const ceil = ceilingAt(me.x, me.z, me.y); if (me.y + (me.cr ? 1.4 : 1.95) > ceil) { me.y = ceil - (me.cr ? 1.4 : 1.95); me.vy = 0; } }
     else if (me.y > gnd + 0.001) { if (me.grounded && me.y - gnd <= STEP + 0.05) { me.y = gnd; } else { me.vy -= GRAV * dt; me.y = Math.max(gnd, me.y + me.vy * dt); if (me.y === gnd) me.vy = 0; } }
@@ -5410,7 +5535,7 @@ function shooterFrame(dt, t) {
   me.rx = me.x; me.rz = me.z;
   if (firing && alive && battle) { if (WEAPONS[me.w].auto || !me.pressFired) { if (fireShot()) me.pressFired = true; } }
   if (alive && battle && S.pickups && performance.now() > me.pickT) for (const k of S.pickups) if (k.a && Math.hypot(k.x - me.x, k.z - me.z) < 1.7 && Math.abs(me.y - (k.y || 0)) < 1.4) { send('pick', { pid: k.id }); me.pickT = performance.now() + 700; break; }
-  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr, myStance()]); }
+  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr, myStance(), MECH.on ? (MECH.fly ? 2 : 1) : 0]); }
   // ตัวละคร
   const scoped = me.w === 2 && me.aimK > 0.6;
   for (const [id, r] of runners) {
@@ -5427,13 +5552,14 @@ function shooterFrame(dt, t) {
     poseBuffs(r, pl, pl.alive !== false);
     poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0, id === myId ? myStance() : (performance.now() - (src.fireT || 0) < 1600 ? 1 : src.st | 0));
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
+    mechPose(id, r, src, pl, yy, dt, air);
   }
   tickPickups(t);
   updateTracers(dt);
   // กล้องข้ามไหล่ + ซูม
   const k = me.aimK, cp = Math.cos(me.pitch), f = [Math.sin(me.yaw) * cp, Math.sin(me.pitch), Math.cos(me.yaw) * cp];
-  const eye = me.y + (me.cr ? 1.75 : 2.35);
-  const side = me.w === 2 ? 0.75 * (1 - k) : 0.75 - 0.2 * k, back = me.w === 2 ? 4.4 * (1 - k) + 0.05 : 4.4 - 2.6 * k;
+  const eye = me.y + (me.cr ? 1.75 : 2.35) + MECH.k * 5.2;
+  const side = (me.w === 2 ? 0.75 * (1 - k) : 0.75 - 0.2 * k) + MECH.k * 3.0, back = (me.w === 2 ? 4.4 * (1 - k) + 0.05 : 4.4 - 2.6 * k) + MECH.k * 11;
   headV.set(me.x + rx * side, eye, me.z + rz * side);
   dirV.set(-f[0], -f[1] * 0.6 + 0.12 * (1 - k), -f[2]).normalize();
   const hcam = rayCast(headV, dirV, back, null, 0, true), dist = Math.max(0.05, Math.min(back, hcam.t - 0.3));
@@ -5450,7 +5576,7 @@ function shooterFrame(dt, t) {
   $('#buffs').innerHTML = (infL > 0 ? `<span class="bf inf">∞ กระสุนไม่จำกัด ${Math.ceil(infL / 1000)}s</span>` : '') + (godL > 0 ? `<span class="bf god">★ อมตะ ${Math.ceil(godL / 1000)}s</span>` : '');
   if (P && (P.infU || 0) > (me.lastInfU || 0) && infL > 0) { Music.sfx('kill'); toast('กระสุนไม่จำกัด 10 วินาที!'); } if (P) me.lastInfU = P.infU || 0;
   if (P && (P.godU || 0) > (me.lastGodU || 0) && godL > 0) { Music.sfx('kill'); toast('อมตะ 10 วินาที!'); } if (P) me.lastGodU = P.godU || 0;
-  $('#ammoNum').textContent = infL > 0 ? '∞' : me.reload ? 'รีโหลด…' : `${me.ammo[me.w]}/${me.res[me.w]}`; $('#ammoNum').classList.toggle('low', !me.reload && me.ammo[me.w] <= Math.max(1, WEAPONS[me.w].mag * 0.2));
+  $('#ammoNum').textContent = MECH.on ? `🚀 ${MECH.ammo}/${MECH_AMMO}` : infL > 0 ? '∞' : me.reload ? 'รีโหลด…' : `${me.ammo[me.w]}/${me.res[me.w]}`; $('#ammoNum').classList.toggle('low', !me.reload && me.ammo[me.w] <= Math.max(1, WEAPONS[me.w].mag * 0.2));
   const left = Math.max(0, S.endsAt - hostNow());
   { const mine = S.players.find(p => p.id === myId), best = Math.max(0, ...S.players.filter(p => p.id !== myId).map(p => p.kills | 0)), tm = battle ? `${String(Math.floor(left / 60000)).padStart(2, '0')}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}` : 'READY';
     const html = `<span class="k me">${mine ? mine.kills | 0 : 0}</span><span class="tm">${tm}</span><span class="k en">${best}</span>`; if ($('#bTimer').innerHTML !== html) $('#bTimer').innerHTML = html; }
