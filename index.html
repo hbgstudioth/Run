@@ -339,6 +339,31 @@
   #mechPips { display: flex; gap: 3px; margin: 4px 0; } #mechPips i { flex: 1; height: 9px; background: rgba(255,255,255,.14); transform: skewX(-18deg); } #mechPips i.on { background: #39FF14; box-shadow: 0 0 6px #39FF14; } #mechFly { font-size: 11px; text-align: center; color: #b9f5a6; }
   @keyframes spBlink { 50% { opacity: .45; } } @keyframes spFloat { 50% { transform: translateY(-5px); } } @keyframes spPulse { 50% { box-shadow: 0 0 22px #39FF14; filter: brightness(1.25); } }
   @media (pointer: coarse) { #skillBtn em { display: none; } #skillBtn { bottom: 130px; } #mechHud { bottom: 110px; } }
+  #chat { position: fixed; left: 10px; top: 168px; width: min(320px, 62vw); z-index: 9; display: none; font-family: "Kanit", sans-serif; font-size: 13px; pointer-events: none; }
+  #chat.show { display: block; } #chatLog { max-height: 150px; overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
+  #chatLog div { align-self: flex-start; max-width: 100%; background: rgba(8,10,9,.62); color: #eef3ea; padding: 2px 8px; border-left: 2px solid #39FF14; border-radius: 2px; word-break: break-word; transition: opacity .6s; text-shadow: 0 1px 2px #000; }
+  #chatLog div.old { opacity: 0; } #chatLog b { color: #7be22b; font-weight: 600; } #chatLog b.me { color: #ffd23c; } #chatLog div.sys { border-left-color: #ffb020; color: #ffd9a0; font-style: italic; }
+  #chat.open { pointer-events: auto; } #chat.open #chatLog { overflow-y: auto; background: rgba(8,10,9,.5); padding: 4px; } #chat.open #chatLog div.old { opacity: 1; }
+  #chatForm { display: none; margin-top: 4px; gap: 4px; } #chat.open #chatForm { display: flex; }
+  #chatIn { flex: 1; min-width: 0; background: rgba(8,10,9,.9); border: 1px solid #39FF14; color: #fff; padding: 7px 9px; font: 14px "Kanit", sans-serif; outline: none; border-radius: 3px; } #chatForm button { background: #39FF14; color: #071006; border: 0; padding: 0 12px; font: 600 13px "Kanit", sans-serif; border-radius: 3px; cursor: pointer; }
+  #chatBtn, #exitBtn { position: fixed; right: 10px; width: 40px; height: 40px; border-radius: 4px; font-size: 17px; z-index: 9; display: none; border: 1px solid var(--line); background: rgba(13,15,19,.7); color: var(--txt); cursor: pointer; }
+  #chatBtn { top: 102px; } #exitBtn { top: 148px; color: #ff6a5a; border-color: rgba(255,90,70,.5); } #chatBtn.show, #exitBtn.show { display: block; }
+  #exitAsk { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.6); font-family: "Kanit", sans-serif; } #exitAsk.show { display: flex; }
+  #exitAsk .ea-box { background: #0d110e; border: 1px solid #39FF14; padding: 20px 22px; width: min(86vw, 340px); text-align: center; color: #eaffe2; box-shadow: 0 0 30px rgba(57,255,20,.3); } #exitAsk b { display: block; font: 700 22px "Oswald", sans-serif; letter-spacing: 2px; } #exitAsk span { display: block; font-size: 13px; color: #a9b8a4; margin: 8px 0 14px; }
+  #exitAsk button { font: 600 14px "Kanit", sans-serif; padding: 9px 16px; margin: 0 4px; border: 0; cursor: pointer; border-radius: 3px; } #exitYes { background: #ff4a3a; color: #fff; } #exitNo { background: #39FF14; color: #071006; }
+  #hsFx[data-k="kill"] .hs-txt, #hsFx[data-k="streak"] .hs-txt { font-size: clamp(40px, 9vw, 80px); text-shadow: 0 0 26px rgba(57,255,20,.85), 0 4px 14px #000; color: #eaffe2; }
+  #hsFx[data-k="streak"] .hs-txt { color: #ffe27a; text-shadow: 0 0 30px rgba(255,170,30,.9), 0 4px 14px #000; }
+  #hsFx[data-k="kill"] .slash { background: linear-gradient(90deg, transparent, #39FF14 20%, #fff 50%, #39FF14 80%, transparent); } #hsFx[data-k="streak"] .slash { background: linear-gradient(90deg, transparent, #ffb020 20%, #fff 50%, #ffb020 80%, transparent); }
+  #deathFx { position: fixed; inset: 0; z-index: 7; pointer-events: none; opacity: 0; text-align: center; font-family: "Oswald", sans-serif; }
+  #deathFx.play { animation: dfFade 2.6s ease-out both; } #deathFx .df-vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(120,0,0,0) 30%, rgba(150,0,0,.55) 75%, rgba(40,0,0,.9) 100%); }
+  #deathFx.play .df-vig { animation: dfVig .5s ease-out both; }
+  #deathFx .df-txt { position: absolute; left: 0; right: 0; top: 17%; font-size: clamp(64px, 16vw, 150px); font-weight: 800; font-style: italic; letter-spacing: .08em; color: #fff; text-shadow: -4px 0 #ff2d20, 4px 0 #20e0ff, 0 6px 24px #000; }
+  #deathFx.play .df-txt { animation: dfSlam .5s cubic-bezier(.2,1.6,.4,1) both, dfGlitch .18s steps(2) 4; }
+  #deathFx .df-sub { position: absolute; left: 0; right: 0; top: calc(17% + clamp(74px, 18vw, 170px)); font: 500 17px "Kanit", sans-serif; letter-spacing: .12em; color: #ffb4a8; text-shadow: 0 2px 6px #000; } #deathFx.play .df-sub { animation: rise .5s .3s both; }
+  body.im-dead #c { filter: grayscale(.85) contrast(1.1) brightness(.85); transition: filter .5s; }
+  @keyframes dfFade { 0% { opacity: 0; } 6% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } } @keyframes dfVig { 0% { background-color: rgba(255,40,30,.75); } 100% { background-color: transparent; } }
+  @keyframes dfSlam { 0% { transform: scale(3.2) rotate(-8deg); opacity: 0; } 100% { transform: scale(1) rotate(-4deg); opacity: 1; } } @keyframes dfGlitch { 0% { transform: translate(-6px, 2px) rotate(-4deg); } 50% { transform: translate(6px, -2px) rotate(-4deg) skewX(8deg); } 100% { transform: rotate(-4deg); } }
+  #charLoad { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 20; font: 500 13px "Kanit", sans-serif; color: #b9f5a6; background: rgba(8,12,9,.8); border: 1px solid rgba(57,255,20,.5); padding: 6px 14px; border-radius: 20px; pointer-events: none; animation: spBlink 1.2s ease-in-out infinite; } #charLoad.done { display: none; }
   #bToast { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); font-family: "Kanit", sans-serif; font-size: 16px; color: #fff; text-shadow: 0 2px 6px #000; opacity: 0; transition: opacity .3s; pointer-events: none; }
   #hpBox { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(10,12,15,.72); border: 1px solid var(--line); padding: 6px 14px; border-radius: 4px; pointer-events: none; }
   #hpBox .row2 { display: flex; align-items: center; gap: 10px; margin: 2px 0; }
@@ -407,6 +432,13 @@
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="chat"><div id="chatLog"></div><form id="chatForm"><input id="chatIn" maxlength="120" placeholder="พิมพ์ข้อความ…" autocomplete="off" enterkeyhint="send"><button type="submit">ส่ง</button></form></div>
+<button id="chatBtn" title="แชท (Enter)">💬</button>
+<button id="exitBtn" title="ออกจากเกม">⏻</button>
+<div id="exitAsk"><div class="ea-box"><b>ออกจากเกม?</b><span>คุณจะกลับไปหน้าแรก และผู้เล่นคนอื่นจะเห็นว่าคุณออกแล้ว</span><div><button id="exitYes">ออกจากเกม</button><button id="exitNo">เล่นต่อ</button></div></div></div>
+<div id="deathFx"><div class="df-vig"></div><div class="df-txt" data-t="K.O.">K.O.</div><div class="df-sub"></div></div>
+<div id="charLoad">กำลังโหลดโมเดลตัวละคร…</div>
+
 <div id="vignette"></div>
 <div id="grain"></div>
 <div id="ui">
@@ -466,7 +498,7 @@
         <div class="secT">วิธีเล่น</div>
         <div class="small" style="text-align:left;line-height:1.7">🏁 <b>วิ่งแข่ง</b> ตอบโจทย์ให้ถูกและไว ยิ่งไวยิ่งวิ่งไกล ถึงเส้นชัยก่อนชนะ<br>🎯 <b>ยิงปืน</b> WASD เดิน · Shift วิ่ง · Space กระโดด · C นั่ง · คลิกซ้ายยิง · คลิกขวาเล็ง · 1/2/3 เปลี่ยนปืน · ยิงได้ 15 ครั้งก่อนหรือคะแนนสูงสุดใน 3 นาทีชนะ</div>
         <div class="secT">เครดิต</div>
-        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>VIPER ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/sexy-necromancer-12221428cf0c4e9580d65d146e5f8798" style="color:#39FF14" target="_blank" rel="noopener">"Sexy Necromancer"</a> โดย <a href="https://sketchfab.com/jeraynor979" style="color:#39FF14" target="_blank" rel="noopener">jeraynor979</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน-ขาใหม่)<br>รถยนต์: <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" style="color:#39FF14" target="_blank" rel="noopener">"Car Concept"</a> — Khronos Group (ต้นแบบ public domain โดย Unity Fan) — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน เอาป้ายทะเบียนออก เปลี่ยนสี)<br>ภาพตึกขอบด่าน: จาก <a href="https://sketchfab.com/3d-models/postwar-city-exterior-scene-30b694d1a4074855a1116a15a0f75731" style="color:#39FF14" target="_blank" rel="noopener">"Postwar City - Exterior Scene"</a> โดย <a href="https://sketchfab.com/aurelien_martel" style="color:#39FF14" target="_blank" rel="noopener">Aurélien Martel</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ตัดภาพ facade มาใช้)<br>ของประกอบฉาก: Quaternius และ Brazil Lowpoly Props Kit (kayquer) — CC0<br>GHOUL และซอมบี้ NPC ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/giant-humanoid-zombie-bed2a788157242c9881cd980bfd55ddf" style="color:#39FF14" target="_blank" rel="noopener">"Giant humanoid zombie"</a> โดย <a href="https://sketchfab.com/shivaykaran1434" style="color:#39FF14" target="_blank" rel="noopener">shivaykaran1434</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน เพิ่มเสื้อผ้าขาด)<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen · <a href="https://sketchfab.com/3d-models/rpg-1ca29509b173431bad3927f604fc11a0" style="color:#39FF14" target="_blank" rel="noopener">"RPG"</a> โดย 3dmodelsmith — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)<br>ตู้คอนเทนเนอร์: <a href="https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5" style="color:#39FF14" target="_blank" rel="noopener">"Container Pack"</a> โดย drcrazzie — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้เฉพาะแบบไม่มีโลโก้ ปรับขนาด)<br>เรือสินค้า: <a href="https://sketchfab.com/3d-models/container-ship-aaa41cca946b4a08bc08cf692b7757be" style="color:#39FF14" target="_blank" rel="noopener">"Container Ship"</a> โดย RM02 — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ถอดตู้เดิมออก จัดตู้ใหม่ ปรับขนาด)<br>ย่านกรุงเทพ: <a href="https://sketchfab.com/3d-models/bangkok-cityscene-9db96447324d40569566222fccc9a926" style="color:#39FF14" target="_blank" rel="noopener">"Bangkok Cityscene"</a> โดย billycorveleyn — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้ของแต่งถนน: รถเข็น สามล้อ กระถางต้นไม้ จาน TV ถังน้ำ ฯลฯ · ลบโฆษณาที่มีแบรนด์/บุคคลจริง)<br>ตัวละคร MECHA / หุ่นรบ: <a href="https://sketchfab.com/3d-models/muv-luv-f16-tsf-wip-fb25fba3d6ff42a2a2920f52df328b1d" style="color:#39FF14" target="_blank" rel="noopener">"[Muv-Luv] F16-TSF WIP"</a> โดย EXcaliburK117 — Sketchfab Standard License (ผูกโครงกระดูก เปลี่ยนสีเป็นดำ-เขียว)<br>สนามกีฬา: <a href="https://sketchfab.com/3d-models/thanh-hoa-stadium-7215e81a92914f1a879f2970f0fb955d" style="color:#39FF14" target="_blank" rel="noopener">"Thanh Hoa Stadium"</a> โดย NGUYENNGHIAKK — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ปรับสัดส่วนให้เข้ากับลู่ ลดโพลิกอน เปลี่ยนป้ายโลโก้เป็นของเกม)<br>บอสมังกรแดง: <a href="https://sketchfab.com/3d-models/red-dragon-77e89ab9b88a444cb51339c2ed3959a3" style="color:#39FF14" target="_blank" rel="noopener">"Red Dragon"</a> โดย GadgetHamster — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ย่อเท็กซ์เจอร์ ปรับขนาด)<br>ตัวละคร DRAKE: <a href="https://sketchfab.com/3d-models/dragon-character-3d-by-oscar-creativo-7bad9ad76293430f8e5bb24cd499c53b" style="color:#39FF14" target="_blank" rel="noopener">"Dragon Character 3d"</a> โดย OSCAR CREATIVO — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ลดโพลิกอน จัดท่า ผูกโครงกระดูกเกม)<br>ตัวละคร/บอส INFERNO: <a href="https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295" style="color:#39FF14" target="_blank" rel="noopener">"Lava Monster horns"</a> โดย Its Aadi — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใส่โครงกระดูก ปรับขนาด)<br>บันได/ราวจับ: <a href="https://sketchfab.com/3d-models/stairs-railings-a419edddce534968937313dcff8429e7" style="color:#39FF14" target="_blank" rel="noopener">"Stairs &amp; Railings"</a> โดย ATD-London — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (แยกชิ้น ลดโพลิกอน ย้อมสีตามพื้นที่)<br>เมืองถล่ม: <a href="https://sketchfab.com/3d-models/ruined-city-free-5-4b0b0021d91442079a91b075576efe4e" style="color:#39FF14" target="_blank" rel="noopener">"Ruined city FREE (5)"</a> · พื้นผิวผนัง: <a href="https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2" style="color:#39FF14" target="_blank" rel="noopener">"abandoned city street for games"</a> โดย dasy444 — Sketchfab Standard License (ลดโพลิกอน ปรับขนาด)</div>
+        <div class="small" style="text-align:left;line-height:1.7">VANGUARD ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-confederate-soldier-0222bdc42b2e4b8e948bc527c56955c7" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Confederate Soldier"</a> และ TITAN ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/bulletstorm-heavy-echo-elite-shocktroopers-b6e4bae740f64a3eaec74825cc3594f1" style="color:#39FF14" target="_blank" rel="noopener">"Bulletstorm - Heavy Echo Elite Shocktroopers"</a> โดย <a href="https://sketchfab.com/Barcelo" style="color:#39FF14" target="_blank" rel="noopener">Barcelo</a> สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ห้ามใช้เชิงพาณิชย์) — ดัดแปลง: จัดท่าแขน ปรับขนาด ผูกโครงกระดูกใหม่ ลดขนาดเท็กซ์เจอร์<br>VIPER ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/sexy-necromancer-12221428cf0c4e9580d65d146e5f8798" style="color:#39FF14" target="_blank" rel="noopener">"Sexy Necromancer"</a> โดย <a href="https://sketchfab.com/jeraynor979" style="color:#39FF14" target="_blank" rel="noopener">jeraynor979</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน-ขาใหม่)<br>รถยนต์: <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" style="color:#39FF14" target="_blank" rel="noopener">"Car Concept"</a> — Khronos Group (ต้นแบบ public domain โดย Unity Fan) — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน เอาป้ายทะเบียนออก เปลี่ยนสี)<br>ภาพตึกขอบด่าน: จาก <a href="https://sketchfab.com/3d-models/postwar-city-exterior-scene-30b694d1a4074855a1116a15a0f75731" style="color:#39FF14" target="_blank" rel="noopener">"Postwar City - Exterior Scene"</a> โดย <a href="https://sketchfab.com/aurelien_martel" style="color:#39FF14" target="_blank" rel="noopener">Aurélien Martel</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ตัดภาพ facade มาใช้)<br>ของประกอบฉาก: Quaternius และ Brazil Lowpoly Props Kit (kayquer) — CC0<br>GHOUL และซอมบี้ NPC ดัดแปลงจาก <a href="https://sketchfab.com/3d-models/giant-humanoid-zombie-bed2a788157242c9881cd980bfd55ddf" style="color:#39FF14" target="_blank" rel="noopener">"Giant humanoid zombie"</a> โดย <a href="https://sketchfab.com/shivaykaran1434" style="color:#39FF14" target="_blank" rel="noopener">shivaykaran1434</a> — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ใส่โครงกระดูก จัดท่าแขน เพิ่มเสื้อผ้าขาด)<br>ปืน: <a href="https://sketchfab.com/3d-models/desert-eagle-gun-1605b6c38826433fb3fe564e1d043199" style="color:#39FF14" target="_blank" rel="noopener">"Desert Eagle Gun"</a> โดย attix84work · <a href="https://sketchfab.com/3d-models/gun-m4a1-d41a80aa5bc14742be249d2e8e7369b9" style="color:#39FF14" target="_blank" rel="noopener">"Gun M4A1"</a> โดย Ivan008 · <a href="https://sketchfab.com/3d-models/sniper-cdefd833b4b5407ba32c53c9e7f50cae" style="color:#39FF14" target="_blank" rel="noopener">"Sniper"</a> โดย DJMaesen · <a href="https://sketchfab.com/3d-models/rpg-1ca29509b173431bad3927f604fc11a0" style="color:#39FF14" target="_blank" rel="noopener">"RPG"</a> โดย 3dmodelsmith — สัญญาอนุญาต <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ดัดแปลง: ลดโพลิกอน ปรับขนาดและทิศ)<br>ตู้คอนเทนเนอร์: <a href="https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5" style="color:#39FF14" target="_blank" rel="noopener">"Container Pack"</a> โดย drcrazzie — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้เฉพาะแบบไม่มีโลโก้ ปรับขนาด)<br>เรือสินค้า: <a href="https://sketchfab.com/3d-models/container-ship-aaa41cca946b4a08bc08cf692b7757be" style="color:#39FF14" target="_blank" rel="noopener">"Container Ship"</a> โดย RM02 — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ถอดตู้เดิมออก จัดตู้ใหม่ ปรับขนาด)<br>ย่านกรุงเทพ: <a href="https://sketchfab.com/3d-models/bangkok-cityscene-9db96447324d40569566222fccc9a926" style="color:#39FF14" target="_blank" rel="noopener">"Bangkok Cityscene"</a> โดย billycorveleyn — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใช้ของแต่งถนน: รถเข็น สามล้อ กระถางต้นไม้ จาน TV ถังน้ำ ฯลฯ · ลบโฆษณาที่มีแบรนด์/บุคคลจริง)<br>ตัวละคร MECHA / หุ่นรบ: <a href="https://sketchfab.com/3d-models/muv-luv-f16-tsf-wip-fb25fba3d6ff42a2a2920f52df328b1d" style="color:#39FF14" target="_blank" rel="noopener">"[Muv-Luv] F16-TSF WIP"</a> โดย EXcaliburK117 — Sketchfab Standard License (ผูกโครงกระดูก เปลี่ยนสีเป็นดำ-เขียว)<br>รถไฟฟ้า: <a href="https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC" style="color:#39FF14" target="_blank" rel="noopener">"superconductor train concept WIP"</a> โดย 3DHaupt — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ดัดแปลง: ตัดเป็นตู้ ปรับสัดส่วน เจาะช่องประตู ลงสีลายรถไฟฟ้า)<br>สนามกีฬา: <a href="https://sketchfab.com/3d-models/thanh-hoa-stadium-7215e81a92914f1a879f2970f0fb955d" style="color:#39FF14" target="_blank" rel="noopener">"Thanh Hoa Stadium"</a> โดย NGUYENNGHIAKK — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ปรับสัดส่วนให้เข้ากับลู่ ลดโพลิกอน เปลี่ยนป้ายโลโก้เป็นของเกม)<br>บอสมังกรแดง: <a href="https://sketchfab.com/3d-models/red-dragon-77e89ab9b88a444cb51339c2ed3959a3" style="color:#39FF14" target="_blank" rel="noopener">"Red Dragon"</a> โดย GadgetHamster — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ย่อเท็กซ์เจอร์ ปรับขนาด)<br>ตัวละคร DRAKE: <a href="https://sketchfab.com/3d-models/dragon-character-3d-by-oscar-creativo-7bad9ad76293430f8e5bb24cd499c53b" style="color:#39FF14" target="_blank" rel="noopener">"Dragon Character 3d"</a> โดย OSCAR CREATIVO — <a href="https://creativecommons.org/licenses/by-nc/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ไม่ใช้เชิงพาณิชย์ · ลดโพลิกอน จัดท่า ผูกโครงกระดูกเกม)<br>ตัวละคร/บอส INFERNO: <a href="https://sketchfab.com/3d-models/lava-monster-horns-be8049b33e1441bba654c0c9e5583295" style="color:#39FF14" target="_blank" rel="noopener">"Lava Monster horns"</a> โดย Its Aadi — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (ใส่โครงกระดูก ปรับขนาด)<br>บันได/ราวจับ: <a href="https://sketchfab.com/3d-models/stairs-railings-a419edddce534968937313dcff8429e7" style="color:#39FF14" target="_blank" rel="noopener">"Stairs &amp; Railings"</a> โดย ATD-London — <a href="https://creativecommons.org/licenses/by/4.0/" style="color:#39FF14" target="_blank" rel="noopener">CC BY 4.0</a> (แยกชิ้น ลดโพลิกอน ย้อมสีตามพื้นที่)<br>เมืองถล่ม: <a href="https://sketchfab.com/3d-models/ruined-city-free-5-4b0b0021d91442079a91b075576efe4e" style="color:#39FF14" target="_blank" rel="noopener">"Ruined city FREE (5)"</a> · พื้นผิวผนัง: <a href="https://sketchfab.com/3d-models/abandoned-city-street-for-games-0232bce6a27d477c947b6ef4e985fff2" style="color:#39FF14" target="_blank" rel="noopener">"abandoned city street for games"</a> โดย dasy444 — Sketchfab Standard License (ลดโพลิกอน ปรับขนาด)</div>
       </div>
     </div>
   </section>
@@ -1521,7 +1553,8 @@ function buildSciFi() {
   const winTex = (acc) => { const t = canvasTex(64, 256, (x) => { x.fillStyle = '#0a1018'; x.fillRect(0, 0, 64, 256); for (let r = 0; r < 42; r++) for (let c = 0; c < 6; c++) { const q = R(); x.fillStyle = q < 0.32 ? '#a9dcff' : q < 0.38 ? acc : q < 0.45 ? '#ffd9a0' : '#101824'; x.fillRect(3 + c * 10, 3 + r * 6, 7, 3); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
   const wins = [winTex('#39ff14'), winTex('#7fe9ff'), winTex('#c0c0c0')].map(t => { const m = new THREE.MeshStandardMaterial({ map: t, emissiveMap: t, emissive: '#ffffff', emissiveIntensity: 0, metalness: 0.6, roughness: 0.25, color: '#9aa6b4' }); world.nightMats.push({ m, on: 1.1 }); return m; });
   const blinkM = em('#ff3b30', 3);
-  for (let i = 0; i < 90; i++) {
+  ringModel(g, 'models/ruin.glb', [[112, -0.3, -40, 0, 1], [-112, -0.3, -40, Math.PI, 1], [0, -0.3, -152, -Math.PI / 2, 1], [150, -0.3, -190, -Math.PI / 2, 1], [-150, -0.3, -190, -Math.PI / 2, 1]]); // ฉากหลังหน้าแรก: ตึกเมืองรอบนอกของด่านซอมบี้
+  for (let i = 0; i < 0; i++) {
     const a = R() * Math.PI * 2, d = 55 + Math.pow(R(), 0.7) * 230, x = Math.sin(a) * d, z = Math.cos(a) * d - 40;
     if (z > 10 && Math.abs(x) < 70) continue; // เว้นด้านหน้ากล้อง
     const h = 30 + R() * (d > 140 ? 170 : 90), w = 8 + R() * 14, sides = [4, 6, 8][(R() * 3) | 0], top = w * (0.35 + R() * 0.6);
@@ -1783,11 +1816,8 @@ function loadContainers(ld) {
   }).catch(e => console.warn('containers', e));
 }
 function loadTrain(ld) {
-  return ld.loadAsync('models/train.glb').then(gl => {
-    if (!world.train) return; const m = gl.scene;
-    m.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; o.userData.keep = true; if (o.material.name === 'glass') { o.material.transparent = true; o.material.opacity = 0.42; o.material.depthWrite = false; } } });
-    world.train.add(m);
-  }).catch(e => console.warn('train', e));
+  const prep = (gl) => { gl.scene.traverse(o => { o.userData.keep = true; if (o.isMesh) { o.castShadow = o.receiveShadow = true; o.material.side = THREE.DoubleSide; if (o.material.name === 'glass') { o.material.transparent = true; o.material.opacity = 0.42; o.material.depthWrite = false; o.castShadow = false; } } }); return gl.scene; };
+  return Promise.all([ld.loadAsync('models/train_car.glb'), ld.loadAsync('models/train_nose.glb')]).then(([a, b]) => { TRN.mdl = { car: prep(a), nose: prep(b) }; trainSkin(); }).catch(e => console.warn('train', e));
 }
 function loadShip(ld) {
   return ld.loadAsync('models/ship.glb').then(gl => { if (!world.shipG) return; gl.scene.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; o.userData.keep = true; } }); world.shipG.add(gl.scene); }).catch(e => console.warn('ship', e));
@@ -2165,6 +2195,7 @@ function attachHero(r, kind) {
     bone(r.hands[0]), bone(F0[0] || r.hands[0]), bone(r.hands[1]), bone(F1[0] || r.hands[1]), bone(F1[1] || F1[0] || r.hands[1])];
   r.root.updateMatrixWorld(true);
   const skel = new THREE.Skeleton(bones), meshes = K.prims.map(p => { const m = new THREE.SkinnedMesh(p.geo, p.mat); m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); return m; });
+  if (r.outfit === 'sport') try { heroJersey(r, K, J, skel); } catch (e) { console.warn('jersey', e); }
   r.att = { body: r.body, head: r.head, knees: r.knees, elbows: r.elbows, hand: r.hands[0] };
   r.girl = { meshes, base: meshes, skel, hero: kind };
   const CC = r.clothCol || { Pants: '#3b4252', Shirt: '#6b5e4a' };
@@ -2319,7 +2350,7 @@ const SKIN_TINT = ['#3f4542', '#c9cfd5', '#6a8550', '#242628'];
 const BN = n => ['mixamorig' + n, 'mixamorig:' + n];
 function loadChars() {
   const ld = new GLTFLoader(), got = {};
-  Promise.all([loadGuns(ld), loadProps(ld), loadContainers(ld), loadShip(ld), loadBkk(ld), loadApt(ld), loadStairKit(ld), loadStadium(ld), loadZProps(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
+  Promise.all([loadGuns(ld), loadProps(ld), loadContainers(ld), loadTrain(ld), loadShip(ld), loadBkk(ld), loadApt(ld), loadStairKit(ld), loadStadium(ld), loadZProps(ld), ...Object.entries(CH_FILES).map(([k, u]) => ld.loadAsync(u).then(g => { got[k] = g; }).catch(e => console.warn('model', k, e)))]).then(() => {
     const base = got.xbot || got.soldier;
     for (const [k, g] of Object.entries(got)) {
       if (HERO_J[k]) { CHAR.kinds[k] = { hero: true, prims: heroPrep(g.scene, k === 'cc' || k === 'cz' || k === 'czn' || k === 'cl' || k === 'cd' || k === 'cm' ? 1.0 : 1.45) }; if (k === 'cc' || k === 'cd' || k === 'cm') CHAR.kinds[k].prims.forEach(p => { p.mat.side = THREE.DoubleSide; }); continue; }
@@ -2339,7 +2370,7 @@ function loadChars() {
           grayMap = new THREE.CanvasTexture(cv); grayMap.flipY = o.material.map.flipY; grayMap.colorSpace = THREE.SRGBColorSpace; grayMap.wrapS = o.material.map.wrapS; grayMap.wrapT = o.material.map.wrapT; } catch (e) { console.warn('gray', e); } });
       CHAR.kinds[k] = { grayMap, scene: g.scene, scale: 2.62 / (h || 1.8), clips: map, yaw: la < ra ? Math.PI : 0, proc: k === 'michelle' };
     }
-    CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (CHAR.ready) onCharsReady();
+    CHAR.ready = Object.keys(CHAR.kinds).length > 0; if (!CHAR.ready) CHAR.failed = true; onCharsReady();
   });
 }
 function charKind(lookIdx, outfit) { const hk = FORCE_KIND || ['ca', 'cc', 'cz', 'cb', 'cl', 'cd', 'cm'][lookIdx % LOOKS.length]; if (CHAR.kinds[hk]) return hk; if (FEMALE.has(lookIdx % LOOKS.length) && CHAR.kinds.girl) return 'girl'; const need = outfit === 'sport' ? 'xbot' : 'soldier'; return CHAR.kinds[need] ? need : (CHAR.kinds.soldier ? 'soldier' : null); }
@@ -2460,6 +2491,7 @@ function glbTick(r, dt, anim, o = {}) {
   if (o.aim != null && B.Head && !o.dead) { B.Head.rotation.x -= p * 0.4; B.Head.updateMatrixWorld(true); }
 }
 function onCharsReady() {
+  try { const cl = $('#charLoad'); if (cl) cl.classList.add('done'); } catch {}
   try {
     THUMBS.tac = []; THUMBS.sport = []; buildThumbs(); buildLookPicker(); lbChip();
     demo.forEach(d => removeRunner(d)); buildDemo(); showcaseLook(myLook);
@@ -2567,6 +2599,7 @@ function makeRunner(lookIdx, name, isMe, parent = scene, outfit = 'tac', skin = 
   if (name) for (let k = 0; k < 14; k++) { const m = new THREE.Mesh(G.spark, new THREE.MeshBasicMaterial({ color: lk.glow, transparent: true, opacity: 0, depthWrite: false })); m.visible = false; parent.add(m); aura.push({ m, life: 0, vy: 0 }); }
   const R0 = { tagSp, outfit, skin: skin | 0, root, body, legs, arms, knees, elbows, head, cape: null, scarf: null, aura, auraT: 0, phase: Math.random() * 6, u: 0, speed: 0, look: lookIdx, name, isMe };
   if (FORCE_CLOTH) R0.clothCol = FORCE_CLOTH;
+  if (!CHAR.ready && !CHAR.failed) body.visible = false; // ยังโหลดโมเดลไม่เสร็จ: ไม่โชว์หุ่นปั้นสำรอง รอแสดงโมเดลจริง
   if (CHAR.ready) { const kd = charKind(lookIdx, outfit); if (kd) try { attachGLB(R0, kd, lookIdx, outfit, SK, lk); } catch (e) { console.warn('glb', e); } }
   return R0;
 }
@@ -3573,7 +3606,8 @@ function handleAction(a) {
   H.dirty = true;
 }
 function removePlayer(id) {
-  seen.delete(id); if (!H.players.delete(id)) return;
+  const gone = H.players.get(id); seen.delete(id); if (!H.players.delete(id)) return;
+  if (gone && !H.bots.has(id)) try { pub('fx', ['#x', gone.name]); } catch {}
   H.answers.delete(id);
   if (H.state === 'question' && H.players.size && H.answers.size >= H.players.size) { clearTimers(); later(endQuestion, 300); }
   H.bots.delete(id);
@@ -3660,7 +3694,7 @@ const GH_N = 10, GH_HP = 100, GH_BITE = 50, GH_RUN = 8.0, BOSS_HP = 390, BOSS_SP
 H.mobs = []; H.bossAt = []; H.fbs = [];
 const groundSpots = () => playSpots(2).filter(s => !s.y);
 function mobsInit() {
-  H.mobs = []; H.fbs = []; H.bossAt = H.map >= 1 && H.map <= 3 ? [60000, 120000] : []; if (H.map !== 2) return;
+  H.mobs = []; H.fbs = []; H.bossAt = H.map >= 1 && H.map <= 4 ? [60000, 120000] : []; if (H.map !== 2) return;
   const sp = groundSpots();
   for (let i = 0; i < GH_N; i++) { const s = sp[(Math.random() * sp.length) | 0]; H.mobs.push({ k: 0, x: s.x, z: s.z, yaw: Math.random() * 6.28, hp: GH_HP, st: 0, tx: s.x, tz: s.z, wait: Math.random() * 2, sp: 0.7 + Math.random() * 0.5, tg: null, t0: 0 }); }
 }
@@ -3704,7 +3738,7 @@ function ghoulTick(m, now, dt) {
 }
 function spawnBoss(now) {
   if (H.map === 3) { H.mobs.push({ k: 2, x: 0, z: 0, yaw: 0, hp: BOSS_HP, st: 6, t0: now, next: now + BOSS_RISE + 1500, tg: null }); mobEvent(['p', 0, 0, 2]); return; }
-  const K = H.map === 1 ? 3 : 1; let x = K === 3 ? 2.5 : 0, z = 0; for (let k = 0; k < 40 && insideAny(x, z, 3, H.map, 0); k++) { x = (Math.random() - .5) * 14; z = (Math.random() - .5) * 14; }
+  const K = H.map === 1 ? 3 : H.map === 4 ? 4 : 1; let x = K === 3 ? 2.5 : 0, z = 0; for (let k = 0; k < 40 && insideAny(x, z, 3, H.map, 0); k++) { x = (Math.random() - .5) * 14; z = (Math.random() - .5) * 14; }
   H.mobs.push({ k: K, x, z, yaw: 0, hp: BOSS_HP, st: 6, t0: now, next: now + BOSS_RISE + 1500, tg: null });
   mobEvent(['p', +x.toFixed(1), +z.toFixed(1), K]);
 }
@@ -3715,11 +3749,11 @@ function bossTick(m, now, dt) {
   for (const [id, p] of H.players) { if (!p.alive) continue; const ps = posOf(id); if (!ps) continue; alive.push(id); const d = bdist(m, ps); if (d < bd) { bd = d; best = ps; bid = id; } }
   if (m.st === 4) {
     const tp = mobTarget(m.tg) || best; if (tp) turnTo(m, Math.atan2(tp.x - m.x, tp.z - m.z), dt * 8);
-    if (now >= m.t0 + (m.k === 3 ? TT_CHARGE : BOSS_CHARGE)) {
+    if (now >= m.t0 + (m.k === 3 ? TT_CHARGE : m.k === 4 ? ST_CHARGE : BOSS_CHARGE)) {
       if (tp) {
         const a = new THREE.Vector3(m.x + Math.sin(m.yaw) * 2.0, m.k === 3 ? 6.2 : 9.2, m.z + Math.cos(m.yaw) * 2.0), b = new THREE.Vector3(tp.x, (tp.y || 0) + 1.2, tp.z);
-        const d = b.clone().sub(a), L = d.length(); d.normalize(); const h = rayCast(a, d, L, null, 0.2, true), e = a.clone().addScaledVector(d, Math.min(L, h.t)), fl = Math.round(a.distanceTo(e) / FB_V * 1000);
-        H.fbs.push(m.k === 3 ? { at: now + fl, p: e, dmg: TT_DMG, who: 'ไททันกรด' } : { at: now + fl, p: e }); mobEvent(['f', +a.x.toFixed(2), +a.y.toFixed(2), +a.z.toFixed(2), +e.x.toFixed(2), +e.y.toFixed(2), +e.z.toFixed(2), fl, m.k]);
+        const d = b.clone().sub(a), L = d.length(); d.normalize(); const h = rayCast(a, d, L, null, 0.2, true), e = a.clone().addScaledVector(d, Math.min(L, h.t)), fl = m.k === 4 ? 120 : Math.round(a.distanceTo(e) / FB_V * 1000);
+        H.fbs.push(m.k === 3 ? { at: now + fl, p: e, dmg: TT_DMG, who: 'ไททันกรด' } : m.k === 4 ? { at: now + fl, p: e, dmg: ST_DMG, who: 'เดรคสายฟ้า', R: ST_R } : { at: now + fl, p: e }); mobEvent(['f', +a.x.toFixed(2), +a.y.toFixed(2), +a.z.toFixed(2), +e.x.toFixed(2), +e.y.toFixed(2), +e.z.toFixed(2), fl, m.k]);
       }
       m.st = 5; m.t0 = now;
     }
@@ -3727,18 +3761,18 @@ function bossTick(m, now, dt) {
   }
   if (m.st === 5) { if (now >= m.t0 + 650) m.st = 0; return; }
   m.st = 0;
-  if (best && now >= m.next) { m.tg = Math.random() < 0.5 ? bid : alive[(Math.random() * alive.length) | 0]; m.st = 4; m.t0 = now; m.next = now + (m.k === 3 ? TT_CD : BOSS_CD); return; }
+  if (best && now >= m.next) { m.tg = Math.random() < 0.5 ? bid : alive[(Math.random() * alive.length) | 0]; m.st = 4; m.t0 = now; m.next = now + (m.k === 3 ? TT_CD : m.k === 4 ? ST_CD : BOSS_CD); return; }
   if (best) {
     const dx = best.x - m.x, dz = best.z - m.z, d = Math.hypot(dx, dz) || 1; turnTo(m, Math.atan2(dx, dz), dt * 3);
     if (d > 7) { const r = moveCollide(m.x, m.z, m.x + dx / d * BOSS_SP * dt, m.z + dz / d * BOSS_SP * dt, 0); m.x = r.x; m.z = r.z; }
   }
 }
 function mobTick(now) {
-  if (!(H.map >= 1 && H.map <= 3) || H.state !== 'battle') return; const dt = 0.1;
+  if (!(H.map >= 1 && H.map <= 4) || H.state !== 'battle') return; const dt = 0.1;
   const el = BATTLE_TIME - (H.endsAt - now); while (H.bossAt.length && el >= H.bossAt[0]) { H.bossAt.shift(); spawnBoss(now); }
   for (const m of H.mobs) m.k === 2 ? dragonTick(m, now, dt) : m.k ? bossTick(m, now, dt) : ghoulTick(m, now, dt);
   for (let i = H.fbs.length - 1; i >= 0; i--) { const f = H.fbs[i]; if (now < f.at) continue; H.fbs.splice(i, 1);
-    for (const [id, p] of H.players) { if (!p.alive) continue; const ps = posOf(id); if (!ps) continue; const c = new THREE.Vector3(ps.x, (ps.y || 0) + 1.3, ps.z), d = c.distanceTo(f.p); if (d > FB_R) continue;
+    for (const [id, p] of H.players) { if (!p.alive) continue; const ps = posOf(id); if (!ps) continue; const c = new THREE.Vector3(ps.x, (ps.y || 0) + 1.3, ps.z), d = c.distanceTo(f.p); if (d > (f.R || FB_R)) continue;
       if (d > 1.2) { const dir = c.clone().sub(f.p).normalize(), h = rayCast(f.p.clone().addScaledVector(dir, 0.15), dir, d, null, 0, true); if (h.t < d - 0.5) continue; }
       mobHurt(id, f.dmg || 9999, f.who || 'INFERNO'); } }
   const arr = ['#m', ...H.mobs.map(m => [m.k, +m.x.toFixed(2), +m.z.toFixed(2), +m.yaw.toFixed(2), Math.max(0, m.hp | 0), m.st])];
@@ -3750,7 +3784,7 @@ function mobHit(a, p) {
   m.hp -= dmg;
   if (!m.k) { m.tg = a.id; m.lose = Date.now() + 7000; if (m.st === 0) m.st = 1; }
   if (m.hp <= 0) { m.hp = 0; m.st = 3; m.t0 = Date.now() + 20000; mobEvent(['d', i, m.k]); if (m.k) mobEvent(['s', a.id, p.name]);
-    if (m.k) { H.feed.push({ k: p.name, v: m.k === 2 ? 'บอสมังกรแดง' : m.k === 3 ? 'บอสไททันกรด' : 'บอส INFERNO', w, t: Date.now(), kid: a.id, vid: null, hs: false }); if (H.feed.length > 5) H.feed.shift(); H.dirty = true; } }
+    if (m.k) { H.feed.push({ k: p.name, v: m.k === 2 ? 'บอสมังกรแดง' : m.k === 3 ? 'บอสไททันกรด' : m.k === 4 ? 'บอสเดรคสายฟ้า' : 'บอส INFERNO', w, t: Date.now(), kid: a.id, vid: null, hs: false }); if (H.feed.length > 5) H.feed.shift(); H.dirty = true; } }
 }
 /* ---------- บอสไททันกรด (ด่านกรุงเทพ): ซอมบี้ยักษ์สีแดงเลือดลายกล้ามเนื้อ · พ่นน้ำกรดสีเขียว ทุก 3 วินาที ---------- */
 const TT_CD = 3000, TT_CHARGE = 900, TT_DMG = 60;
@@ -3778,6 +3812,46 @@ function acidSplash(p) { // น้ำกรดแตกกระจาย
   for (let i = 0; i < 16; i++) { const a = Math.random() * 6.28, s = 3 + Math.random() * 7; addPart('fire', p.clone(), new THREE.Vector3(Math.cos(a) * s, 2 + Math.random() * 6, Math.sin(a) * s), 0.7, 1.8, 0.5 + Math.random() * 0.4, true, 0.9); tint('#8dff3a'); }
   for (let i = 0; i < 9; i++) { const a = Math.random() * 6.28; addPart('smoke', p.clone().add(new THREE.Vector3(Math.cos(a) * 1.5, 0.2, Math.sin(a) * 1.5)), new THREE.Vector3(Math.cos(a) * 1.5, 1.2 + Math.random() * 1.5, Math.sin(a) * 1.5), 1.5, 4.5, 1.6 + Math.random(), false, 0.5); tint('#7fd04a'); }
   if (Math.hypot(p.x - me.x, p.z - me.z) < 12) me.shake = Math.max(me.shake || 0, 0.35);
+}
+/* ---------- บอสเดรคสายฟ้า (ด่านท่าเรือ): ตัวละคร DRAKE สีดำเทา · ปล่อยสายฟ้าช็อตผู้เล่น ทุก 3 วินาที ---------- */
+const ST_CD = 3000, ST_CHARGE = 900, ST_DMG = 60, ST_R = 2.8;
+function stormTex(src) {
+  try { const im = src.image, w = Math.min(1024, im.width || 512), h = Math.min(1024, im.height || 512);
+    const t = canvasTex(w, h, (x) => { x.drawImage(im, 0, 0, w, h); const d = x.getImageData(0, 0, w, h), p = d.data;
+      for (let i = 0; i < p.length; i += 4) { const l = (p[i] * 0.3 + p[i + 1] * 0.59 + p[i + 2] * 0.11), g = Math.pow(l / 255, 1.15) * 150 + 8; p[i] = g * 0.94; p[i + 1] = g * 0.97; p[i + 2] = g * 1.06; } x.putImageData(d, 0, 0); });
+    t.flipY = src.flipY; t.wrapS = src.wrapS; t.wrapT = src.wrapT; t.colorSpace = src.colorSpace; t.needsUpdate = true; return t;
+  } catch (e) { return src; }
+}
+function stormRig(n) {
+  MOB.stR = MOB.stR || []; if (MOB.stR[n]) return MOB.stR[n]; if (!CHAR.kinds.cd) return null;
+  FORCE_KIND = 'cd'; let r = null; try { r = makeRunner(5, null, false, scene); } catch (e) { console.warn('storm', e); } FORCE_KIND = null; if (!r) return null;
+  r.root.rotation.order = 'YXZ'; r.root.userData.noCrop = true; const tex = new Map();
+  r.root.traverse(o => { o.frustumCulled = false; if (!o.isMesh || !o.material || !o.visible) return; const m = o.material = o.material.clone(); if (m.map) { if (!tex.has(m.map)) tex.set(m.map, stormTex(m.map)); m.map = tex.get(m.map); } else m.color.set('#3a3d42'); if (m.emissiveMap) m.emissiveMap = null; if (m.emissive) { m.emissive.set('#0c1622'); m.emissiveIntensity = 0.7; } });
+  const orb = rpgSprite('glow', true); orb.material.color.set('#bfe6ff'); orb.visible = false; const oL = rpgSprite('glow', true); oL.material.color.set('#4aa8ff'); oL.visible = false;
+  return (MOB.stR[n] = { r, L: { intensity: 0 }, orb, oL, em: 0, warm: 0 });
+}
+function boltPath(a, b, n, amp) { const pts = [a.clone()]; for (let i = 1; i < n; i++) { const p = a.clone().lerp(b, i / n); p.x += (Math.random() - .5) * amp; p.y += (Math.random() - .5) * amp; p.z += (Math.random() - .5) * amp; pts.push(p); } pts.push(b.clone()); return pts; }
+function boltFx(a, b) { // สายฟ้าฟาดจากมือบอสถึงเป้า (กิ่งหลัก + กิ่งย่อย กะพริบสั้น ๆ)
+  MOB.bolts = MOB.bolts || []; const g = new THREE.Group(); g.userData.noCrop = true; scene.add(g);
+  const core = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, toneMapped: false, depthWrite: false }), halo = new THREE.MeshBasicMaterial({ color: '#58b4ff', transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, toneMapped: false, depthWrite: false });
+  const geo = MOB.boltGeo || (MOB.boltGeo = new THREE.CylinderGeometry(1, 1, 1, 5, 1, true)), segs = [];
+  const mk = (rad, m) => { const o = new THREE.Mesh(geo, m); o.userData.rad = rad; o.frustumCulled = false; g.add(o); return o; };
+  for (let i = 0; i < 12; i++) segs.push([mk(0.09, core), mk(0.42, halo)]); const br = []; for (let i = 0; i < 6; i++) br.push(mk(0.05, core));
+  const B = { g, a: a.clone(), b: b.clone(), segs, br, t: 0, re: 0, core, halo }; MOB.bolts.push(B);
+  const v = mobVol(b.x, b.z, 110); if (v > 0.02) { Music.mob('throw', Math.max(0.3, v)); Music.sfx('hit'); }
+  addPart('glow', b.clone(), new THREE.Vector3(0, 0.5, 0), 3, 10, 0.4, true, 0.9); RPG.parts[RPG.parts.length - 1].s.material.color.set('#8fd0ff');
+  for (let i = 0; i < 14; i++) { const d = new THREE.Vector3(Math.random() - .5, Math.random() * 0.8, Math.random() - .5).normalize().multiplyScalar(6 + Math.random() * 9); addPart('fire', b.clone(), d, 0.5, 0.15, 0.3 + Math.random() * 0.3, true, 1); RPG.parts[RPG.parts.length - 1].s.material.color.set('#bfe6ff'); }
+  if (Math.hypot(b.x - me.x, b.z - me.z) < 14) { me.shake = Math.max(me.shake || 0, 0.5); me.flash = Math.max(me.flash || 0, 0.25); }
+}
+const _bu = new THREE.Vector3(0, 1, 0), _bd = new THREE.Vector3();
+function boltSeg(o, p, q) { _bd.subVectors(q, p); const L = _bd.length() || 0.001; o.position.copy(p).addScaledVector(_bd, 0.5); o.quaternion.setFromUnitVectors(_bu, _bd.multiplyScalar(1 / L)); o.scale.set(o.userData.rad, L, o.userData.rad); }
+function boltTick(dt) {
+  const L = MOB.bolts; if (!L) return;
+  for (let i = L.length - 1; i >= 0; i--) { const B = L[i]; B.t += dt; B.re -= dt; const T = 0.42;
+    if (B.re <= 0) { B.re = 0.05; const pts = boltPath(B.a, B.b, 12, Math.min(2.2, B.a.distanceTo(B.b) * 0.08)); B.segs.forEach((s, k) => { boltSeg(s[0], pts[k], pts[k + 1]); boltSeg(s[1], pts[k], pts[k + 1]); });
+      B.br.forEach((o, k) => { const p = pts[2 + k * 2 % 10], q = p.clone().add(new THREE.Vector3((Math.random() - .5) * 5, (Math.random() - .7) * 4, (Math.random() - .5) * 5)); boltSeg(o, p, q); }); }
+    const f = Math.max(0, 1 - B.t / T) * (0.6 + Math.random() * 0.4); B.core.opacity = f; B.halo.opacity = 0.5 * f;
+    if (B.t >= T) { scene.remove(B.g); L.splice(i, 1); } }
 }
 /* ---------- บอสมังกรแดง (ด่านเมืองยามเย็น): ออกจากประตูมิติกลางแผนที่ · บินได้ (ช้ากว่าคนเดิน 2 เท่า) · พ่นไฟ ทุก 3 วินาที ---------- */
 const DR_ALT = 11, DR_SP = 7 / 2, DR_CD = 3000, DR_CHARGE = 900, DR_K = 3.6, DR_R = 3.2;
@@ -3840,7 +3914,7 @@ function breathTick(dt) {
     if (B.t > 1.3) MOB.breaths.splice(i, 1); }
 }
 // ===== ฝั่งผู้เล่น (แสดงผล) =====
-const mobsActive = () => S && S.map >= 1 && S.map <= 3 && S.mode === 'shoot' && performance.now() - MOB.seen < 4000;
+const mobsActive = () => S && S.map >= 1 && S.map <= 4 && S.mode === 'shoot' && performance.now() - MOB.seen < 4000;
 function onMobs(a) {
   MOB.seen = performance.now(); MOB.wasOn = true; const n = a.length - 1;
   for (let i = 0; i < n; i++) { const [k, x, z, yaw, hp, st] = a[i + 1]; let m = MOB.list[i];
@@ -3858,11 +3932,12 @@ function mobStateFx(m, was) {
 function onMobEvent(a) {
   const k = a[1];
   if (k === 's') { if (a[2] === myId) mechGrant(); else toast(`⚡ ${a[3]} ได้รับสกิล MECHA DRIVE`); }
-  else if (k === 'p') openPortal(+a[2], +a[3], a[4] === 2 ? 'มังกรแดง' : a[4] === 3 ? 'ไททันกรด' : 'INFERNO');
+  else if (k === 'p') openPortal(+a[2], +a[3], a[4] === 2 ? 'มังกรแดง' : a[4] === 3 ? 'ไททันกรด' : a[4] === 4 ? 'เดรคสายฟ้า' : 'INFERNO');
   else if (k === 'r') { const b = new THREE.Vector3(+a[3], +a[4], +a[5]), m = MOB.list[a[2] | 0]; (MOB.breaths = MOB.breaths || []).push({ i: a[2] | 0, b, a: new THREE.Vector3(m ? m.rx : b.x, DR_ALT, m ? m.rz : b.z), t: 0 }); Music.mob('breath', Math.max(0.3, mobVol(b.x, b.z, 120))); }
+  else if (k === 'f' && a[9] === 4) boltFx(new THREE.Vector3(+a[2], +a[3], +a[4]), new THREE.Vector3(+a[5], +a[6], +a[7]));
   else if (k === 'f') throwBall(new THREE.Vector3(+a[2], +a[3], +a[4]), new THREE.Vector3(+a[5], +a[6], +a[7]), (+a[8] || 300) / 1000, a[9] === 3);
   else if (k === 'b') { Music.mob('bite', Math.max(a[4] === myId ? 1 : 0, mobVol(+a[2], +a[3], 30))); if (a[4] === myId) { me.shake = Math.max(me.shake || 0, 0.7); me.flash = Math.max(me.flash || 0, 0.5); } }
-  else if (k === 'd') { const m = MOB.list[a[2] | 0]; if (!m) return; if (a[3]) { const hy = a[3] === 2 ? DR_ALT : 3, p = new THREE.Vector3(m.rx, hy, m.rz); explode(p, null); setTimeout(() => explode(new THREE.Vector3(m.rx + 1.5, hy + 3, m.rz - 1.5), null), 350); Music.mob('roar', 0.9); toast(a[3] === 2 ? '☠ บอสมังกรแดงถูกกำจัด!' : a[3] === 3 ? '☠ บอสไททันกรดถูกกำจัด!' : '☠ บอส INFERNO ถูกกำจัด!'); } else Music.mob('die', mobVol(m.rx, m.rz, 40)); }
+  else if (k === 'd') { const m = MOB.list[a[2] | 0]; if (!m) return; if (a[3]) { const hy = a[3] === 2 ? DR_ALT : 3, p = new THREE.Vector3(m.rx, hy, m.rz); explode(p, null); setTimeout(() => explode(new THREE.Vector3(m.rx + 1.5, hy + 3, m.rz - 1.5), null), 350); Music.mob('roar', 0.9); toast(a[3] === 2 ? '☠ บอสมังกรแดงถูกกำจัด!' : a[3] === 3 ? '☠ บอสไททันกรดถูกกำจัด!' : a[3] === 4 ? '☠ บอสเดรคสายฟ้าถูกกำจัด!' : '☠ บอส INFERNO ถูกกำจัด!'); } else Music.mob('die', mobVol(m.rx, m.rz, 40)); }
 }
 function mobRay(o, d, maxT, tMin = 0) {
   if (!mobsActive()) return null; let best = null;
@@ -3922,7 +3997,7 @@ function bossRig(n) {
 function bossBar(list) {
   const b = list.find(m => m.k && m.st !== 3 && m.st >= 0);
   if (!MOB.bar) { const d = document.createElement('div'); d.style.cssText = 'position:absolute;left:50%;top:58px;transform:translateX(-50%);width:min(46vw,420px);pointer-events:none;z-index:6;display:none;font:700 13px system-ui;color:#ffd9a8;text-align:center;text-shadow:0 0 8px #f60'; d.innerHTML = '<span>☠ INFERNO</span><div style="height:12px;margin-top:3px;background:rgba(10,6,4,.8);border:1px solid #ff7a1f;border-radius:6px;overflow:hidden"><div style="height:100%;width:100%;background:linear-gradient(90deg,#ffcf5a,#ff5a1f,#b3160a);transition:width .15s"></div></div>'; ($('#bToast').parentNode || document.body).appendChild(d); MOB.bar = d; }
-  MOB.bar.style.display = b ? 'block' : 'none'; if (b) MOB.bar.firstChild.textContent = b.k === 2 ? '☠ มังกรแดง' : b.k === 3 ? '☠ ไททันกรด' : '☠ INFERNO'; if (b) MOB.bar.lastChild.firstChild.style.width = (100 * b.hp / BOSS_HP).toFixed(1) + '%';
+  MOB.bar.style.display = b ? 'block' : 'none'; if (b) MOB.bar.firstChild.textContent = b.k === 2 ? '☠ มังกรแดง' : b.k === 3 ? '☠ ไททันกรด' : b.k === 4 ? '☠ เดรคสายฟ้า' : '☠ INFERNO'; if (b) MOB.bar.lastChild.firstChild.style.width = (100 * b.hp / BOSS_HP).toFixed(1) + '%';
 }
 function mobFxTick(dt) { // ประตูมิติ + ลูกไฟ (ทำงานแม้ม็อบหยุดส่งข้อมูลแล้ว เพื่อเก็บกวาดให้จบ)
   for (let i = MOB.portals.length - 1; i >= 0; i--) { const P = MOB.portals[i]; P.t += dt; const T = 5.6, open = Math.min(1, P.t / 1.1), close = Math.max(0, (P.t - (T - 1)) / 1), s = (1 - Math.pow(1 - open, 3)) * (1 - close * close);
@@ -3938,8 +4013,8 @@ function mobFxTick(dt) { // ประตูมิติ + ลูกไฟ (ท�
 }
 function updateMobs(dt) {
   const now = performance.now(), k = Math.min(1, dt * 9); let bn = 0;
-  if (S.map === 3) dragonRig(0); else if (S.map === 1) titanRig(0); else if (!MOB.bossR[0]) bossRig(0); // เตรียมบอสไว้ตั้งแต่เริ่มเกม กันกระตุกตอนประตูมิติเปิด
-  let dn = 0, tn = 0; const DI = MOB.drg ? MOB.drg.inst : [];
+  if (S.map === 3) dragonRig(0); else if (S.map === 1) titanRig(0); else if (S.map === 4) stormRig(0); else if (!MOB.bossR[0]) bossRig(0); // เตรียมบอสไว้ตั้งแต่เริ่มเกม กันกระตุกตอนประตูมิติเปิด
+  let dn = 0, tn = 0, sn = 0; const DI = MOB.drg ? MOB.drg.inst : [];
   MOB.list.forEach((m, i) => {
     const px = m.rx, pz = m.rz; m.rx += (m.x - m.rx) * k; m.rz += (m.z - m.rz) * k; let dy = m.yaw - m.ryaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); m.ryaw += dy * k;
     const spd = Math.hypot(m.rx - px, m.rz - pz) / Math.max(dt, 1e-3), el = (now - m.stT) / 1000; m.ph += dt;
@@ -3954,7 +4029,7 @@ function updateMobs(dt) {
       return;
     }
     if (m.k === 2) { const d = dragonRig(dn++); if (d) { d.idx = i; d.used = now; updateDragon(m, d, dt, now); } return; }
-    const TT = m.k === 3, b = TT ? titanRig(tn++) : bossRig(bn++); if (!b) return; const r = b.r; let P, sc = BOSS_SC, y = 0, fall = 0;
+    const TT = m.k === 3, SM = m.k === 4, b = TT ? titanRig(tn++) : SM ? stormRig(sn++) : bossRig(bn++); if (!b) return; const r = b.r; let P, sc = BOSS_SC, y = 0, fall = 0;
     r.root.visible = true;
     if (m.st === 6) { const u = clampN((el - 1.3) / (BOSS_RISE / 1000 - 1.6), 0, 1), e = u * u * (3 - 2 * u); r.root.visible = el > 1.3; sc = BOSS_SC * (0.25 + 0.75 * e); y = (1 - e) * 1.2; P = TT ? pvPose('ghoul', u * 2) : pvPose('inferno', 3.2 + u * 2.2); }
     else if (m.st === 4) P = TT ? pvPose('gbite', Math.min(0.4, el * 0.45)) : pvPose('bcharge', Math.min(1, el / (BOSS_CHARGE / 1000)));
@@ -3965,22 +4040,23 @@ function updateMobs(dt) {
     if (m.hurt) { m.hurt = 0; r.blast = 0.2; r.blastDir = m.ryaw + Math.PI; }
     b.L.intensity = m.st === 3 ? 0 : 14 + Math.sin(now * 0.02) * 4 + Math.random() * 3;
     // ออร่าเปลวไฟรอบตัว
-    b.em += dt; if (TT) b.em = 0; if (m.st !== 3 && r.root.visible) while (b.em > 0.035) { b.em -= 0.035; const a = Math.random() * 6.28, rr = (0.5 + Math.random() * 0.9) * sc / 1.3; addPart('fire', new THREE.Vector3(m.rx + Math.cos(a) * rr, y + 0.3 + Math.random() * 3.4 * sc / 1.3, m.rz + Math.sin(a) * rr), new THREE.Vector3((Math.random() - .5) * 0.8, 3 + Math.random() * 3.5, (Math.random() - .5) * 0.8), 2.0, 0.4, 0.45 + Math.random() * 0.3, true, 0.75); }
+    b.em += dt; if (TT) b.em = 0; if (m.st !== 3 && r.root.visible) while (b.em > 0.035) { b.em -= 0.035; const a = Math.random() * 6.28, rr = (0.5 + Math.random() * 0.9) * sc / 1.3; addPart('fire', new THREE.Vector3(m.rx + Math.cos(a) * rr, y + 0.3 + Math.random() * 3.4 * sc / 1.3, m.rz + Math.sin(a) * rr), new THREE.Vector3((Math.random() - .5) * 0.8, 3 + Math.random() * 3.5, (Math.random() - .5) * 0.8), SM ? 0.8 : 2.0, SM ? 0.2 : 0.4, SM ? 0.25 : 0.45 + Math.random() * 0.3, true, 0.75); if (SM) RPG.parts[RPG.parts.length - 1].s.material.color.set('#9fd8ff'); }
     // ชาร์จพลังที่มือก่อนขว้าง
     const hp = new THREE.Vector3(m.rx + Math.sin(m.ryaw) * 1.2 + Math.cos(m.ryaw) * -2.0, 9.8, m.rz + Math.cos(m.ryaw) * 1.2 - Math.sin(m.ryaw) * -2.0);
     if (TT) hp.set(m.rx + Math.sin(m.ryaw) * 1.7, 6.2, m.rz + Math.cos(m.ryaw) * 1.7);
-    if (m.st === 4) { const u = Math.min(1, el / ((TT ? TT_CHARGE : BOSS_CHARGE) / 1000)); b.orb.visible = true; b.orb.position.copy(hp); const s = 1 + u * 5.5 + Math.sin(now * 0.05) * 0.3; b.orb.scale.set(s, s, 1); b.orb.material.rotation += dt * 8; b.oL.visible = true; b.oL.position.copy(hp); b.oL.scale.set(4 + u * 9, 4 + u * 9, 1); b.oL.material.opacity = 0.25 + u * 0.4; b.L.intensity = 14 + u * 40;
-      for (let q = 0; q < 2; q++) { const d = new THREE.Vector3(Math.random() - .5, Math.random() - .5, Math.random() - .5).normalize(); addPart('fire', hp.clone().addScaledVector(d, 4.5), d.multiplyScalar(-11), 0.9, 0.2, 0.38, true, 1); if (TT) RPG.parts[RPG.parts.length - 1].s.material.color.set('#8dff3a'); } }
+    if (m.st === 4) { const u = Math.min(1, el / ((TT ? TT_CHARGE : SM ? ST_CHARGE : BOSS_CHARGE) / 1000)); b.orb.visible = true; b.orb.position.copy(hp); const s = 1 + u * 5.5 + Math.sin(now * 0.05) * 0.3; b.orb.scale.set(s, s, 1); b.orb.material.rotation += dt * 8; b.oL.visible = true; b.oL.position.copy(hp); b.oL.scale.set(4 + u * 9, 4 + u * 9, 1); b.oL.material.opacity = 0.25 + u * 0.4; b.L.intensity = 14 + u * 40;
+      for (let q = 0; q < 2; q++) { const d = new THREE.Vector3(Math.random() - .5, Math.random() - .5, Math.random() - .5).normalize(); addPart('fire', hp.clone().addScaledVector(d, 4.5), d.multiplyScalar(-11), 0.9, 0.2, 0.38, true, 1); if (TT || SM) RPG.parts[RPG.parts.length - 1].s.material.color.set(SM ? '#bfe6ff' : '#8dff3a'); } }
     else { b.orb.visible = false; b.oL.visible = false; }
   });
   for (let n = bn; n < MOB.bossR.length; n++) if (MOB.bossR[n]) { const B = MOB.bossR[n]; if (B.warm > 0) { B.warm--; B.r.root.visible = true; B.r.root.scale.setScalar(0.02); B.r.root.position.set(camera.position.x, camera.position.y - 30, camera.position.z); pvApply(B.r, pvPose('inferno', 0), 0, dt); continue; } MOB.bossR[n].r.root.visible = false; MOB.bossR[n].orb.visible = false; MOB.bossR[n].oL.visible = false; }
   for (let n = tn; n < (MOB.titR || []).length; n++) if (MOB.titR[n]) { MOB.titR[n].r.root.visible = false; MOB.titR[n].orb.visible = false; MOB.titR[n].oL.visible = false; }
+  for (let n = sn; n < (MOB.stR || []).length; n++) if (MOB.stR[n]) { MOB.stR[n].r.root.visible = false; MOB.stR[n].orb.visible = false; MOB.stR[n].oL.visible = false; }
   for (const d of DI) if (d && d.used !== now) { if (d.warm > 0) { d.warm--; d.root.visible = true; d.root.scale.setScalar(0.02); d.root.position.set(camera.position.x, camera.position.y - 40, camera.position.z); } else d.root.visible = false; d.orb.visible = false; }
   bossBar(MOB.list);
 }
 function mobsIdle() { // ออกจากโหมดเครือข่าย: ซ่อนบอส คืนซอมบี้ให้เดินเล่นเอง
   if (!MOB.wasOn) return; MOB.wasOn = false; MOB.list = [];
-  for (const b of [...MOB.bossR, ...(MOB.titR || [])]) if (b) { b.r.root.visible = false; b.orb.visible = false; b.oL.visible = false; }
+  for (const b of [...MOB.bossR, ...(MOB.titR || []), ...(MOB.stR || [])]) if (b) { b.r.root.visible = false; b.orb.visible = false; b.oL.visible = false; }
   for (const d of (MOB.drg ? MOB.drg.inst : [])) if (d) { d.root.visible = false; d.orb.visible = false; }
   for (const g of world.ghouls || []) { g.r.root.visible = true; g.r.root.rotation.x = 0; g.r.root.position.y = 0; g.tx = g.x; g.tz = g.z; if (g.r.hpBar) g.r.hpBar.sp.visible = false; }
   if (MOB.bar) MOB.bar.style.display = 'none';
@@ -4079,6 +4155,95 @@ function mechTick(dt) {
     $('#mechTime').textContent = Math.ceil(left / 1000) + 's'; $('#mechBar').style.width = Math.min(100, left / MECH_MS * 100) + '%'; $('#mechLoad').style.width = ((1 - cd) * 100) + '%'; $('#mechLoadT').textContent = MECH.ammo <= 0 ? 'จรวดหมด' : cd > 0.01 ? 'กำลังรีโหลด…' : 'พร้อมยิง'; }
 }
 function onMechFx(a) { if (a[1] !== myId) mechBurst(+a[2], +a[3], +a[4]); }
+/* ---------- แชทในห้อง + แจ้งคนออกจากเกม + ปุ่มออกจากเกม ---------- */
+const CHAT = { last: 0, open: false };
+function chatAdd(name, text, mine) {
+  const log = $('#chatLog'); if (!log) return; const d = document.createElement('div'); if (name == null) d.className = 'sys'; else { const b = document.createElement('b'); b.textContent = name + ': '; if (mine) b.className = 'me'; d.appendChild(b); }
+  d.appendChild(document.createTextNode(String(text).slice(0, 160))); log.appendChild(d); while (log.children.length > 40) log.removeChild(log.firstChild); log.scrollTop = 1e6;
+  setTimeout(() => d.classList.add('old'), 12000); if (name != null && !mine) try { Music.sfx('swap'); } catch {}
+}
+function chatOpen(on) {
+  CHAT.open = on; $('#chat').classList.toggle('open', on); const inp = $('#chatIn');
+  if (on) { try { if (document.pointerLockElement) document.exitPointerLock(); } catch {} for (const k in keys) keys[k] = false; setTimeout(() => inp.focus(), 30); $('#chatLog').scrollTop = 1e6; } else { inp.blur(); inp.value = ''; }
+}
+function chatSend() {
+  const inp = $('#chatIn'), t = inp.value.trim(); inp.value = ''; if (!t || !S || !myId) return chatOpen(false);
+  const now = Date.now(); if (now - CHAT.last < 500) return; CHAT.last = now; const P = S.players.find(p => p.id === myId);
+  try { pub('fx', ['#c', myId, P ? P.name : 'ผู้เล่น', t.slice(0, 120)]); } catch {} if (battleOn()) chatOpen(false);
+}
+function socialInit() {
+  $('#chatForm').onsubmit = e => { e.preventDefault(); chatSend(); };
+  $('#chatBtn').onclick = e => { e.stopPropagation(); chatOpen(!CHAT.open); };
+  $('#chatIn').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') chatOpen(false); });
+  $('#chatIn').addEventListener('keyup', e => e.stopPropagation());
+  addEventListener('keydown', e => { if (e.key !== 'Enter' || !S || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return; e.preventDefault(); chatOpen(true); });
+  $('#exitBtn').onclick = e => { e.stopPropagation(); try { if (document.pointerLockElement) document.exitPointerLock(); } catch {} $('#exitAsk').classList.add('show'); };
+  $('#exitNo').onclick = () => $('#exitAsk').classList.remove('show');
+  $('#exitYes').onclick = () => { $('#exitAsk').classList.remove('show'); leaveRoom(); };
+  setInterval(() => { const inRoom = !!S && !!myId; $('#chatBtn').classList.toggle('show', inRoom); $('#chat').classList.toggle('show', inRoom); $('#exitBtn').classList.toggle('show', inRoom && S.state !== 'lobby'); if (!inRoom && CHAT.open) chatOpen(false); }, 400);
+}
+/* ---------- โมชันตอนฆ่าได้ / ตอนตาย ---------- */
+const KFX = { times: [] };
+function bigFx(kind, title, sub) { const el = $('#hsFx'); el.dataset.k = kind; el.querySelector('.hs-txt').textContent = title; el.querySelector('.hs-sub').textContent = sub; el.classList.remove('play'); void el.offsetWidth; el.classList.add('play'); }
+function killFx(f) {
+  const now = performance.now(); KFX.times = KFX.times.filter(t => now - t < 6000); KFX.times.push(now); const n = KFX.times.length;
+  bigFx(n >= 2 ? 'streak' : 'kill', n >= 4 ? 'RAMPAGE' : n === 3 ? 'TRIPLE KILL' : n === 2 ? 'DOUBLE KILL' : 'ELIMINATED', `☠ ${f && f.v ? f.v : ''} · +1 KILL`);
+  Music.sfx('kill'); if (n >= 2) setTimeout(() => Music.sfx('kill'), 140); me.fovKick = Math.max(me.fovKick || 0, 5 + n);
+}
+function deathFx(f) {
+  const el = $('#deathFx'); if (!el) return; el.querySelector('.df-sub').textContent = f && f.k ? `ถูก ${f.k} กำจัด${f.hs ? ' · ⌖ HEADSHOT' : ''}` : ''; el.classList.remove('play'); void el.offsetWidth; el.classList.add('play'); KFX.times = [];
+  me.shake = Math.max(me.shake || 0, 0.9); try { Music.mob('die', 0.8); } catch {}
+}
+/* ---------- เสื้อฟุตบอล (โหมดวิ่ง): ตัดเสื้อ+กางเกงจากผิวตัวละครแต่ละตัว ให้พอดีตัวและขยับตามกระดูก · สกรีนโลโก้เกม ---------- */
+const JERSEY = { tex: new Map(), logo: null };
+(() => { try { const im = new Image(); im.onload = () => { JERSEY.logo = im; }; im.src = 'logo.png'; } catch {} })();
+function jerseyGeo(K, J) {
+  if (K.jersey !== undefined) return K.jersey; K.jersey = null;
+  const sm = d => Math.max(0, Math.min(1, d / 0.05 + 0.5)), OFF = 0.022;
+  const yHem = J.RUp[1] - 0.03, yNeck = J.neck[1] - 0.03, yShort = J.RUp[1] - (J.RUp[1] - J.RLeg[1]) * 0.55, W = (Math.abs(J.LArm[0]) + 0.45) * 2;
+  const arm = s => { const S0 = J[s + 'Arm'], E = J[s + 'Fore'], ax = [E[0] - S0[0], E[1] - S0[1], E[2] - S0[2]], L = Math.hypot(ax[0], ax[1], ax[2]) || 1; return { S0, ax: ax.map(v => v / L), L }; }, AR = arm('R'), AL = arm('L');
+  const pos = [], nor = [], uv = [], col = [], si = [], sw = [];
+  for (const p of K.prims) {
+    if (p.mat && /^(Pants|Shirt)$/.test(p.mat.name)) continue; const g = p.geo, P = g.attributes.position, N = g.attributes.normal, SI = g.attributes.skinIndex, SW = g.attributes.skinWeight, I = g.index; if (!P || !N || !SI) continue;
+    const n = P.count, mask = new Float32Array(n);
+    for (let v = 0; v < n; v++) { let b = 0, bw = -1; for (let c = 0; c < 4; c++) { const w = SW.getComponent(v, c); if (w > bw) { bw = w; b = SI.getComponent(v, c); } }
+      const x = P.getX(v), y = P.getY(v), z = P.getZ(v); let m;
+      if (b === 2 || b === 4) { const A = b === 2 ? AR : AL, t = (x - A.S0[0]) * A.ax[0] + (y - A.S0[1]) * A.ax[1] + (z - A.S0[2]) * A.ax[2]; m = sm(A.L * 0.5 - t); }
+      else if (b === 3 || b === 5 || b >= 11 || b === 8 || b === 9) m = 0; else if (b === 1) m = sm(yNeck - y); else m = sm(y - yShort) * sm(yNeck - y);
+      mask[v] = m; }
+    const T = I ? I.count / 3 : n / 3;
+    for (let t = 0; t < T; t++) { const id = [0, 1, 2].map(k => I ? I.getX(t * 3 + k) : t * 3 + k); if (Math.max(mask[id[0]], mask[id[1]], mask[id[2]]) < 0.02) continue;
+      const front = N.getZ(id[0]) + N.getZ(id[1]) + N.getZ(id[2]) >= 0;
+      for (const v of id) { const x = P.getX(v), y = P.getY(v), z = P.getZ(v), nx = N.getX(v), ny = N.getY(v), nz = N.getZ(v); pos.push(x + nx * OFF, y + ny * OFF, z + nz * OFF); nor.push(nx, ny, nz);
+        const u0 = Math.max(0, Math.min(1, 0.5 + x / W)); uv.push(front ? u0 * 0.5 : 0.5 + (1 - u0) * 0.5, y >= yHem ? Math.min(1, 0.3 + 0.7 * (y - yHem) / (yNeck - yHem)) : Math.max(0, 0.3 * (y - yShort) / (yHem - yShort)));
+        col.push(1, 1, 1, mask[v]); for (let c = 0; c < 4; c++) { si.push(SI.getComponent(v, c)); sw.push(SW.getComponent(v, c)); } } }
+  }
+  if (!pos.length) return null; const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+  g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4)); g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4)); return (K.jersey = g);
+}
+function jerseyTex(color, num) {
+  const key = color + '|' + num; if (JERSEY.tex.has(key) && JERSEY.tex.get(key).lg === !!JERSEY.logo) return JERSEY.tex.get(key).t;
+  const C = new THREE.Color(color), dk = '#' + C.clone().multiplyScalar(0.55).getHexString(), lt = '#' + C.clone().lerp(new THREE.Color('#ffffff'), 0.25).getHexString(), base = '#' + C.getHexString();
+  const t = canvasTex(1024, 512, (x) => { const H = 512, yS = H * 0.7;
+    for (const bk of [0, 1]) { const X = bk * 512; x.save(); x.beginPath(); x.rect(X, 0, 512, H); x.clip();
+      x.fillStyle = base; x.fillRect(X, 0, 512, yS); for (let k = 0; k < 7; k++) { x.fillStyle = k % 2 ? dk : lt; x.globalAlpha = k % 2 ? 0.55 : 0.18; x.fillRect(X + 130 + k * 36, 0, 22, yS); } x.globalAlpha = 1;
+      x.fillStyle = '#0d110d'; x.fillRect(X, 0, 112, yS); x.fillRect(X + 400, 0, 112, yS); x.fillStyle = '#39FF14'; x.fillRect(X + 112, 0, 7, yS); x.fillRect(X + 393, 0, 7, yS);
+      x.fillStyle = '#0d110d'; x.beginPath(); x.moveTo(X + 190, 0); x.lineTo(X + 256, bk ? 26 : 62); x.lineTo(X + 322, 0); x.closePath(); x.fill(); x.strokeStyle = '#39FF14'; x.lineWidth = 6; x.stroke();
+      x.fillStyle = '#0d110d'; x.fillRect(X, yS, 512, H - yS); x.fillStyle = base; x.fillRect(X, yS, 512, 8); x.fillRect(X + 120, yS, 14, H - yS); x.fillRect(X + 378, yS, 14, H - yS); x.fillStyle = '#39FF14'; x.fillRect(X, yS - 6, 512, 6);
+      x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round';
+      if (!bk) { if (JERSEY.logo) { const w = 210, h = w * JERSEY.logo.height / JERSEY.logo.width; x.fillStyle = 'rgba(8,12,8,.78)'; x.fillRect(X + 256 - w / 2 - 8, 140 - h / 2 - 6, w + 16, h + 12); x.drawImage(JERSEY.logo, X + 256 - w / 2, 140 - h / 2, w, h); }
+        else { x.font = 'italic 800 54px Oswald, sans-serif'; x.lineWidth = 8; x.strokeStyle = '#0d110d'; x.strokeText('HAXY', X + 256, 120); x.fillStyle = '#39FF14'; x.fillText('HAXY', X + 256, 120); x.font = 'italic 700 30px Oswald, sans-serif'; x.strokeText('MATCH', X + 256, 162); x.fillStyle = '#fff'; x.fillText('MATCH', X + 256, 162); }
+        x.font = '800 62px Oswald, sans-serif'; x.lineWidth = 8; x.strokeStyle = '#0d110d'; x.strokeText(num, X + 256, 262); x.fillStyle = '#fff'; x.fillText(num, X + 256, 262); x.fillStyle = '#fff'; x.font = '700 30px Oswald, sans-serif'; x.fillText(num, X + 180, yS + 80); }
+      else { x.font = 'italic 800 40px Oswald, sans-serif'; x.lineWidth = 7; x.strokeStyle = '#0d110d'; x.strokeText('HAXY MATCH', X + 256, 92); x.fillStyle = '#39FF14'; x.fillText('HAXY MATCH', X + 256, 92); x.font = '800 170px Oswald, sans-serif'; x.lineWidth = 12; x.strokeText(num, X + 256, 222); x.fillStyle = '#fff'; x.fillText(num, X + 256, 222); }
+      x.restore(); } });
+  t.anisotropy = 4; JERSEY.tex.set(key, { t, lg: !!JERSEY.logo }); return t;
+}
+function heroJersey(r, K, J, skel) {
+  const g = jerseyGeo(K, J); if (!g) return; let h = 0; for (const ch of String(r.name || ('L' + r.look))) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const lk = LOOKS[r.look % LOOKS.length], m = new THREE.SkinnedMesh(g, new THREE.MeshStandardMaterial({ map: jerseyTex(lk.glow || lk.trim || '#39FF14', String(1 + h % 99)), vertexColors: true, alphaTest: 0.5, roughness: 0.82, metalness: 0, side: THREE.DoubleSide }));
+  m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; r.root.add(m); m.bind(skel); r.jersey = m;
+}
 function losClear(a, b) {
   const o = new THREE.Vector3(a.x, (a.y || 0) + 1.9, a.z), d = new THREE.Vector3(b.x - a.x, (b.y || 0) + 1.5 - o.y, b.z - a.z); const len = d.length(); if (!len) return true; d.divideScalar(len);
   const h = rayCast(o, d, len, null, 0, true); return h.t >= len - 0.6;
@@ -4668,32 +4833,37 @@ function trainBuild() {
   const glass = new THREE.MeshStandardMaterial({ color: '#3d5566', roughness: 0.1, metalness: 0.6, transparent: true, opacity: 0.38, depthWrite: false }), lightM = new THREE.MeshBasicMaterial({ color: '#f4f8ff' }), headM = new THREE.MeshBasicMaterial({ color: '#fff3c4' }), tailM = new THREE.MeshBasicMaterial({ color: '#ff3b30' });
   const ledT = canvasTex(512, 64, (x, w, h) => { x.fillStyle = '#080a08'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffb020'; x.font = 'bold 40px monospace'; x.textAlign = 'center'; x.fillText('HAXY LINE · วนรอบเมือง', w / 2, 46); }), ledM = new THREE.MeshBasicMaterial({ map: ledT });
   for (let i = 0; i < TRN.N; i++) {
-    const g = new THREE.Group(); g.userData.keep = true; G.add(g);
-    const bx = (x0, x1, y0, y1, z0, z1, m, sh = true) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = sh && m !== glass; o.receiveShadow = true; o.userData.keep = true; g.add(o); return o; };
+    const g = new THREE.Group(); g.userData.keep = true; G.add(g); const shell = new THREE.Group(); shell.userData.keep = true; g.add(shell); let par = g;
+    const bx = (x0, x1, y0, y1, z0, z1, m, sh = true) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = sh && m !== glass; o.receiveShadow = true; o.userData.keep = true; par.add(o); return o; };
     bx(-HL, HL, F - 0.2, F, -HW, HW, floorM); bx(-HL + 0.4, HL - 0.4, 0.55, F - 0.2, -HW + 0.7, HW - 0.7, dark); for (const x of [-3.9, 3.9]) bx(x - 1.4, x + 1.4, 0.05, 0.6, -2.3, 2.3, dark);
-    bx(-HL, HL, C, C + 0.3, -HW, HW, white); bx(-HL + 0.5, HL - 0.5, C + 0.3, C + 0.42, -HW + 0.6, HW - 0.6, grey); for (const x of [-3, 3]) bx(x - 1.5, x + 1.5, C + 0.42, C + 0.85, -1.3, 1.3, grey);
-    bx(-HL + 0.3, HL - 0.3, C - 0.06, C, -HW + 0.3, HW - 0.3, inner, false); for (const z of [-1.5, 1.5]) bx(-HL + 0.8, HL - 0.8, C - 0.12, C - 0.06, z - 0.18, z + 0.18, lightM, false);
+    par = shell; bx(-HL, HL, C, C + 0.3, -HW, HW, white); bx(-HL + 0.5, HL - 0.5, C + 0.3, C + 0.42, -HW + 0.6, HW - 0.6, grey); for (const x of [-3, 3]) bx(x - 1.5, x + 1.5, C + 0.42, C + 0.85, -1.3, 1.3, grey);
+    bx(-HL + 0.3, HL - 0.3, C - 0.06, C, -HW + 0.3, HW - 0.3, inner, false); par = g; for (const z of [-1.5, 1.5]) bx(-HL + 0.8, HL - 0.8, C - 0.12, C - 0.06, z - 0.18, z + 0.18, lightM, false);
     for (const s of [-1, 1]) { // ผนังข้าง: 3 ช่วง + ช่องประตูเปิดโล่ง 2 ช่อง (ช่องยิง)
       const zo = s * HW, zi = s * (HW - 0.25), z0 = Math.min(zo, zi), z1 = Math.max(zo, zi);
-      for (const [a, b] of [[-HL, -4.2], [-1.8, 1.8], [4.2, HL]]) {
+      par = shell; for (const [a, b] of [[-HL, -4.2], [-1.8, 1.8], [4.2, HL]]) {
         bx(a, b, F, 2.5, z0, z1, white); bx(a, b, 4.3, C, z0, z1, white); bx(a, a + 0.18, 2.5, 4.3, z0, z1, dark); bx(b - 0.18, b, 2.5, 4.3, z0, z1, dark); bx(a + 0.18, b - 0.18, 2.5, 4.3, zo - s * 0.14, zo - s * 0.08, glass);
         bx(a, b, 1.55, 2.0, zo, zo + s * 0.03, blue, false); bx(a, b, 2.0, 2.16, zo, zo + s * 0.03, green, false); bx(a, b, 5.5, 5.62, zo, zo + s * 0.03, green, false);
       }
-      for (const [a, b] of [[-4.2, -1.8], [1.8, 4.2]]) { bx(a, b, 4.6, C, z0, z1, white); bx(a, b, 4.52, 4.6, z0, z1, yellow, false); bx(a - 0.08, a + 0.04, F, 4.6, z0 - 0.02, z1 + 0.02, yellow, false); bx(b - 0.04, b + 0.08, F, 4.6, z0 - 0.02, z1 + 0.02, yellow, false); bx(a, b, F - 0.02, F + 0.02, z0, z1, yellow, false); }
-      const led = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.42), ledM); led.position.set(0, 4.75, zo + s * 0.04); led.rotation.y = s > 0 ? 0 : Math.PI; led.userData.keep = true; g.add(led);
-      bx(-HL + 0.6, HL - 0.6, 4.95, 5.0, s * 2.2 - 0.03, s * 2.2 + 0.03, pole, false);
+      for (const [a, b] of [[-4.2, -1.8], [1.8, 4.2]]) { par = shell; bx(a, b, 4.6, C, z0, z1, white); par = g; bx(a, b, 4.52, 4.6, z0, z1, yellow, false); bx(a - 0.08, a + 0.04, F, 4.6, z0 - 0.02, z1 + 0.02, yellow, false); bx(b - 0.04, b + 0.08, F, 4.6, z0 - 0.02, z1 + 0.02, yellow, false); bx(a, b, F - 0.02, F + 0.02, z0, z1, yellow, false); }
+      const led = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.42), ledM); led.position.set(0, 4.75, zo + s * 0.04); led.rotation.y = s > 0 ? 0 : Math.PI; led.userData.keep = true; shell.add(led);
     }
     for (const e of [-1, 1]) { // ผนังหัว-ท้ายตู้
       const xo = e * HL, xi = e * (HL - 0.25), x0 = Math.min(xo, xi), x1 = Math.max(xo, xi); bx(x0, x1, F, 2.5, -HW, HW, white); bx(x0, x1, 4.3, C, -HW, HW, white); bx(x0, x1, 2.5, 4.3, -HW, -HW + 0.9, white); bx(x0, x1, 2.5, 4.3, HW - 0.9, HW, white); bx(xo - e * 0.14, xo - e * 0.08, 2.5, 4.3, -HW + 0.9, HW - 0.9, glass);
       const cab = (i === 0 && e > 0) || (i === TRN.N - 1 && e < 0);
-      if (cab) { bx(Math.min(xo, xo + e * 1.5), Math.max(xo, xo + e * 1.5), 0.5, 3.0, -HW + 0.25, HW - 0.25, white); bx(Math.min(xo + e * 1.5, xo + e * 1.56), Math.max(xo + e * 1.5, xo + e * 1.56), 1.5, 1.95, -HW + 0.25, HW - 0.25, blue, false);
-        const ws = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.3, 2 * HW - 0.9), M('#10161c', { roughness: 0.15, metalness: 0.7 })); ws.position.set(xo + e * 0.85, 4.25, 0); ws.rotation.z = e * 0.52; ws.userData.keep = true; g.add(ws);
-        for (const z of [-2.5, 2.5]) bx(Math.min(xo + e * 1.5, xo + e * 1.58), Math.max(xo + e * 1.5, xo + e * 1.58), 0.9, 1.3, z - 0.45, z + 0.45, (i === 0) === (e > 0) && i === 0 ? headM : tailM, false); }
+      if (cab) { par = shell; bx(Math.min(xo, xo + e * 1.5), Math.max(xo, xo + e * 1.5), 0.5, 3.0, -HW + 0.25, HW - 0.25, white); bx(Math.min(xo + e * 1.5, xo + e * 1.56), Math.max(xo + e * 1.5, xo + e * 1.56), 1.5, 1.95, -HW + 0.25, HW - 0.25, blue, false);
+        const ws = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.3, 2 * HW - 0.9), M('#10161c', { roughness: 0.15, metalness: 0.7 })); ws.position.set(xo + e * 0.85, 4.25, 0); ws.rotation.z = e * 0.52; ws.userData.keep = true; shell.add(ws);
+        for (const z of [-2.5, 2.5]) bx(Math.min(xo + e * 1.5, xo + e * 1.58), Math.max(xo + e * 1.5, xo + e * 1.58), 0.9, 1.3, z - 0.45, z + 0.45, (i === 0) === (e > 0) && i === 0 ? headM : tailM, false); par = g; }
       else bx(Math.min(xo, xo + e * 0.5), Math.max(xo, xo + e * 0.5), 0.6, F, -1.3, 1.3, dark);
     }
     for (const x of [-3, 3]) for (const z of [-1.1, 1.1]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, C - F, 8), pole); p.position.set(x, (C + F) / 2, z); p.userData.keep = true; g.add(p); }
-    TRN.cars.push({ g, x: 0, z: 0, th: 0, init: false });
+    TRN.cars.push({ g, shell, x: 0, z: 0, th: 0, init: false });
   }
+  trainSkin();
+}
+function trainSkin() { // สวมโมเดลรถไฟ (ตัวถังเดิม ปรับสัดส่วนให้เท่าตู้ปัจจุบัน) แทนผนัง/หลังคาที่ปั้นไว้
+  if (!TRN.mdl || TRN.skinned || !TRN.cars.length) return; TRN.skinned = true;
+  TRN.cars.forEach((c, i) => { c.shell.visible = false; const m = TRN.mdl.car.clone(); c.g.add(m);
+    if (i === 0) c.g.add(TRN.mdl.nose.clone()); if (i === TRN.N - 1) { const n = TRN.mdl.nose.clone(); n.rotation.y = Math.PI; c.g.add(n); } });
 }
 function trainTick() {
   const on = !!(S && S.map === 1 && world.bkk && world.bkk.visible); if (!on) { TRN.on = false; return; }
@@ -5127,7 +5297,7 @@ function frame() {
     world.seats.forEach(([x, y, z, ph], i) => { const yy = y + Math.max(0, Math.sin(t * 5 + ph)) * 0.35; m.makeTranslation(x, yy, z); world.crowd.setMatrixAt(i, m); m.makeTranslation(x, yy + 0.62, z); world.crowdHeads.setMatrixAt(i, m); });
     world.crowd.instanceMatrix.needsUpdate = true; world.crowdHeads.instanceMatrix.needsUpdate = true;
     world.flags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2 + i) * 0.4; });
-    updateZombie(dt, t); mobFxTick(dt); breathTick(dt); mechTick(dt); if (mobsActive()) updateMobs(dt); else mobsIdle();
+    updateZombie(dt, t); mobFxTick(dt); boltTick(dt); breathTick(dt); mechTick(dt); if (mobsActive()) updateMobs(dt); else mobsIdle();
     if (world.bkk && world.bkk.visible) {
       world.bkkFlags.forEach((f, i) => { f.rotation.y = Math.sin(t * 2.2 + i) * 0.45; });
       for (const c of world.cars) {
@@ -5260,6 +5430,8 @@ function onFx(a, local) {
   if (a[0] === '#m') { if (!isHost) onMobs(a); return; }
   if (a[0] === '#e') { if (!isHost) onMobEvent(a); return; }
   if (a[0] === '#k') { onMechFx(a); return; }
+  if (a[0] === '#c') { chatAdd(String(a[2]).slice(0, 24), a[3], a[1] === myId); return; }
+  if (a[0] === '#x') { chatAdd(null, `${String(a[1]).slice(0, 24)} ออกจากเกม`); return; }
   if (!local && a[0] === myId) return;
   { const rr = remotes.get(a[0]); if (rr) rr.fireT = performance.now(); const ru = runners.get(a[0]); if (ru && ru.wpS) ru.wpS.kick = a[7] == 3 ? 0.3 : a[7] == 2 ? 0.2 : 0.09; }
   const A = new THREE.Vector3(+a[1], +a[2], +a[3]), B = new THREE.Vector3(+a[4], +a[5], +a[6]);
@@ -5558,7 +5730,7 @@ $('#shootHud').addEventListener('touchend', touchEnd); $('#shootHud').addEventLi
 $('#fireBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firing = true; me.pressFired = false; });
 for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) $('#fireBtn').addEventListener(ev, () => { firing = false; });
 const tapBtn = (sel, fn) => $(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); fn(); });
-tapBtn('#swapBtn', () => swapWeapon()); tapBtn('#jumpBtn', doJump); tapBtn('#skillBtn', mechStart); tapBtn('#skillGo', mechStart); tapBtn('#crouchBtn', toggleCrouch); tapBtn('#aimBtn', () => setAim(!me.aim));
+tapBtn('#swapBtn', () => swapWeapon()); tapBtn('#jumpBtn', doJump); socialInit(); tapBtn('#skillBtn', mechStart); tapBtn('#skillGo', mechStart); tapBtn('#crouchBtn', toggleCrouch); tapBtn('#aimBtn', () => setAim(!me.aim));
 $('#weaponBar').addEventListener('pointerdown', e => { const s = e.target.closest('.wslot'); if (s) { e.preventDefault(); e.stopPropagation(); swapWeapon(+s.dataset.w); } });
 function renderWeaponBar() {
   $('#weaponBar').innerHTML = WEAPONS.map((W, i) => `<div class="wslot${i === me.w ? ' on' : ''}" data-w="${i}"><span class="k">${i + 1}</span>${GUN_ICONS[i] ? `<img src="${GUN_ICONS[i]}" alt="">` : ''}<span class="n">${W.name} · ${me.ammo[i] + (me.res ? me.res[i] : 0)}</span></div>`).join('');
@@ -5883,20 +6055,20 @@ function leaveBattle() {
   for (const tr of tracers) { tr.life = 0; tr.l.visible = tr.fl.visible = tr.sp.visible = false; }
 }
 let lastFeedT = 0, hsDeath = false;
-function headshotFx() {
-  const el = $('#hsFx'); el.classList.remove('play'); void el.offsetWidth; el.classList.add('play');
+function headshotFx(fd) {
+  bigFx('hs', 'HEADSHOT', `⌖ ยิงหัว${fd && fd.v ? ' ' + fd.v : ''} · +1 KILL`); KFX.times.push(performance.now());
   const f = $('#hsFlash'); f.classList.remove('play'); void f.offsetWidth; f.classList.add('play');
   const hud = $('#shootHud'); hud.classList.remove('shake'); void hud.offsetWidth; hud.classList.add('shake');
   me.fovKick = 9; Music.sfx('headshot');
   try { if ('speechSynthesis' in window) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance('Headshot!'); u.lang = 'en-US'; u.pitch = 0.4; u.rate = 0.9; u.volume = 1; setTimeout(() => speechSynthesis.speak(u), 120); } } catch {}
 }
-function killFx() { const el = $('#killFx'); el.classList.remove('play'); void el.offsetWidth; el.classList.add('play'); Music.sfx('kill'); }
 function renderBattleHud() {
   for (const f of S.feed || []) if (f.t > lastFeedT) {
     lastFeedT = f.t;
-    if (f.kid === myId) { if (f.hs) headshotFx(); else killFx(); }
-    if (f.vid === myId) hsDeath = !!f.hs;
+    if (f.kid === myId) { if (f.hs) headshotFx(f); else killFx(f); }
+    if (f.vid === myId) { hsDeath = !!f.hs; deathFx(f); }
   }
+  { const P = S.players.find(p => p.id === myId); if (document.body && document.body.classList) document.body.classList.toggle('im-dead', !!P && P.alive === false && S.state === 'battle'); }
   const sorted = [...S.players].sort((a, b) => (b.kills - a.kills) || (a.deaths - b.deaths));
   $('#bScore').innerHTML = `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>HS</span><span>D</span></li>` + sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span class="hsc">${p.hs || 0}</span><span>${p.deaths}</span></li>`).join('');
   const now = hostNow();

@@ -96,3 +96,7 @@ mecha.glb — "[Muv-Luv] F16-TSF WIP" by EXcaliburK117
   License: Sketchfab Standard License (NOT Creative Commons — check the licence terms before any public/commercial release;
   the design is a fan model based on the Muv-Luv franchise)
   Changes: rigged to the game skeleton, recoloured black/green.
+
+models/train_car.glb, models/train_nose.glb - "superconductor train concept WIP" by 3DHaupt (https://sketchfab.com/dennish2010)
+  https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC - CC BY-NC 4.0 (NON-COMMERCIAL)
+  Changes: cut into car sections, rescaled, door openings cut, figures and gull-wing doors removed, repainted.
