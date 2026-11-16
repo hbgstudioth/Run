@@ -44,8 +44,6 @@ models/containers.glb - "Container Pack" by drcrazzie (https://sketchfab.com/drc
   https://sketchfab.com/3d-models/container-pack-0d416a9bcfc14978aa50e80281dfe9a5 - CC BY 4.0
   Changes: only the generic (logo-free) variants kept, normalised to unit size, textures downsized.
 
-models/train.glb - "superconductor train concept WIP" by 3DHaupt (https://sketchfab.com/dennish2010)
-  https://sketchfab.com/3d-models/superconductor-train-concept-wip-7ZA2tOVNoMbYbll27zJ0RWsMdxC - CC BY-NC 4.0 (NON-COMMERCIAL)
   Changes: guideway/pillars removed, rescaled, generic BTS/MRT-style livery painted via vertex colours (no real logos).
 
 models/ship.glb - "Container Ship" by RM02 (https://sketchfab.com/RM02)
