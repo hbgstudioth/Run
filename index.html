@@ -317,6 +317,7 @@
             background: rgba(10,12,15,.7); border: 1px solid var(--line); padding: 2px 16px; border-radius: 3px; pointer-events: none; }
   #bScore { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 6px; background: rgba(10,12,15,.68); border: 1px solid var(--line); border-radius: 4px; pointer-events: none; font-size: 13px; min-width: 220px; }
   #bScore li { display: grid; grid-template-columns: 26px 1fr 24px 28px 24px; align-items: center; gap: 6px; padding: 2px 4px; }
+  #bScore li.tmhd { display: flex; justify-content: center; gap: 8px; font: 700 15px "Oswald", "Kanit", sans-serif; padding: 2px 4px 5px; border-bottom: 1px solid var(--line); margin-bottom: 3px; } #bScore li.tmhd i { color: var(--mut); font-style: normal; }
   #bScore li.hd { color: var(--mut); font-family: "Kanit", sans-serif; font-size: 11px; } #bScore li.me { background: rgba(123,226,43,.18); } #bScore li.dead { opacity: .45; }
   #bScore .ava { width: 22px; height: 22px; } #bScore li span:nth-child(3) { color: var(--acc); text-align: right; } #bScore li span:nth-child(4) { color: #ff6b5a; text-align: right; } #bScore li span:nth-child(5) { color: var(--mut); text-align: right; } #bScore li.hd span { color: var(--mut) !important; }
   #killFeed { position: absolute; right: 60px; top: 12px; text-align: right; pointer-events: none; font-size: 13px; }
@@ -520,6 +521,8 @@
       <div id="mapsBox"><div class="lobbyHead"><b>เลือกด่าน</b></div>
       <div id="maps" class="diffs" style="grid-template-columns:repeat(2,1fr)"></div>
       <div id="mapPrev"><img id="mapPrevImg" alt=""><div id="mapPrevCap"></div></div></div>
+      <div id="teamBox"><div class="lobbyHead"><b>รูปแบบการรบ</b></div>
+      <div id="teams" class="diffs" style="grid-template-columns:1fr 1fr"></div></div>
       <div class="lobbyHead"><b>ช่วงเวลา</b></div>
       <div id="tods" class="diffs" style="grid-template-columns:1fr 1fr"></div>
       <div id="shootInfo" class="small hidden" style="text-align:left;line-height:1.6;margin:10px 0 12px">เลือด 100 · ปืนสั้น 30 นัด / ปืนกล 60 นัด / สไนเปอร์ 20 นัด · ยิงหัวแรง ×2 · เล็งซูม กระโดด นั่ง · ขึ้นตึก บันได ตู้คอนเทนเนอร์ และดาดฟ้าได้<br>กล่องแดง +50 เลือด · กล่องเขียว เติมกระสุนเต็มทุกกระบอก · กล่องฟ้า +50 เกราะ (สะสมได้ไม่จำกัด) · กล่องส้ม ∞ กระสุนไม่จำกัด 10 วิ · กล่องทอง ★ อมตะ 10 วิ · เล่น 3 นาที หรือใครยิงได้ 15 ครั้งก่อนชนะ</div>
@@ -2075,7 +2078,7 @@ function explode(p, owner) {
   // ความเสียหาย (คนยิงเป็นคนคำนวณ แล้วส่งให้โฮสต์ตรวจ)
   if (owner === myId) mobBlast(p);
   if (owner === myId && S.players) for (const pl of S.players) {
-    if (pl.id === myId || pl.alive === false) continue; const ps = remotes.get(pl.id); if (!ps) continue;
+    if (pl.id === myId || pl.alive === false || sameTeam(pl.id)) continue; const ps = remotes.get(pl.id); if (!ps) continue;
     const c = new THREE.Vector3(ps.rx ?? ps.x, (ps.ry || 0) + 1.3, ps.rz ?? ps.z), d = c.distanceTo(p); if (d > BLAST_R) continue;
     const dir = c.clone().sub(p).normalize(), h = rayCast(p.clone().addScaledVector(dir, 0.2), dir, d, null, 0, true); if (h.t < d - 0.5 && d > 1.5) continue;
     const dmg = Math.round(BLAST_DMG * Math.max(0.15, 1 - Math.pow(d / BLAST_R, 1.3)));
@@ -3480,22 +3483,27 @@ function genQ(diff) {
 function snapshot() {
   const reveal = H.state !== 'question';
   return {
-    state: H.state, map: H.map, tod: H.tod, cat: H.cat, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
+    state: H.state, map: H.map, tod: H.tod, team: H.team ? 1 : 0, cat: H.cat, diff: H.diff, qTime: H.qTime, round: H.round, maxRounds: MAX_ROUNDS, goal: GOAL, endsAt: H.endsAt, now: Date.now(),
     q: H.q ? { id: H.q.id, kind: H.q.kind || 'math', text: H.q.text, choices: H.q.choices, answer: reveal ? H.q.answer : null } : null,
     results: H.state === 'reveal' ? H.results : null, final: H.state === 'finished' ? H.final : null,
     players: [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, skin: p.skin | 0, lane: p.lane, points: p.points, gain: p.gain,
       correct: p.correct, ctime: p.ctime, answered: H.answers.has(id), bot: !!p.bot, ready: !!p.ready,
-      hp: p.hp, armor: p.armor || 0, hs: p.hs || 0, infU: p.infU || 0, godU: p.godU || 0, kills: p.kills || 0, deaths: p.deaths || 0, alive: p.alive !== false, rsp: p.rsp || 0, sp: p.sp || null, ag: p.ag || 0 })),
+      hp: p.hp, armor: p.armor || 0, hs: p.hs || 0, infU: p.infU || 0, godU: p.godU || 0, kills: p.kills || 0, deaths: p.deaths || 0, alive: p.alive !== false, rsp: p.rsp || 0, sp: p.sp || null, ag: p.ag || 0, tm: p.tm == null ? null : p.tm })),
     mode: H.mode, killTarget: KILL_TARGET, feed: H.mode === 'shoot' ? H.feed : null,
     pickups: H.mode === 'shoot' && (H.state === 'battle' || H.state === 'countdown') ? H.pickups.map(k => ({ id: k.id, k: k.k, x: k.x, z: k.z, y: k.y || 0, a: k.a })) : null,
   };
 }
+// ตัวจับเวลาที่ไม่ถูกเบราว์เซอร์หน่วงเมื่อแท็บโฮสต์ไม่ได้อยู่หน้าจอ (ใช้ Web Worker) — กันเกมทั้งห้องค้างเมื่อโฮสต์สลับแอป/แท็บ
+const fastInterval = (() => { const fns = new Map(); let w = null, n = 0;
+  try { w = new Worker(URL.createObjectURL(new Blob(['const t={};onmessage=e=>{const[i,ms]=e.data;t[i]=setInterval(()=>postMessage(i),ms)}'], { type: 'text/javascript' }))); w.onmessage = e => { const f = fns.get(e.data); if (f) try { f(); } catch (err) { console.warn('tick', err); } }; } catch { w = null; }
+  return (fn, ms) => { if (!w) return setInterval(fn, ms); const i = ++n; fns.set(i, fn); w.postMessage([i, ms]); return i; }; })();
+const upSeen = new Map(); let lastCast = 0;
 function broadcast() {
-  const snap = snapshot();
-  pub('down', snap, true);
+  const snap = snapshot(); lastCast = Date.now();
+  pub('down', snap, true, 1);
   applyState(snap); H.dirty = false;
 }
-setInterval(() => { if (isHost && H.dirty) broadcast(); }, 100);
+fastInterval(() => { if (isHost && H.dirty && Date.now() - lastCast >= (H.state === 'battle' ? 160 : 90)) broadcast(); }, 50);
 
 function nextQuestion() {
   H.round++; H.q = H.cat === 1 ? genVocab(H.diff) : genQ(H.diff); H.qTime = LV(H.cat, H.diff).time; H.answers.clear(); H.results = null;
@@ -3557,6 +3565,9 @@ function handleAction(a) {
     case 'setMap':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       { const nm = Math.max(0, Math.min(MAPS.length - 1, a.map | 0)); if ((H.mode !== 'shoot') !== (nm === 0)) return; H.map = nm; } break;
+    case 'setTeam':
+      if (a.id !== 'host' || H.state !== 'lobby') return;
+      H.team = a.team ? 1 : 0; break;
     case 'setTod':
       if (a.id !== 'host' || H.state !== 'lobby') return;
       H.tod = a.tod ? 1 : 0; break;
@@ -3652,7 +3663,8 @@ function spawnPlayer(id, p) {
   Object.assign(p, { hp: HP_MAX, armor: 0, infU: 0, godU: 0, alive: true, rsp: 0, sp: [+s.x.toFixed(2), +s.z.toFixed(2), ((p.sp && p.sp[2]) || 0) + 1, s.y || 0] });
   if (p.bot) { const b = H.bots.get(id) || { w: (Math.random() * 3) | 0, next: 0, sd: 1, flip: 0 }; Object.assign(b, { x: s.x, z: s.z, y: s.y || 0, yaw: 0, pitch: 0, mv: 0 }); H.bots.set(id, b); }
 }
-function initBattlePlayer(id, p) { Object.assign(p, { kills: 0, deaths: 0, ag: 0, hs: 0 }); spawnPlayer(id, p); }
+function teamPick() { let n0 = 0, n1 = 0; for (const q of H.players.values()) { if (q.tm === 0) n0++; else if (q.tm === 1) n1++; } return n1 < n0 ? 1 : 0; }
+function initBattlePlayer(id, p) { Object.assign(p, { kills: 0, deaths: 0, ag: 0, hs: 0 }); if (H.team && H.mode === 'shoot') { if (p.tm == null) p.tm = teamPick(); } else p.tm = null; spawnPlayer(id, p); }
 function freePickupSpot() {
   const spots = playPickSpots(H.map).filter(s => !H.pickups.some(k => k.a && Math.hypot(k.x - s.x, k.z - s.z) < 3 && Math.abs((k.y || 0) - (s.y || 0)) < 1));
   return spots[(Math.random() * spots.length) | 0];
@@ -3662,20 +3674,22 @@ function startBattle() {
   H.feed = []; H.pickups = []; H.bots.clear();
   for (let i = 0; i < (H.map >= 1 ? 11 : 8); i++) { const s = freePickupSpot(); H.pickups.push({ id: 'k' + i, k: ['hp', 'ammo', 'armor'][i % 3], x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
   for (const k of ['inf', 'god']) { const s = freePickupSpot(); H.pickups.push({ id: 'p' + k, k, x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true, re: 0 }); }
+  for (const p of H.players.values()) p.tm = null; // โหมดทีม: แบ่งทีมใหม่ทุกรอบ สลับคนละฝั่งให้จำนวนเท่ากัน
   for (const [id, p] of H.players) initBattlePlayer(id, p);
   mobsInit();
   H.state = 'countdown'; H.endsAt = Date.now() + 3200;
   later(() => { H.state = 'battle'; H.endsAt = Date.now() + BATTLE_TIME; H.dirty = true; }, 3200);
-  if (!H.bt) H.bt = setInterval(battleTick, 100);
+  if (!H.bt) H.bt = fastInterval(battleTick, 100);
 }
 function endBattle() {
-  H.final = [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, points: p.kills || 0, correct: p.kills || 0, deaths: p.deaths || 0, ctime: p.deaths || 0, hs: p.hs || 0 }))
+  H.final = [...H.players.entries()].map(([id, p]) => ({ id, name: p.name, look: p.look, points: p.kills || 0, correct: p.kills || 0, deaths: p.deaths || 0, ctime: p.deaths || 0, hs: p.hs || 0, tm: H.team ? p.tm : null }))
     .sort((a, b) => (b.points - a.points) || (a.deaths - b.deaths));
   H.state = 'finished'; H.dirty = true;
 }
 function applyHit(sid, tid, dmg, w, hs) {
   const s = H.players.get(sid), tg = H.players.get(tid);
   if (H.state !== 'battle' || !s || !tg || !s.alive || !tg.alive || sid === tid) return;
+  if (H.team && s.tm != null && s.tm === tg.tm) return; // ทีมเดียวกันยิงกันไม่ได้
   if ((tg.godU || 0) > Date.now()) return;
   hs = !!hs; dmg = Math.max(0, Math.min((WEAPONS[w | 0] || WEAPONS[0]).dmg * (hs ? 2 : 1), Math.round(+dmg || 0))); if (!dmg) return;
   const ab = Math.min(tg.armor || 0, dmg); tg.armor = (tg.armor || 0) - ab; tg.hp -= dmg - ab;
@@ -3776,7 +3790,7 @@ function mobTick(now) {
       if (d > 1.2) { const dir = c.clone().sub(f.p).normalize(), h = rayCast(f.p.clone().addScaledVector(dir, 0.15), dir, d, null, 0, true); if (h.t < d - 0.5) continue; }
       mobHurt(id, f.dmg || 9999, f.who || 'INFERNO'); } }
   const arr = ['#m', ...H.mobs.map(m => [m.k, +m.x.toFixed(2), +m.z.toFixed(2), +m.yaw.toFixed(2), Math.max(0, m.hp | 0), m.st])];
-  pub('fx', arr); onMobs(arr);
+  H.mobN = (H.mobN || 0) + 1; if (H.mobs.length ? H.mobN % 2 === 0 : H.mobN % 20 === 0) pub('fx', arr); onMobs(arr);
 }
 function mobHit(a, p) {
   if (!p || !p.alive || H.state !== 'battle') return; const i = a.i | 0, m = H.mobs[i]; if (!m || m.st === 3 || m.st === 6) return;
@@ -4090,7 +4104,7 @@ function mechRig(id) {
 }
 function mechTarget(from) { // ผู้เล่นที่ใกล้ที่สุด (ยังไม่ตาย)
   let best = null, bd = 1e9;
-  for (const pl of S.players) { if (pl.id === myId || pl.alive === false) continue; const s = remotes.get(pl.id); if (!s) continue; const d = Math.hypot((s.rx ?? s.x) - from.x, (s.rz ?? s.z) - from.z); if (d < bd) { bd = d; best = pl.id; } }
+  for (const pl of S.players) { if (pl.id === myId || pl.alive === false || sameTeam(pl.id)) continue; const s = remotes.get(pl.id); if (!s) continue; const d = Math.hypot((s.rx ?? s.x) - from.x, (s.rz ?? s.z) - from.z); if (d < bd) { bd = d; best = pl.id; } }
   return best;
 }
 function mechFire() {
@@ -4155,6 +4169,19 @@ function mechTick(dt) {
     $('#mechTime').textContent = Math.ceil(left / 1000) + 's'; $('#mechBar').style.width = Math.min(100, left / MECH_MS * 100) + '%'; $('#mechLoad').style.width = ((1 - cd) * 100) + '%'; $('#mechLoadT').textContent = MECH.ammo <= 0 ? 'จรวดหมด' : cd > 0.01 ? 'กำลังรีโหลด…' : 'พร้อมยิง'; }
 }
 function onMechFx(a) { if (a[1] !== myId) mechBurst(+a[2], +a[3], +a[4]); }
+/* ---------- โหมดทีม 4v4: ออร่าสีทีมรอบตัว · ทีมเดียวกันยิงกันไม่ได้ ---------- */
+const TEAM = { col: ['#1f6bff', '#ff2a1f'], name: ['ฟ้า', 'แดง'], told: null };
+const myTeam = () => { const P = S && S.team ? S.players.find(p => p.id === myId) : null; return P && P.tm != null ? P.tm : null; };
+const sameTeam = (id) => { const t = myTeam(); if (t == null) return false; const o = S.players.find(p => p.id === id); return !!o && o.tm === t; };
+function teamAura(r, pl) {
+  const on = !!(S && S.team) && pl.tm != null && pl.alive !== false; if (!on) { if (r.tmA) r.tmA.visible = false; return; }
+  if (!r.tmA || r.tmA.userData.tm !== pl.tm) { if (r.tmA) r.root.remove(r.tmA); const g = r.tmA = new THREE.Group(); g.userData.tm = pl.tm; g.userData.noCrop = true; const c = TEAM.col[pl.tm];
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.72, 1.02, 36), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06; g.add(ring);
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 2.9, 24, 1, true), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); col.position.y = 1.45; g.add(col);
+    const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: rpgTex('glow'), color: c, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); gl.scale.set(3.6, 4.6, 1); gl.position.y = 1.4; g.add(gl);
+    const mk = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.36, 4), new THREE.MeshBasicMaterial({ color: c })); mk.rotation.x = Math.PI; mk.position.y = 3.5; g.add(mk); g.userData.ring = ring; g.userData.mk = mk; r.root.add(g); }
+  r.tmA.visible = true; const t = performance.now() / 1000; r.tmA.userData.ring.scale.setScalar(1 + Math.sin(t * 3) * 0.06); r.tmA.userData.mk.position.y = 3.5 + Math.sin(t * 2.4) * 0.08; r.tmA.userData.mk.rotation.y = t * 2;
+}
 /* ---------- แชทในห้อง + แจ้งคนออกจากเกม + ปุ่มออกจากเกม ---------- */
 const CHAT = { last: 0, open: false };
 function chatAdd(name, text, mine) {
@@ -4254,7 +4281,7 @@ function botTick(now) {
     const p = H.players.get(id); if (!p) { H.bots.delete(id); continue; }
     if (!p.alive || H.state !== 'battle') { b.mv = 0; continue; }
     let tgt = null, td = 1e9, tid = null;
-    for (const [oid, op] of H.players) { if (oid === id || !op.alive) continue; const ps = posOf(oid); if (!ps) continue; const d = bdist(b, ps); if (d < td) { td = d; tgt = ps; tid = oid; } }
+    for (const [oid, op] of H.players) { if (oid === id || !op.alive || (H.team && op.tm != null && op.tm === p.tm)) continue; const ps = posOf(oid); if (!ps) continue; const d = bdist(b, ps); if (d < td) { td = d; tgt = ps; tid = oid; } }
     let mx = 0, mz = 0;
     if (tgt) {
       const dx = tgt.x - b.x, dz = tgt.z - b.z, dl = Math.hypot(dx, dz) || 1; b.yaw = Math.atan2(dx, dz);
@@ -4274,7 +4301,7 @@ function botTick(now) {
     } else { mx = Math.sin(now / 1500 + b.x); mz = Math.cos(now / 1700 + b.z); }
     const nx = b.x + mx * 5.2 * dt, nz = b.z + mz * 5.2 * dt, r = moveCollide(b.x, b.z, nx, nz, b.y || 0);
     b.mv = Math.hypot(r.x - b.x, r.z - b.z) > 0.05 ? 1 : 0; b.x = r.x; b.z = r.z; b.y = groundAt(b.x, b.z, b.y || 0);
-    pub('pos', [id, +b.x.toFixed(2), +b.z.toFixed(2), +b.yaw.toFixed(2), 0, b.w, b.mv, 1, +(b.y || 0).toFixed(2), 0]);
+    (H.botPos = H.botPos || []).push([id, +b.x.toFixed(2), +b.z.toFixed(2), +b.yaw.toFixed(2), 0, b.w, b.mv, 1, +(b.y || 0).toFixed(2), 0]);
     onPos([id, b.x, b.z, b.yaw, 0, b.w, b.mv, 1, b.y || 0, 0], true);
   }
 }
@@ -4286,7 +4313,7 @@ function battleTick() {
     for (const [id, p] of H.players) if (!p.alive && p.rsp && now >= p.rsp) { spawnPlayer(id, p); H.dirty = true; }
     for (const k of H.pickups) if (!k.a && now >= k.re) { const s = freePickupSpot(); Object.assign(k, { x: +s.x.toFixed(2), z: +s.z.toFixed(2), y: s.y || 0, a: true }); H.dirty = true; }
   }
-  botTick(now); mobTick(now);
+  botTick(now); if (H.botPos && H.botPos.length) { pub('pos', ['#b', ...H.botPos]); H.botPos.length = 0; } mobTick(now);
 }
 function battlePick(a, p) {
   if (H.state !== 'battle' || !p || !p.alive) return false;
@@ -4312,7 +4339,7 @@ const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const TOPIC = 'h-runner-th-v2/';
 const seen = new Map();
 const pick = str => str[(Math.random() * str.length) | 0];
-const pub = (dir, obj, retain = false) => { if (client && client.connected && roomCode) client.publish(TOPIC + roomCode + '/' + dir, JSON.stringify(obj), { qos: 0, retain }); };
+const pub = (dir, obj, retain = false, qos = 0) => { if (client && roomCode && (client.connected || qos)) client.publish(TOPIC + roomCode + '/' + dir, JSON.stringify(obj), { qos, retain }); };
 
 function setNet(ok, msg) {
   $('#netWarn').textContent = msg || '📡 การเชื่อมต่อหลุด กำลังเชื่อมใหม่…';
@@ -4349,13 +4376,14 @@ async function createRoom() {
   client.on('offline', () => setNet(false)); client.on('close', () => setNet(false));
   client.on('message', (topic, buf) => {
     let a; try { a = JSON.parse(buf.toString()); } catch { return; }
-    if (topic.endsWith('/pos')) { if (Array.isArray(a) && !String(a[0]).startsWith('bot-')) { onPos(a); seen.set(a[0], Date.now()); } return; }
+    if (topic.endsWith('/pos')) { if (Array.isArray(a) && a[0] !== '#b' && !String(a[0]).startsWith('bot-')) { onPos(a); seen.set(a[0], Date.now()); } return; }
     if (topic.endsWith('/fx')) { if (Array.isArray(a) && !String(a[0]).startsWith('bot-')) onFx(a); return; }
     if (!a || typeof a !== 'object' || typeof a.id !== 'string' || a.id === 'host' || a.id.startsWith('bot-')) return;
     seen.set(a.id, Date.now());
+    if (a.n != null) { let q = upSeen.get(a.id); if (!q) upSeen.set(a.id, q = []); if (q.includes(a.n)) return; q.push(a.n); if (q.length > 80) q.shift(); } // กันคำสั่งซ้ำจากการส่งซ้ำของ QoS1
     if (a.type === 'leave') return removePlayer(a.id);
     if (a.type === 'ping') { if (!H.players.has(a.id)) return; H.dirty = true; return; }
-    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'setTod', 'setMode', 'start', 'lobby'].includes(a.type)) return;
+    if (['addBot', 'removeBot', 'setDiff', 'setCat', 'setMap', 'setTod', 'setTeam', 'setMode', 'start', 'lobby'].includes(a.type)) return;
     handleAction(a);
   });
   // ลบคนที่หายไปนาน (ปิดเว็บไปแล้ว)
@@ -4391,7 +4419,7 @@ async function joinRoom() {
   status(`กำลังค้นหาห้อง ${code} …`);
   client.on('message', (topic, buf) => {
     let d; try { d = JSON.parse(buf.toString()); } catch { return; }
-    if (topic.endsWith('/pos')) { if (Array.isArray(d)) onPos(d); return; }
+    if (topic.endsWith('/pos')) { if (Array.isArray(d)) { if (d[0] === '#b') { for (let i = 1; i < d.length; i++) if (Array.isArray(d[i])) onPos(d[i]); } else onPos(d); } return; }
     if (topic.endsWith('/fx')) { if (Array.isArray(d)) onFx(d); return; }
     if (!d || typeof d !== 'object') return;
     if (d.closed) {
@@ -4420,9 +4448,10 @@ async function joinRoom() {
   tick(); joinTimer = setInterval(tick, 2500);
 }
 function stopJoin() { clearInterval(joinTimer); joinTimer = null; if (client) { try { client.end(true); } catch {} client = null; } setNet(true); }
+let upSeq = Math.floor(Math.random() * 1e9);
 function send(type, extra = {}) {
   if (isHost) handleAction({ id: myId, type, ...extra });
-  else pub('up', { id: myId, type, ...extra });
+  else pub('up', { id: myId, type, ...extra, n: ++upSeq }, false, 1); // QoS1: คำสั่งสำคัญ (ยิงโดน/เก็บของ/ตอบ) ต้องถึงโฮสต์แน่นอน
 }
 
 /* ======================================================================
@@ -4445,6 +4474,7 @@ $('#startBtn').onclick = () => send('start');
 $('#readyBtn').onclick = () => { const me = S && S.players.find(p => p.id === myId); if (me) send('ready', { ready: !me.ready }); };
 $('#addBot').onclick = () => send('addBot');
 $('#removeBot').onclick = () => send('removeBot');
+$('#teams').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setTeam', { team: +b.dataset.t }); };
 $('#tods').onclick = e => { const b = e.target.closest('.diff'); if (b && isHost) send('setTod', { tod: +b.dataset.t }); };
 $('#roomLooks').onclick = e => { const el = e.target.closest('.look'); if (!el) return; myLook = +el.dataset.i; localStorage.hrLook = myLook; Music.sfx('click'); send('join', { name: myName(), look: myLook, skin: mySkin }); };
 $('#roomSkins').onclick = e => { const el = e.target.closest('.skin'); if (!el) return; mySkin = pvSkin = +el.dataset.i; localStorage.hrSkin = mySkin; Music.sfx('click'); send('join', { name: myName(), look: myLook, skin: mySkin }); };
@@ -4587,6 +4617,7 @@ function render() {
     show('#quizOpts', !shootMode); show('#shootInfo', shootMode);
     if (shootMode) { const mi = (S.map | 0) || 1, im = $('#mapPrevImg'), src = `assets/map${mi}.jpg`; if (!im.src.endsWith(src)) im.src = src; $('#mapPrevCap').innerHTML = `<b>${MAPS[mi].name}</b><small>${MAPS[mi].sub || ''} · พื้นที่ 102×102 ม.</small>`; }
     if (shootMode) $('#maps').innerHTML = MAPS.map((m, i) => i === 0 ? '' : `<button class="diff${i === (S.map | 0) ? ' sel' : ''}" data-m="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${m.name}<small style="display:block;font-size:10px;opacity:.7">${m.sub || ''}</small></button>`).join('');
+    show('#teamBox', shootMode); if (shootMode) $('#teams').innerHTML = [['เดี่ยว', 'ทุกคนสู้กันเอง'], ['ทีม 4 v 4', 'ฟ้า vs แดง · แบ่งทีมอัตโนมัติ']].map((n, i) => `<button class="diff${i === (S.team | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${n[0]}<small style="display:block;font-size:10px;opacity:.75">${n[1]}</small></button>`).join('');
     $('#tods').innerHTML = TODS.map((n, i) => `<button class="diff${i === (S.tod | 0) ? ' sel' : ''}" data-t="${i}" ${isHost ? '' : 'disabled'} style="font-size:15px;padding:9px 0">${i ? '☾ ' : '☀ '}${n}</button>`).join('');
     $('#cats').innerHTML = CATS.map((c, i) => `<button class="diff${i === S.cat ? ' sel' : ''}" data-c="${i}" ${isHost ? '' : 'disabled'} style="font-size:16px;padding:10px 0">${c.name}</button>`).join('');
     $('#diffs').innerHTML = CATS[S.cat].levels.map((d, i) => `<button class="diff${i === S.diff ? ' sel' : ''}" data-d="${i}" ${isHost ? '' : 'disabled'}>${d.name}</button>`).join('');
@@ -4619,13 +4650,13 @@ function render() {
     $('#waitHost').textContent = isHost ? '' : 'รอเจ้าของห้องเริ่มรอบใหม่…';
   }
   if (st === 'finished' && S.final) {
-    { const rk = S.final.findIndex(p => p.id === myId) + 1, win = rk === 1, el = $('#winTitle');
+    { const rk = S.final.findIndex(p => p.id === myId) + 1, tk = S.team ? [0, 1].map(t => S.final.filter(p => p.tm === t).reduce((a, p) => a + (p.points || 0), 0)) : null, me0 = S.final.find(p => p.id === myId), win = tk && me0 && me0.tm != null ? tk[me0.tm] >= tk[1 - me0.tm] : rk === 1, el = $('#winTitle');
       el.classList.toggle('lose', !win && shootMode);
       el.innerHTML = (win ? 'VICTORY' : shootMode ? 'DEFEAT' : 'FINISH') + `<small>${rk ? 'อันดับ ' + rk + ' จาก ' + S.final.length : ''}</small>`;
       $('#againBtn').textContent = 'CONTINUE ›'; }
-    $('#finalDiff').textContent = shootMode ? `ยิงกันเอง · ${MAPS[S.map | 0].name}` : `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
+    $('#finalDiff').textContent = shootMode ? (S.team ? `ทีม 4v4 · ${MAPS[S.map | 0].name} · ทีมฟ้า ${S.final.filter(p => p.tm === 0).reduce((a, p) => a + (p.points || 0), 0)} : ${S.final.filter(p => p.tm === 1).reduce((a, p) => a + (p.points || 0), 0)} ทีมแดง` : `ยิงกันเอง · ${MAPS[S.map | 0].name}`) : `${CATS[S.cat].name} · ${LV(S.cat, S.diff).name}`;
     $('#podium').innerHTML = S.final.map((p, i) => `<div class="r ${p.id === myId ? 'me' : ''}"><span class="m">${medal(i)}</span>${ava(p.look)}
-      <div><div class="n">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">${shootMode ? `ยิงได้ ${p.points} · ยิงหัว ${p.hs || 0} · ถูกยิง ${p.deaths || 0}` : `ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}`}</div></div>
+      <div><div class="n">${S.team && p.tm != null ? `<i style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:${TEAM.col[p.tm]}"></i>` : ''}${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</div><div class="d">${shootMode ? `ยิงได้ ${p.points} · ยิงหัว ${p.hs || 0} · ถูกยิง ${p.deaths || 0}` : `ตอบถูก ${p.correct}/${S.round} ข้อ${p.correct ? ` · เฉลี่ย ${(p.ctime / p.correct / 1000).toFixed(2)} วิ` : ''}${p.points >= GOAL ? ' · ถึงเส้นชัย' : ''}`}</div></div>
       <span class="p">${p.points} ${shootMode ? `KILLS<small style="display:block;font-size:12px;color:#ff6b5a">${p.hs || 0} HEADSHOT</small>` : 'คะแนน'}</span></div>`).join('');
   }
 }
@@ -5342,6 +5373,7 @@ const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 const battleOn = () => !!(S && S.mode === 'shoot' && (S.state === 'battle' || S.state === 'countdown') && S.players.some(p => p.id === myId));
 const GRAV = 22, JUMP_V = 8.2;
 function onPos(a) {
+  if (a[0] === '#b') { if (!isHost) for (let i = 1; i < a.length; i++) if (Array.isArray(a[i])) onPos(a[i]); return; }
   const id = a[0]; if (id === myId) return;
   let r = remotes.get(id); if (!r) { r = { rx: +a[1], rz: +a[2], ry: +a[8] || 0, ryaw: +a[3] }; remotes.set(id, r); }
   Object.assign(r, { x: +a[1], z: +a[2], yaw: +a[3], pitch: +a[4] || 0, w: a[5] | 0, mv: a[6] | 0, y: +a[8] || 0, cr: a[9] | 0, st: a[10] | 0, mech: a[11] | 0, t: performance.now() });
@@ -5774,7 +5806,7 @@ function fireShot() {
   if (hb.t < el - 0.25) { end = eye.clone().addScaledVector(ed, hb.t); h = { kind: 'wall' }; hs = false; }
   if (h.kind === 'player') {
     const tp = remotes.get(h.id), dist = tp ? Math.hypot(tp.rx - me.x, tp.rz - me.z) : 99, dmg = dmgAt(me.w, dist) * (hs ? 2 : 1);
-    if (dmg > 0) { send('hit', { target: h.id, dmg, w: me.w, hs }); me.hitFlash = 1; $('#hitMark').classList.toggle('hs', hs); Music.sfx(hs ? 'hshit' : 'hit'); }
+    if (sameTeam(h.id)) { /* เพื่อนร่วมทีม: ไม่นับดาเมจ */ } else if (dmg > 0) { send('hit', { target: h.id, dmg, w: me.w, hs }); me.hitFlash = 1; $('#hitMark').classList.toggle('hs', hs); Music.sfx(hs ? 'hshit' : 'hit'); }
   }
   if (h.kind === 'mob') { const m = MOB.list[h.i], dmg = m ? dmgAt(me.w, Math.hypot(m.rx - me.x, m.rz - me.z)) * (h.hs ? 2 : 1) : 0; if (dmg > 0) { send('mhit', { i: h.i, dmg, w: me.w }); me.hitFlash = 1; $('#hitMark').classList.toggle('hs', !!h.hs); Music.sfx(h.hs ? 'hshit' : 'hit'); } }
   tracer(muzzle, end, me.w);
@@ -5826,7 +5858,7 @@ function shooterFrame(dt, t) {
   me.rx = me.x; me.rz = me.z;
   if (firing && alive && battle) { if (WEAPONS[me.w].auto || !me.pressFired) { if (fireShot()) me.pressFired = true; } }
   if (alive && battle && S.pickups && performance.now() > me.pickT) for (const k of S.pickups) if (k.a && Math.hypot(k.x - me.x, k.z - me.z) < 1.7 && Math.abs(me.y - (k.y || 0)) < 1.4) { send('pick', { pid: k.id }); me.pickT = performance.now() + 700; break; }
-  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; pub('pos', [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr, myStance(), MECH.on ? (MECH.fly ? 2 : 1) : 0]); }
+  if (performance.now() > me.pubT) { me.pubT = performance.now() + 100; const pm = [myId, +me.x.toFixed(2), +me.z.toFixed(2), +me.yaw.toFixed(3), +me.pitch.toFixed(2), me.w, me.mv, alive ? 1 : 0, +me.y.toFixed(2), me.cr, myStance(), MECH.on ? (MECH.fly ? 2 : 1) : 0], pk = pm.join(); if (pk !== me.pubK || performance.now() > (me.pubF || 0)) { me.pubK = pk; me.pubF = performance.now() + 400; pub('pos', pm); } }
   // ตัวละคร
   const scoped = me.w === 2 && me.aimK > 0.6;
   for (const [id, r] of runners) {
@@ -5843,6 +5875,7 @@ function shooterFrame(dt, t) {
     poseBuffs(r, pl, pl.alive !== false);
     poseShooter(r, src.mv, pl.alive !== false, id === myId ? me.pitch : src.pitch || 0, id === myId ? me.w : src.w || 0, dt, id === myId ? me.cr : src.cr, air, pl.armor || 0, id === myId ? myStance() : (performance.now() - (src.fireT || 0) < 1600 ? 1 : src.st | 0));
     r.speed = src.mv && !air ? 7 : 0; updateAura(r, dt);
+    try { teamAura(r, pl); } catch {}
     mechPose(id, r, src, pl, yy, dt, air);
   }
   tickPickups(t);
@@ -6070,7 +6103,9 @@ function renderBattleHud() {
   }
   { const P = S.players.find(p => p.id === myId); if (document.body && document.body.classList) document.body.classList.toggle('im-dead', !!P && P.alive === false && S.state === 'battle'); }
   const sorted = [...S.players].sort((a, b) => (b.kills - a.kills) || (a.deaths - b.deaths));
-  $('#bScore').innerHTML = `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>HS</span><span>D</span></li>` + sorted.map(p => `<li class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span class="hsc">${p.hs || 0}</span><span>${p.deaths}</span></li>`).join('');
+  let tmHd = ''; if (S.team) { const k = [0, 1].map(t => S.players.filter(p => p.tm === t).reduce((a, p) => a + (p.kills || 0), 0)), mt = myTeam(); tmHd = `<li class="tmhd"><b style="color:${TEAM.col[0]}">ทีมฟ้า ${k[0]}</b><i>:</i><b style="color:${TEAM.col[1]}">${k[1]} ทีมแดง</b></li>`;
+    if (mt != null && TEAM.told !== S.endsAt && S.state === 'battle') { TEAM.told = S.endsAt; toast(`คุณอยู่ทีม${TEAM.name[mt]} · ยิงเพื่อนร่วมทีมไม่ได้`); } }
+  $('#bScore').innerHTML = tmHd + `<li class="hd"><span></span><span>ผู้เล่น</span><span>K</span><span>HS</span><span>D</span></li>` + sorted.map(p => `<li ${S.team && p.tm != null ? `style="box-shadow:inset 4px 0 ${TEAM.col[p.tm]}"` : ''} class="${p.id === myId ? 'me' : ''}${p.alive === false ? ' dead' : ''}"><span>${ava(p.look)}</span><span>${esc(p.name)}</span><span>${p.kills}</span><span class="hsc">${p.hs || 0}</span><span>${p.deaths}</span></li>`).join('');
   const now = hostNow();
   $('#killFeed').innerHTML = (S.feed || []).filter(f => now - f.t < 7000).map(f => `<div class="${f.hs ? 'hs' : ''}"><b>${esc(f.k)}</b> <span>${WEAPONS[f.w] ? WEAPONS[f.w].name : ''}${f.hs ? ' · ⌖ HEADSHOT' : ''}</span> <i>${esc(f.v)}</i></div>`).join('');
   syncPickups(S.pickups);
