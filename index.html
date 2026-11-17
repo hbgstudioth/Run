@@ -1546,7 +1546,7 @@ function buildSciFi() {
     const bm = new THREE.MeshStandardMaterial({ color: '#4a3220', roughness: 0.8, metalness: 0.3 }), fm = new THREE.MeshBasicMaterial({ color: '#ff8a2a', transparent: true, opacity: 0.9 }), fm2 = new THREE.MeshBasicMaterial({ color: '#ffd76a' }); A.fires = [];
     for (const [x, z] of [[-13, -4], [13.5, -6], [-9, -17], [10, -19], [-22, -26], [24, -24]]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.4, 1.1, 14), bm); b.position.set(x, 0.55, z); b.castShadow = true; g.add(b);
       const f = new THREE.Mesh(new THREE.ConeGeometry(0.36, 1.2, 8), fm); f.position.set(x, 1.6, z); g.add(f); const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.7, 8), fm2); f2.position.set(x, 1.4, z); g.add(f2); A.fires.push(f, f2);
-      const L = new THREE.PointLight('#ff7a2a', 14, 16, 2); L.position.set(x, 2, z); g.add(L); A.fires.push(L); } }
+ } }
   // เวที
   const dark = new THREE.MeshStandardMaterial({ color: '#141a17', metalness: 0.85, roughness: 0.28 }), neonG = em('#39ff14', 2.2), neonC = em('#7fe9ff', 1.6), silver = new THREE.MeshStandardMaterial({ color: '#c0c0c0', metalness: 0.95, roughness: 0.2 });
   const plat = new THREE.Mesh(new THREE.CylinderGeometry(9.5, 10, 0.3, 64), dark); plat.position.y = -0.15; plat.receiveShadow = true; g.add(plat);
